@@ -1,3 +1,9 @@
+// Product Data
+// Note: Currently using Unsplash images for demo. 
+// To use local images:
+// 1. Upload images to /public/images/products/
+// 2. Update the 'images' array for each product to use local paths, e.g., "/images/products/my-shoe-1.jpg"
+
 export type Product = {
     id: string;
     slug: string;

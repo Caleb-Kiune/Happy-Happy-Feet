@@ -4,6 +4,13 @@ import Container from "@/components/Container";
 import ShoeCard from "@/components/ShoeCard";
 import { getFeaturedProducts } from "@/lib/products";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Happy Happy Feet – Comfortable & Stylish Women's Shoes",
+  description: "Step into comfort and style. A curated collection of women's shoes crafted for joy, designed for you.",
+};
+
 export default function Home() {
   const featuredProducts = getFeaturedProducts();
 

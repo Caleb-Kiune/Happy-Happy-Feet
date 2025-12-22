@@ -8,14 +8,15 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet";
-import { Menu, X, Phone } from "lucide-react";
+import { Menu, Phone } from "lucide-react";
 
-// Placeholder WhatsApp link
-const WHATSAPP_LINK = "https://wa.me/1234567890";
+// Real WhatsApp link
+const WHATSAPP_LINK = "https://wa.me/254736315506";
 
 const NAV_LINKS = [
     { name: "Home", href: "/" },
     { name: "Shop", href: "/shop" },
+    { name: "Size Guide", href: "/size-guide" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
 ];

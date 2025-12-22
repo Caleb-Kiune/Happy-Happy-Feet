@@ -11,8 +11,14 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Happy Happy Feet",
-  description: "Minimalist women's shoe catalog.",
+  title: {
+    template: "%s | Happy Happy Feet",
+    default: "Happy Happy Feet – Comfortable & Stylish Women's Shoes",
+  },
+  description: "Discover our curated collection of women's shoes designed for joy and comfort. Heels, sandals, sneakers, and flats for every occasion.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

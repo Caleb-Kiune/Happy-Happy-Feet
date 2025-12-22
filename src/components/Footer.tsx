@@ -3,7 +3,7 @@ import Container from "@/components/Container";
 import { Phone } from "lucide-react";
 
 // Placeholder WhatsApp link
-const WHATSAPP_LINK = "https://wa.me/1234567890";
+const WHATSAPP_LINK = "https://wa.me/254736315506";
 
 export default function Footer() {
     return (
@@ -30,7 +30,7 @@ export default function Footer() {
                     </a>
 
                     <p className="text-xs text-gray-400 mt-4 text-center">
-                        Copyright © {new Date().getFullYear()} Happy Happy Feet • All rights reserved
+                        Copyright © 2025 Happy Happy Feet • All rights reserved
                     </p>
                 </div>
             </Container>

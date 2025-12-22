@@ -58,8 +58,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                                 key={idx}
                                 onClick={() => setActiveImage(img)}
                                 className={`relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-sm border-2 transition-all ${activeImage === img
-                                        ? "border-accent-500 opacity-100"
-                                        : "border-transparent opacity-70 hover:opacity-100"
+                                    ? "border-accent-500 opacity-100"
+                                    : "border-transparent opacity-70 hover:opacity-100"
                                     }`}
                             >
                                 <Image
@@ -101,8 +101,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                                     key={size}
                                     onClick={() => setSelectedSize(size)}
                                     className={`flex h-12 w-12 items-center justify-center rounded-md border text-sm font-medium transition-all ${selectedSize === size
-                                            ? "border-accent-500 bg-accent-500 text-white"
-                                            : "border-gray-200 bg-white text-gray-900 hover:border-accent-500 hover:text-accent-500"
+                                        ? "border-accent-500 bg-accent-500 text-white"
+                                        : "border-gray-200 bg-white text-gray-900 hover:border-accent-500 hover:text-accent-500"
                                         }`}
                                 >
                                     {size}
@@ -122,8 +122,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                     <Button
                         asChild
                         className={`w-full rounded-full py-6 text-lg font-semibold transition-all ${!selectedSize && sizes.length > 0
-                                ? "opacity-50 cursor-not-allowed bg-gray-300 hover:bg-gray-300 text-gray-500"
-                                : "bg-success hover:bg-success/90 text-white shadow-sm hover:shadow-md"
+                            ? "opacity-50 cursor-not-allowed bg-gray-300 hover:bg-gray-300 text-gray-500"
+                            : "bg-success hover:bg-success/90 text-white shadow-sm hover:shadow-md"
                             }`}
                     >
                         <a

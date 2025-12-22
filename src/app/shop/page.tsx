@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 
 const CATEGORIES = ["All", "Heels", "Sandals", "Sneakers", "Flats"];
 
+// Skipping metadata export in client component
 export default function ShopPage() {
     const [activeCategory, setActiveCategory] = useState("All");
 
@@ -40,8 +41,8 @@ export default function ShopPage() {
                             variant={activeCategory === category ? "default" : "outline"}
                             onClick={() => setActiveCategory(category)}
                             className={`min-w-[80px] rounded-full px-6 transition-all ${activeCategory === category
-                                    ? "bg-accent-500 hover:bg-accent-600 text-white border-transparent"
-                                    : "border-gray-200 text-gray-600 hover:border-accent-500 hover:text-accent-500"
+                                ? "bg-accent-500 hover:bg-accent-600 text-white border-transparent"
+                                : "border-gray-200 text-gray-600 hover:border-accent-500 hover:text-accent-500"
                                 }`}
                         >
                             {category}
