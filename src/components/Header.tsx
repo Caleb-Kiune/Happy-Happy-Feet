@@ -68,7 +68,7 @@ export default function Header() {
                                     <Menu className="h-6 w-6 text-gray-900" />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white p-8">
+                            <SheetContent side="right" className="w-full max-w-sm border-l border-gray-200 bg-white p-8 transition-all duration-500 ease-out sm:max-w-[400px]">
                                 <SheetHeader>
                                     <SheetTitle className="text-left font-sans text-xl font-bold tracking-tight text-gray-900">
                                         Happy <span className="text-accent-500">Happy</span> Feet
