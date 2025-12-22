@@ -3,7 +3,7 @@ import Container from "@/components/Container";
 import { Phone } from "lucide-react";
 
 // Placeholder WhatsApp link
-const WHATSAPP_LINK = "https://wa.me/254736315506";
+const WHATSAPP_LINK = "https://wa.me/254705774171";
 
 export default function Footer() {
     return (

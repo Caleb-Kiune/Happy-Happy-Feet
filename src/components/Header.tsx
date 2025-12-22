@@ -11,7 +11,7 @@ import {
 import { Menu, Phone } from "lucide-react";
 
 // Real WhatsApp link
-const WHATSAPP_LINK = "https://wa.me/254736315506";
+const WHATSAPP_LINK = "https://wa.me/254705774171";
 
 const NAV_LINKS = [
     { name: "Home", href: "/" },

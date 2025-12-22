@@ -10,7 +10,7 @@ type ProductDetailProps = {
     product: Product;
 };
 
-const PHONE_NUMBER = "254736315506";
+const PHONE_NUMBER = "254705774171";
 
 export default function ProductDetail({ product }: ProductDetailProps) {
     const [activeImage, setActiveImage] = useState(product.images[0]);

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     description: "Contact us for orders, inquiries, or assistance. We're here to help you find your perfect pair.",
 };
 
-const PHONE_NUMBER = "254736315506";
+const PHONE_NUMBER = "254705774171";
 const EMAIL = "hello@happyhappyfeet.com"; // Placeholder email
 
 export default function ContactPage() {
