@@ -72,7 +72,7 @@ export const products: Product[] = [
         price: 2999,
         category: "sandals",
         images: [
-            `https://images.unsplash.com/photo-1560343090-f0409e92791a${OPTIMIZE}`,
+            `https://images.unsplash.com/photo-1728973702902-9cd4c75eebdb?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8U3VtbWVyJTIwU3RyYXBweSUyMFNhbmRhbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
             `https://images.unsplash.com/photo-1545624795-c1e1946dc6cf${OPTIMIZE}`
         ],
         sizes: ["36", "37", "38", "39", "40", "41", "42"],
@@ -86,7 +86,7 @@ export const products: Product[] = [
         price: 3499,
         category: "sandals",
         images: [
-            `https://images.unsplash.com/photo-1621255567362-e9c8f2f65b12${OPTIMIZE}`,
+            `https://images.unsplash.com/photo-1568347619798-2008f2ce5b94?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8VGFuJTIwTGVhdGhlciUyMFNhbmRhbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
             `https://images.unsplash.com/photo-1615525546687-3531cb482813${OPTIMIZE}`
         ],
         sizes: ["37", "38", "39", "40", "41"],
@@ -130,7 +130,7 @@ export const products: Product[] = [
         price: 4999,
         category: "sneakers",
         images: [
-            `https://images.unsplash.com/photo-1555529733-UE16a80226c3${OPTIMIZE}`,
+            `https://images.unsplash.com/photo-1572293276811-1f27592be0a8?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Qmx1c2glMjBQaW5rJTIwVHJhaW5lcnN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
             `https://images.unsplash.com/photo-1521093470119-a3acdc43374a${OPTIMIZE}`
         ],
         sizes: ["36", "37", "38", "39", "40"],
@@ -184,7 +184,7 @@ export const products: Product[] = [
         price: 3499,
         category: "flats",
         images: [
-            `https://images.unsplash.com/photo-1582142203794-b148007a9761${OPTIMIZE}`
+            `https://images.unsplash.com/photo-1608629601270-a0007becead3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fENoaWMlMjBTdWVkZSUyME11bGVzJTIwc2hvZXN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`
         ],
         sizes: ["36", "37", "38", "39", "40"],
         description: "Slide into style. These Suede Mules offer an effortless chic look that works with everything.",
