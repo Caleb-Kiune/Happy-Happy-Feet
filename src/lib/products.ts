@@ -28,9 +28,9 @@ export const products: Product[] = [
         price: 4999,
         category: "heels",
         images: [
-            `https://images.unsplash.com/photo-1543163521-1bf539c55dd2${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1543163521-1bf539c55dd2${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1543163521-1bf539c55dd2${OPTIMIZE}`
+            `https://images.unsplash.com/photo-1584473457417-bd0afe798ae1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGNsYXNzaWMlMjBibGFjayUyMHB1bXBzJTIwaGVlbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
+            `https://images.unsplash.com/photo-1584473457417-bd0afe798ae1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGNsYXNzaWMlMjBibGFjayUyMHB1bXBzJTIwaGVlbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
+            `https://images.unsplash.com/photo-1584473457417-bd0afe798ae1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGNsYXNzaWMlMjBibGFjayUyMHB1bXBzJTIwaGVlbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`
         ],
         sizes: ["36", "37", "38", "39", "40", "41"],
         featured: true,
@@ -43,9 +43,9 @@ export const products: Product[] = [
         price: 5499,
         category: "heels",
         images: [
-            `https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1605763240004-741a4a4d651d${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1596704017254-9b121068fb31${OPTIMIZE}`
+            `https://images.unsplash.com/photo-1543163521-1bf539c55dd2${OPTIMIZE}`,
+            `https://images.unsplash.com/photo-1543163521-1bf539c55dd2${OPTIMIZE}`,
+            `https://images.unsplash.com/photo-1543163521-1bf539c55dd2${OPTIMIZE}`
         ],
         sizes: ["36", "37", "38", "39", "40"],
         description: "Versatile and chic, these Nude Block Heels are your go-to for both office days and weekend brunches. The sturdy block heel ensures stability.",
@@ -57,8 +57,8 @@ export const products: Product[] = [
         price: 6999,
         category: "heels",
         images: [
-            `https://images.unsplash.com/photo-1566174053879-31528523f8ae${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1549298916-b41d501d3772${OPTIMIZE}`
+            `https://images.unsplash.com/photo-1542185185-47838d6b00c9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fFN0YXRlbWVudCUyMFJlZCUyMFN0aWxldHRvc3xlbnwwfHwwfHx8Mg%3D%3D${OPTIMIZE}`,
+            `https://images.unsplash.com/photo-1542185185-47838d6b00c9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fFN0YXRlbWVudCUyMFJlZCUyMFN0aWxldHRvc3xlbnwwfHwwfHx8Mg%3D%3D${OPTIMIZE}`
         ],
         sizes: ["37", "38", "39", "40"],
         description: "Make a bold entrance with our Statement Red Stilettos. Crafted from premium materials designed to turn heads.",
@@ -73,7 +73,7 @@ export const products: Product[] = [
         category: "sandals",
         images: [
             `https://images.unsplash.com/photo-1728973702902-9cd4c75eebdb?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8U3VtbWVyJTIwU3RyYXBweSUyMFNhbmRhbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1545624795-c1e1946dc6cf${OPTIMIZE}`
+            `https://images.unsplash.com/photo-1728973702902-9cd4c75eebdb?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8U3VtbWVyJTIwU3RyYXBweSUyMFNhbmRhbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`
         ],
         sizes: ["36", "37", "38", "39", "40", "41", "42"],
         featured: true,
@@ -87,7 +87,7 @@ export const products: Product[] = [
         category: "sandals",
         images: [
             `https://images.unsplash.com/photo-1568347619798-2008f2ce5b94?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8VGFuJTIwTGVhdGhlciUyMFNhbmRhbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1615525546687-3531cb482813${OPTIMIZE}`
+            `https://images.unsplash.com/photo-1568347619798-2008f2ce5b94?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8VGFuJTIwTGVhdGhlciUyMFNhbmRhbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`
         ],
         sizes: ["37", "38", "39", "40", "41"],
         description: "Minimalist luxury. Our Tan Leather Slides feature soft, genuine leather that molds to your feet.",
@@ -99,9 +99,9 @@ export const products: Product[] = [
         price: 3999,
         category: "sandals",
         images: [
-            `https://images.unsplash.com/photo-1535043934128-cf0b28d52f95${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1595341888016-a392ef81b7de${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1562273138-f46be4ebdf6c${OPTIMIZE}`
+            `https://images.unsplash.com/photo-1702413094780-4bfd4b0d873c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fFdoaXRlJTIwUGxhdGZvcm0lMjBTYW5kYWxzfGVufDB8fDB8fHwy${OPTIMIZE}`,
+            `https://images.unsplash.com/photo-1702413094780-4bfd4b0d873c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fFdoaXRlJTIwUGxhdGZvcm0lMjBTYW5kYWxzfGVufDB8fDB8fHwy${OPTIMIZE}`,
+            `https://images.unsplash.com/photo-1702413094780-4bfd4b0d873c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fFdoaXRlJTIwUGxhdGZvcm0lMjBTYW5kYWxzfGVufDB8fDB8fHwy${OPTIMIZE}`
         ],
         sizes: ["36", "37", "38", "39"],
         description: "Elevate your look literally and figuratively with these trendy White Platform Sandals. Comfortable height for everyday wear.",
@@ -131,7 +131,8 @@ export const products: Product[] = [
         category: "sneakers",
         images: [
             `https://images.unsplash.com/photo-1572293276811-1f27592be0a8?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Qmx1c2glMjBQaW5rJTIwVHJhaW5lcnN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1521093470119-a3acdc43374a${OPTIMIZE}`
+            `https://images.unsplash.com/photo-1521093470119-a3acdc43374a${OPTIMIZE}`,
+            `https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2${OPTIMIZE}`
         ],
         sizes: ["36", "37", "38", "39", "40"],
         description: "Add a soft touch of color to your sporty look with our functional yet fashionable Blush Pink Trainers.",
@@ -158,7 +159,7 @@ export const products: Product[] = [
         category: "flats",
         images: [
             `https://images.unsplash.com/photo-1560343090-f0409e92791a${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1535639684361-88c46387532a${OPTIMIZE}`
+            `https://images.unsplash.com/photo-1560343090-f0409e92791a${OPTIMIZE}`
         ],
         sizes: ["36", "37", "38", "39", "40", "41"],
         featured: true,
@@ -172,7 +173,7 @@ export const products: Product[] = [
         category: "flats",
         images: [
             `https://images.unsplash.com/photo-1511556820780-d912e42b4980${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1624638763788-107315570220${OPTIMIZE}`
+            `https://images.unsplash.com/photo-1511556820780-d912e42b4980${OPTIMIZE}`
         ],
         sizes: ["37", "38", "39", "40"],
         description: "Professional polish without the heel. Sharp, structured, and perfect for the 9-to-5.",
