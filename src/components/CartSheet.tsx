@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { toast } from "sonner";
 
 export default function CartSheet() {
     const { state, dispatch, totalItems, totalPrice } = useCart();
@@ -25,16 +26,22 @@ export default function CartSheet() {
             type: "UPDATE_QUANTITY",
             payload: { id, quantity: newQuantity },
         });
+        // Optional: toast("Quantity updated", {  position: "bottom-center" }); 
+        // Commented out to prevent toast spamming while clicking + rapidly
     };
 
     const handleRemoveItem = (id: string) => {
         dispatch({ type: "REMOVE_ITEM", payload: { id } });
+        toast("Item removed", {
+            description: "The item has been removed from your cart.",
+            action: {
+                label: "Undo",
+                onClick: () => console.log("Undo not implemented yet for simplicity"),
+            },
+        });
     };
 
     const handleCheckout = () => {
-        // Close the sheet automatically handles by navigation usually, 
-        // but explicit SheetClose wrapping buttons is the shadcn way.
-        // For imperative navigation, we rely on the link behavior or SheetClose asChild.
         router.push("/checkout");
     };
 

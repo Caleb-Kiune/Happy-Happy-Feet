@@ -7,6 +7,7 @@ import Container from "@/components/Container";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import { Phone, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function CheckoutPage() {
     const { state, dispatch, totalPrice, totalItems } = useCart();
@@ -43,7 +44,9 @@ export default function CheckoutPage() {
 
         // Basic validation
         if (!formData.name || !formData.phone || !formData.location) {
-            alert("Please fill in all required fields.");
+            toast.error("Missing information", {
+                description: "Please fill in all required fields marked with *",
+            });
             return;
         }
 
@@ -84,6 +87,9 @@ Please confirm availability and delivery fee. Thank you!`;
         // Clear Cart and Show Success
         dispatch({ type: "CLEAR_CART" });
         setIsSuccess(true);
+        toast.success("Order Drafted!", {
+            description: "Please hit send in WhatsApp to complete your order.",
+        });
     };
 
     if (!isMounted) return null;

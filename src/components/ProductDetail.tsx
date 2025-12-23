@@ -6,6 +6,7 @@ import { Product } from "@/lib/products";
 import { Button } from "@/components/ui/button";
 import { Phone, Check, Plus, Minus, ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { toast } from "sonner";
 
 type ProductDetailProps = {
     product: Product;
@@ -28,7 +29,9 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
     const handleAddToCart = () => {
         if (!selectedSize && sizes.length > 0) {
-            alert("Please select a size first!");
+            toast.error("Size required", {
+                description: "Please select a size before adding to cart.",
+            });
             return;
         }
 
@@ -47,14 +50,18 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             }
         });
 
-        alert("Added to cart!");
+        toast.success("Added to cart! 🛍️", {
+            description: "Your shoes are waiting in the cart.",
+        });
         setQuantity(1);
     };
 
     const handleWhatsAppClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         if (!selectedSize && sizes.length > 0) {
             e.preventDefault();
-            alert("Please select a size first!");
+            toast.error("Size required", {
+                description: "Please select a size before ordering.",
+            });
             return;
         }
     };
