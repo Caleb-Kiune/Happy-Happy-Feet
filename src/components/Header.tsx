@@ -1,6 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import Container from "@/components/Container";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useCart } from "@/context/CartContext";
 import {
     Sheet,
     SheetContent,
@@ -8,7 +12,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet";
-import { Menu, Phone } from "lucide-react";
+import { Menu, Phone, ShoppingBag } from "lucide-react";
 
 // Real WhatsApp link
 const WHATSAPP_LINK = "https://wa.me/254705774171";
@@ -22,6 +26,8 @@ const NAV_LINKS = [
 ];
 
 export default function Header() {
+    const { totalItems } = useCart();
+
     return (
         <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all">
             <Container>
@@ -47,6 +53,16 @@ export default function Header() {
                                 {link.name}
                             </Link>
                         ))}
+
+                        {/* Cart Button (Desktop) */}
+                        <Button variant="ghost" size="icon" className="relative">
+                            <ShoppingBag className="h-6 w-6" />
+                            {totalItems > 0 && (
+                                <Badge variant="secondary" className="absolute -top-1 -right-1 px-1.5 py-0.5 text-xs">
+                                    {totalItems}
+                                </Badge>
+                            )}
+                        </Button>
 
                         {/* WhatsApp Button (Desktop) */}
                         <a
@@ -84,6 +100,25 @@ export default function Header() {
                                             {link.name}
                                         </Link>
                                     ))}
+
+                                    {/* Cart Button (Mobile) */}
+                                    <div className="flex items-center justify-start">
+                                        <Button variant="ghost" size="icon" className="relative ml-0 pl-0 hover:bg-transparent">
+                                            <div className="flex items-center gap-4">
+                                                <div className="relative">
+                                                    <ShoppingBag className="h-6 w-6" />
+                                                    {totalItems > 0 && (
+                                                        <Badge variant="secondary" className="absolute -top-1 -right-1 px-1.5 py-0.5 text-xs">
+                                                            {totalItems}
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                                <span className="text-xl font-medium text-gray-900">Cart</span>
+                                            </div>
+                                        </Button>
+                                    </div>
+
+
                                     <a
                                         href={WHATSAPP_LINK}
                                         target="_blank"
@@ -102,3 +137,4 @@ export default function Header() {
         </header>
     );
 }
+
