@@ -4,7 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { Product } from "@/lib/products";
 import { Button } from "@/components/ui/button";
-import { Phone, Check } from "lucide-react";
+import { Phone, Check, Plus, Minus, ShoppingBag } from "lucide-react";
+import { useCart } from "@/context/CartContext";
 
 type ProductDetailProps = {
     product: Product;
@@ -13,11 +14,42 @@ type ProductDetailProps = {
 const PHONE_NUMBER = "254705774171";
 
 export default function ProductDetail({ product }: ProductDetailProps) {
+    const { dispatch } = useCart();
     const [activeImage, setActiveImage] = useState(product.images[0]);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
+    const [quantity, setQuantity] = useState(1);
 
     // Fallback if product has no sizes defined
     const sizes = product.sizes || [];
+
+    const handleQuantityChange = (delta: number) => {
+        setQuantity((prev) => Math.max(1, prev + delta));
+    };
+
+    const handleAddToCart = () => {
+        if (!selectedSize && sizes.length > 0) {
+            alert("Please select a size first!");
+            return;
+        }
+
+        const sizeToUse = selectedSize || "One Size";
+
+        dispatch({
+            type: "ADD_ITEM",
+            payload: {
+                id: `${product.id}-${sizeToUse}`,
+                slug: product.slug,
+                name: product.name,
+                price: product.price,
+                image: product.images[0],
+                size: sizeToUse,
+                quantity: quantity
+            }
+        });
+
+        alert("Added to cart!");
+        setQuantity(1);
+    };
 
     const handleWhatsAppClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         if (!selectedSize && sizes.length > 0) {
@@ -117,14 +149,49 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                     </div>
                 )}
 
-                {/* Action Button */}
-                <div className="mt-10">
+                {/* Quantity Selector */}
+                <div className="mt-8">
+                    <h3 className="text-sm font-medium text-gray-900">Quantity</h3>
+                    <div className="mt-3 flex items-center">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleQuantityChange(-1)}
+                            disabled={quantity <= 1}
+                            className="h-10 w-10"
+                        >
+                            <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="mx-4 text-lg font-medium min-w-[20px] text-center">
+                            {quantity}
+                        </span>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleQuantityChange(1)}
+                            className="h-10 w-10"
+                        >
+                            <Plus className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="mt-10 flex flex-col gap-4">
+                    {/* Add to Cart */}
+                    <Button
+                        onClick={handleAddToCart}
+                        className="w-full rounded-full py-6 text-lg font-semibold bg-gray-900 hover:bg-gray-800 text-white shadow-sm hover:shadow-md transition-all"
+                    >
+                        <ShoppingBag className="mr-2 h-5 w-5" />
+                        Add to Cart
+                    </Button>
+
+                    {/* WhatsApp */}
                     <Button
                         asChild
-                        className={`w-full rounded-full py-6 text-lg font-semibold transition-all ${!selectedSize && sizes.length > 0
-                            ? "opacity-50 cursor-not-allowed bg-gray-300 hover:bg-gray-300 text-gray-500"
-                            : "bg-success hover:bg-success/90 text-white shadow-sm hover:shadow-md"
-                            }`}
+                        variant="outline"
+                        className="w-full rounded-full py-6 text-lg font-semibold border-success text-success hover:bg-success/5 hover:text-success transition-all"
                     >
                         <a
                             href={whatsappUrl}
@@ -137,7 +204,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                             {selectedSize ? "Order on WhatsApp" : "Select Size to Order"}
                         </a>
                     </Button>
-                    <p className="mt-4 text-center text-xs text-gray-400">
+
+                    <p className="mt-2 text-center text-xs text-gray-400">
                         Secure checkout via WhatsApp. We'll confirm availability instantly.
                     </p>
                 </div>
