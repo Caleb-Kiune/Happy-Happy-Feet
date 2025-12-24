@@ -6,7 +6,12 @@ import ShoeCard from "@/components/ShoeCard";
 import { products, Product } from "@/lib/products";
 import { Button } from "@/components/ui/button";
 
-const CATEGORIES = ["All", "Heels", "Sandals", "Sneakers", "Flats"];
+// Helper to capitalize first letter
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
+// Derive unique categories from products
+const uniqueCategories = Array.from(new Set(products.map((p) => p.category)));
+const CATEGORIES = ["All", ...uniqueCategories.map(capitalize)];
 
 // Skipping metadata export in client component
 export default function ShopPage() {
