@@ -12,7 +12,7 @@ export type Product = {
     slug: string;
     name: string;
     price: number; // in Kenyan Shillings (or lowest unit)
-    category: "heels" | "sandals" | "sneakers" | "flats";
+    category: "heels" | "sandals" | "sneakers" | "flats" | "boots";
     images: string[];
     sizes: string[];
     description?: string;
@@ -189,6 +189,18 @@ export const products: Product[] = [
         ],
         sizes: ["36", "37", "38", "39", "40"],
         description: "Slide into style. These Suede Mules offer an effortless chic look that works with everything.",
+    },
+    {
+        id: "f4",
+        slug: "suede-boots",
+        name: "Brown Suede Boots",
+        price: 3499,
+        category: "boots",
+        images: [
+            `https://images.unsplash.com/photo-1608629601270-a0007becead3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fENoaWMlMjBTdWVkZSUyME11bGVzJTIwc2hvZXN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`
+        ],
+        sizes: ["36", "37", "38", "39", "40"],
+        description: "Slide into style. These Suede Boots offer an effortless chic look that works with everything.",
     }
 ];
 
