@@ -154,7 +154,59 @@ function ShopContent() {
         });
     }, [filteredProducts, sortBy]);
 
-    // Pagination Logic
+    // Derived Active Filters
+    const activeFilters = useMemo(() => {
+        const filters = [];
+
+        if (activeCategory !== "All") {
+            filters.push({
+                id: "category",
+                label: activeCategory,
+                onRemove: () => setActiveCategory("All"),
+            });
+        }
+
+        if (searchQuery) {
+            filters.push({
+                id: "search",
+                label: `Search: "${searchQuery}"`,
+                onRemove: () => {
+                    setSearchQuery("");
+                    setDebouncedQuery("");
+                },
+            });
+        }
+
+        if (sortBy !== "featured") {
+            const label = SORT_OPTIONS.find((o) => o.value === sortBy)?.label;
+            filters.push({
+                id: "sort",
+                label: label,
+                onRemove: () => setSortBy("featured"),
+            });
+        }
+
+        if (priceRange !== "all") {
+            const label = PRICE_RANGES.find((r) => r.value === priceRange)?.label;
+            filters.push({
+                id: "price",
+                label: label,
+                onRemove: () => setPriceRange("all"),
+            });
+        }
+
+        return filters;
+    }, [activeCategory, searchQuery, sortBy, priceRange]);
+
+    const handleClearAll = () => {
+        setActiveCategory("All");
+        setSearchQuery("");
+        setDebouncedQuery("");
+        setSortBy("featured");
+        setPriceRange("all");
+    };
+
+
     const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);
     const paginatedProducts = useMemo(() => {
         const start = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -250,7 +302,37 @@ function ShopContent() {
                     </div>
                 </div>
 
-                {/* Filters */}
+                {/* Active Filter Chips */}
+                {activeFilters.length > 0 && (
+                    <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+                        {activeFilters.map((filter) => (
+                            <span
+                                key={filter.id}
+                                className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-200"
+                            >
+                                <span className="max-w-[200px] truncate">{filter.label}</span>
+                                <button
+                                    onClick={filter.onRemove}
+                                    className="ml-0.5 rounded-full p-0.5 hover:bg-gray-300/50 hover:text-gray-700 focus:outline-none"
+                                    aria-label={`Remove ${filter.label} filter`}
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </button>
+                            </span>
+                        ))}
+
+                        {activeFilters.length >= 2 && (
+                            <button
+                                onClick={handleClearAll}
+                                className="ml-2 text-sm font-medium text-accent-500 hover:text-accent-600 hover:underline transition-colors"
+                            >
+                                Clear all
+                            </button>
+                        )}
+                    </div>
+                )}
+
+                {/* Categories */}
                 <div className="mt-8 flex flex-wrap justify-center gap-2">
                     {CATEGORIES.map((category) => (
                         <Button
