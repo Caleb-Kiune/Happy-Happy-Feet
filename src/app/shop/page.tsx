@@ -6,7 +6,7 @@ import Container from "@/components/Container";
 import ShoeCard from "@/components/ShoeCard";
 import { products, Product } from "@/lib/products";
 import { Button } from "@/components/ui/button";
-import { Search, X, Check, ChevronDown } from "lucide-react";
+import { Search, X, Check, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -32,6 +32,8 @@ const PRICE_RANGES = [
     { label: "Over KSh 6,000", value: "over-6000" },
 ];
 
+const ITEMS_PER_PAGE = 24;
+
 // Helper to capitalize first letter
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
@@ -50,6 +52,7 @@ function ShopContent() {
     const [debouncedQuery, setDebouncedQuery] = useState(searchParams.get("search") || "");
     const [sortBy, setSortBy] = useState(searchParams.get("sort") || "featured");
     const [priceRange, setPriceRange] = useState(searchParams.get("price") || "all");
+    const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
 
     // Debounce search query
     useEffect(() => {
@@ -92,11 +95,23 @@ function ShopContent() {
             params.set("price", priceRange);
         }
 
+        // Page
+        if (currentPage > 1) {
+            params.set("page", currentPage.toString());
+        } else {
+            params.delete("page");
+        }
+
         // Update URL
         if (params.toString() !== searchParams.toString()) {
             router.replace(`${pathname}?${params.toString()}`, { scroll: false });
         }
-    }, [activeCategory, debouncedQuery, sortBy, priceRange, pathname, router, searchParams]);
+    }, [activeCategory, debouncedQuery, sortBy, priceRange, currentPage, pathname, router, searchParams]);
+
+    // Reset page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeCategory, debouncedQuery, priceRange, sortBy]);
 
     // Filter products
     const filteredProducts = useMemo(() => {
@@ -138,6 +153,20 @@ function ShopContent() {
             }
         });
     }, [filteredProducts, sortBy]);
+
+    // Pagination Logic
+    const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);
+    const paginatedProducts = useMemo(() => {
+        const start = (currentPage - 1) * ITEMS_PER_PAGE;
+        return sortedProducts.slice(start, start + ITEMS_PER_PAGE);
+    }, [currentPage, sortedProducts]);
+
+    // Handle out of bounds
+    useEffect(() => {
+        if (currentPage > totalPages && totalPages > 0) {
+            setCurrentPage(totalPages);
+        }
+    }, [currentPage, totalPages]);
 
     return (
         <div className="bg-white pb-24 pt-16 md:pt-24">
@@ -240,10 +269,57 @@ function ShopContent() {
 
                 {/* Grid */}
                 <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {sortedProducts.map((product) => (
+                    {paginatedProducts.map((product) => (
                         <ShoeCard key={product.id} product={product} />
                     ))}
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="mt-16 flex flex-col items-center gap-4 border-t border-gray-100 pt-8">
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                                className="h-10 w-10 rounded-full"
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+
+                            <div className="flex items-center gap-1">
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                    <button
+                                        key={page}
+                                        onClick={() => setCurrentPage(page)}
+                                        className={`h-10 w-10 rounded-full text-sm font-medium transition-colors ${currentPage === page
+                                            ? "bg-gray-900 text-white"
+                                            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                                            }`}
+                                    >
+                                        {page}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages}
+                                className="h-10 w-10 rounded-full"
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        <p className="text-sm text-gray-500">
+                            Showing <span className="font-medium">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span>–
+                            <span className="font-medium">{Math.min(currentPage * ITEMS_PER_PAGE, sortedProducts.length)}</span> of{" "}
+                            <span className="font-medium">{sortedProducts.length}</span> results
+                        </p>
+                    </div>
+                )}
 
                 {/* Empty State */}
                 {filteredProducts.length === 0 && (
