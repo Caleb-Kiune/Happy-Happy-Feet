@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { formatPrice } from "@/lib/utils";
 import { Product } from "@/lib/products";
 
 type ShoeCardProps = {
@@ -25,7 +26,7 @@ export default function ShoeCard({ product }: ShoeCardProps) {
                     {product.name}
                 </h3>
                 <p className="text-sm font-normal text-gray-500">
-                    {(product.price / 100).toFixed(2)} KES
+                    {formatPrice(product.price)}
                 </p>
             </div>
         </Link>

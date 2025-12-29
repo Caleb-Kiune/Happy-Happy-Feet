@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { formatPrice } from "@/lib/utils";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
@@ -114,7 +115,7 @@ export default function CartSheet() {
                                                 <p className="mt-1 text-xs text-gray-500">Size: {item.size}</p>
                                             </div>
                                             <p className="font-medium text-gray-900">
-                                                {(item.price * item.quantity / 100).toFixed(2)}
+                                                {formatPrice(item.price * item.quantity)}
                                             </p>
                                         </div>
 
@@ -163,7 +164,7 @@ export default function CartSheet() {
                         <div className="flex-shrink-0 bg-gray-50/50 p-6 border-t border-gray-100 space-y-4">
                             <div className="flex items-center justify-between text-base font-medium text-gray-900">
                                 <p>Subtotal</p>
-                                <p>{(totalPrice / 100).toFixed(2)} KES</p>
+                                <p>{formatPrice(totalPrice)}</p>
                             </div>
                             <p className="text-xs text-gray-500 text-center">
                                 Taxes and shipping calculated at checkout.

@@ -6,6 +6,7 @@ import Image from "next/image";
 import Container from "@/components/Container";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
+import { formatPrice } from "@/lib/utils";
 import { Phone, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -54,14 +55,13 @@ export default function CheckoutPage() {
         const itemsList = state.items
             .map(
                 (item, index) =>
-                    `${index + 1}. ${item.name} (Size: ${item.size}) x ${item.quantity} - ${(
-                        (item.price * item.quantity) /
-                        100
-                    ).toFixed(2)}`
+                    `${index + 1}. ${item.name} (Size: ${item.size}) x ${item.quantity} - ${formatPrice(
+                        item.price * item.quantity
+                    )}`
             )
             .join("\n");
 
-        const subtotal = (totalPrice / 100).toFixed(2);
+        const subtotal = formatPrice(totalPrice);
 
         const message = `*New Order from Happy Happy Feet* 🛍️
 --------------------------------
@@ -73,7 +73,7 @@ ${formData.notes ? `*Note:* ${formData.notes}` : ""}
 *Order Details:*
 ${itemsList}
 
-*Subtotal:* ${subtotal} KES
+*Subtotal:* ${subtotal}
 --------------------------------
 Please confirm availability and delivery fee. Thank you!`;
 
@@ -258,7 +258,7 @@ Please confirm availability and delivery fee. Thank you!`;
                                                     {item.name}
                                                 </h3>
                                                 <p className="text-sm font-medium text-gray-900">
-                                                    {((item.price * item.quantity) / 100).toFixed(2)}
+                                                    {formatPrice(item.price * item.quantity)}
                                                 </p>
                                             </div>
                                             <p className="mt-1 text-xs text-gray-500">
@@ -272,7 +272,7 @@ Please confirm availability and delivery fee. Thank you!`;
                             <div className="border-t border-gray-200 pt-4 space-y-4">
                                 <div className="flex justify-between text-base font-medium text-gray-900">
                                     <p>Subtotal</p>
-                                    <p>{(totalPrice / 100).toFixed(2)} KES</p>
+                                    <p>{formatPrice(totalPrice)}</p>
                                 </div>
                                 <div className="bg-blue-50 text-blue-800 text-xs px-3 py-2 rounded-md">
                                     Delivery fees will be confirmed via WhatsApp based on your location.

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Product } from "@/lib/products";
+import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Phone, Check, Plus, Minus, ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
@@ -120,7 +121,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 </h1>
                 <div className="mt-4 flex items-end">
                     <p className="text-2xl font-bold text-gray-900">
-                        {(product.price / 100).toFixed(2)} KES
+                        {formatPrice(product.price)}
                     </p>
                 </div>
 
