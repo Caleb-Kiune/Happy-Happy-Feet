@@ -12,6 +12,8 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 // Sort Options
@@ -20,6 +22,14 @@ const SORT_OPTIONS = [
     { label: "Price: Low to High", value: "price-asc" },
     { label: "Price: High to Low", value: "price-desc" },
     { label: "Name: A to Z", value: "name-asc" },
+];
+
+// Price Ranges
+const PRICE_RANGES = [
+    { label: "All Prices", value: "all" },
+    { label: "Under KSh 4,000", value: "under-4000" },
+    { label: "KSh 4,000 – 6,000", value: "4000-6000" },
+    { label: "Over KSh 6,000", value: "over-6000" },
 ];
 
 // Helper to capitalize first letter
@@ -39,6 +49,7 @@ function ShopContent() {
     const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
     const [debouncedQuery, setDebouncedQuery] = useState(searchParams.get("search") || "");
     const [sortBy, setSortBy] = useState(searchParams.get("sort") || "featured");
+    const [priceRange, setPriceRange] = useState(searchParams.get("price") || "all");
 
     // Debounce search query
     useEffect(() => {
@@ -74,11 +85,18 @@ function ShopContent() {
             params.set("sort", sortBy);
         }
 
+        // Price
+        if (priceRange === "all") {
+            params.delete("price");
+        } else {
+            params.set("price", priceRange);
+        }
+
         // Update URL
         if (params.toString() !== searchParams.toString()) {
             router.replace(`${pathname}?${params.toString()}`, { scroll: false });
         }
-    }, [activeCategory, debouncedQuery, sortBy, pathname, router, searchParams]);
+    }, [activeCategory, debouncedQuery, sortBy, priceRange, pathname, router, searchParams]);
 
     // Filter products
     const filteredProducts = useMemo(() => {
@@ -94,9 +112,16 @@ function ShopContent() {
                 product.name.toLowerCase().includes(q) ||
                 (product.description && product.description.toLowerCase().includes(q));
 
-            return matchesCategory && matchesSearch;
+            // 3. Price Filter
+            let matchesPrice = true;
+            const price = product.price;
+            if (priceRange === "under-4000") matchesPrice = price < 4000;
+            else if (priceRange === "4000-6000") matchesPrice = price >= 4000 && price <= 6000;
+            else if (priceRange === "over-6000") matchesPrice = price > 6000;
+
+            return matchesCategory && matchesSearch && matchesPrice;
         });
-    }, [activeCategory, debouncedQuery]);
+    }, [activeCategory, debouncedQuery, priceRange]);
 
     // Sort products
     const sortedProducts = useMemo(() => {
@@ -157,11 +182,12 @@ function ShopContent() {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <button className="flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-accent-500 transition-colors focus:outline-none">
-                                    Sort by: <span className="text-gray-900">{SORT_OPTIONS.find(o => o.value === sortBy)?.label || "Featured"}</span>
+                                    Sort & Filter
                                     <ChevronDown className="h-4 w-4" />
                                 </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-56 bg-white shadow-xl rounded-xl border-gray-100 p-2">
+                                <DropdownMenuLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-1.5">Sort By</DropdownMenuLabel>
                                 {SORT_OPTIONS.map((option) => (
                                     <DropdownMenuItem
                                         key={option.value}
@@ -173,6 +199,21 @@ function ShopContent() {
                                     >
                                         {option.label}
                                         {sortBy === option.value && <Check className="h-4 w-4 text-accent-500" />}
+                                    </DropdownMenuItem>
+                                ))}
+                                <DropdownMenuSeparator className="my-2 bg-gray-100" />
+                                <DropdownMenuLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-1.5">Price Range</DropdownMenuLabel>
+                                {PRICE_RANGES.map((range) => (
+                                    <DropdownMenuItem
+                                        key={range.value}
+                                        onClick={() => setPriceRange(range.value)}
+                                        className={`
+                                            flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-colors
+                                            ${priceRange === range.value ? "bg-accent-50 text-accent-600" : "text-gray-700 focus:bg-gray-50 focus:text-gray-900"}
+                                        `}
+                                    >
+                                        {range.label}
+                                        {priceRange === range.value && <Check className="h-4 w-4 text-accent-500" />}
                                     </DropdownMenuItem>
                                 ))}
                             </DropdownMenuContent>
