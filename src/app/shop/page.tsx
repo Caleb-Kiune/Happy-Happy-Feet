@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useMemo } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Container from "@/components/Container";
 import ShoeCard from "@/components/ShoeCard";
@@ -75,38 +75,44 @@ function ShopContent() {
         }
 
         // Update URL
-        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+        if (params.toString() !== searchParams.toString()) {
+            router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+        }
     }, [activeCategory, debouncedQuery, sortBy, pathname, router, searchParams]);
 
     // Filter products
-    const filteredProducts = products.filter((product) => {
-        // 1. Category Filter
-        const matchesCategory =
-            activeCategory === "All" ||
-            product.category.toLowerCase() === activeCategory.toLowerCase();
+    const filteredProducts = useMemo(() => {
+        return products.filter((product) => {
+            // 1. Category Filter
+            const matchesCategory =
+                activeCategory === "All" ||
+                product.category.toLowerCase() === activeCategory.toLowerCase();
 
-        // 2. Search Filter (Name or Description)
-        const q = debouncedQuery.toLowerCase();
-        const matchesSearch =
-            product.name.toLowerCase().includes(q) ||
-            (product.description && product.description.toLowerCase().includes(q));
+            // 2. Search Filter (Name or Description)
+            const q = debouncedQuery.toLowerCase();
+            const matchesSearch =
+                product.name.toLowerCase().includes(q) ||
+                (product.description && product.description.toLowerCase().includes(q));
 
-        return matchesCategory && matchesSearch;
-    });
+            return matchesCategory && matchesSearch;
+        });
+    }, [activeCategory, debouncedQuery]);
 
     // Sort products
-    const sortedProducts = [...filteredProducts].sort((a, b) => {
-        switch (sortBy) {
-            case "price-asc":
-                return a.price - b.price;
-            case "price-desc":
-                return b.price - a.price;
-            case "name-asc":
-                return a.name.localeCompare(b.name);
-            default:
-                return 0; // Keep original order for "featured"
-        }
-    });
+    const sortedProducts = useMemo(() => {
+        return [...filteredProducts].sort((a, b) => {
+            switch (sortBy) {
+                case "price-asc":
+                    return a.price - b.price;
+                case "price-desc":
+                    return b.price - a.price;
+                case "name-asc":
+                    return a.name.localeCompare(b.name);
+                default:
+                    return 0; // Keep original order for "featured"
+            }
+        });
+    }, [filteredProducts, sortBy]);
 
     return (
         <div className="bg-white pb-24 pt-16 md:pt-24">
