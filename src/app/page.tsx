@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   description: "Step into comfort and style. A curated collection of women's shoes crafted for joy, designed for you.",
 };
 
-export default function Home() {
-  const featuredProducts = getFeaturedProducts();
+export default async function Home() {
+  const featuredProducts = await getFeaturedProducts();
 
   return (
     <main className="flex min-h-screen flex-col">

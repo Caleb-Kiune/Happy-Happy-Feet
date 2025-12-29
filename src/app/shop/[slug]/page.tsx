@@ -3,7 +3,7 @@ import Link from "next/link";
 import Container from "@/components/Container";
 import ProductDetail from "@/components/ProductDetail";
 import ShoeCard from "@/components/ShoeCard";
-import { getAllProducts, getProductBySlug, getRelatedProducts } from "@/lib/products";
+import { getProductSlugsForStaticParams, getProductBySlug, getRelatedProducts } from "@/lib/products";
 import { Metadata } from "next";
 
 type Props = {
@@ -12,16 +12,13 @@ type Props = {
 
 // Generate static params for all products
 export async function generateStaticParams() {
-    const products = getAllProducts();
-    return products.map((product) => ({
-        slug: product.slug,
-    }));
+    return await getProductSlugsForStaticParams();
 }
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params;
-    const product = getProductBySlug(slug);
+    const product = await getProductBySlug(slug);
 
     if (!product) {
         return {
@@ -37,13 +34,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductPage({ params }: Props) {
     const { slug } = await params;
-    const product = getProductBySlug(slug);
+    const product = await getProductBySlug(slug);
 
     if (!product) {
         notFound();
     }
 
-    const relatedProducts = getRelatedProducts(slug);
+    const relatedProducts = await getRelatedProducts(slug);
 
     return (
         <div className="bg-white pb-24 pt-8 md:pt-12">
