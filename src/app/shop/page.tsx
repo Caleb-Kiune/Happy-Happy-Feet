@@ -5,7 +5,8 @@ import Container from "@/components/Container";
 import ShoeCard from "@/components/ShoeCard";
 import { products, Product } from "@/lib/products";
 import { Button } from "@/components/ui/button";
-import { Search, X, ChevronDown } from "lucide-react";
+import { Search, X } from "lucide-react";
+import SortSheet from "@/components/SortSheet";
 
 // Helper to capitalize first letter
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
@@ -99,20 +100,8 @@ export default function ShopPage() {
                     </div>
 
                     {/* Sort */}
-                    <div className="relative w-full md:w-48 flex-shrink-0">
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <ChevronDown className="h-4 w-4 text-gray-400" />
-                        </div>
-                        <select
-                            value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value)}
-                            className="block w-full appearance-none rounded-full border-0 py-3 pl-5 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-inset focus:ring-accent-500 sm:text-sm sm:leading-6 bg-white cursor-pointer"
-                        >
-                            <option value="featured">Sort: Featured</option>
-                            <option value="price-asc">Price: Low to High</option>
-                            <option value="price-desc">Price: High to Low</option>
-                            <option value="name-asc">Name: A to Z</option>
-                        </select>
+                    <div className="relative w-full md:w-auto min-w-[200px] flex-shrink-0">
+                        <SortSheet currentSort={sortBy} onSortChange={setSortBy} />
                     </div>
                 </div>
 
