@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Container from "@/components/Container";
 import ShoeCard from "@/components/ShoeCard";
 import { products, Product } from "@/lib/products";
@@ -28,12 +29,16 @@ const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLower
 const uniqueCategories = Array.from(new Set(products.map((p) => p.category)));
 const CATEGORIES = ["All", ...uniqueCategories.map(capitalize)];
 
-// Skipping metadata export in client component
-export default function ShopPage() {
-    const [activeCategory, setActiveCategory] = useState("All");
-    const [searchQuery, setSearchQuery] = useState("");
-    const [debouncedQuery, setDebouncedQuery] = useState("");
-    const [sortBy, setSortBy] = useState("featured");
+function ShopContent() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+
+    // Initialize state from URL params or defaults
+    const [activeCategory, setActiveCategory] = useState(searchParams.get("category") || "All");
+    const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+    const [debouncedQuery, setDebouncedQuery] = useState(searchParams.get("search") || "");
+    const [sortBy, setSortBy] = useState(searchParams.get("sort") || "featured");
 
     // Debounce search query
     useEffect(() => {
@@ -43,6 +48,35 @@ export default function ShopPage() {
 
         return () => clearTimeout(timer);
     }, [searchQuery]);
+
+    // Sync state to URL
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams.toString());
+
+        // Category
+        if (activeCategory === "All") {
+            params.delete("category");
+        } else {
+            params.set("category", activeCategory);
+        }
+
+        // Search
+        if (debouncedQuery) {
+            params.set("search", debouncedQuery);
+        } else {
+            params.delete("search");
+        }
+
+        // Sort
+        if (sortBy === "featured") {
+            params.delete("sort");
+        } else {
+            params.set("sort", sortBy);
+        }
+
+        // Update URL
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }, [activeCategory, debouncedQuery, sortBy, pathname, router, searchParams]);
 
     // Filter products
     const filteredProducts = products.filter((product) => {
@@ -186,5 +220,13 @@ export default function ShopPage() {
                 )}
             </Container>
         </div>
+    );
+}
+
+export default function ShopPage() {
+    return (
+        <Suspense fallback={<div className="h-screen bg-white" />}>
+            <ShopContent />
+        </Suspense>
     );
 }
