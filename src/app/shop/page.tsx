@@ -5,8 +5,21 @@ import Container from "@/components/Container";
 import ShoeCard from "@/components/ShoeCard";
 import { products, Product } from "@/lib/products";
 import { Button } from "@/components/ui/button";
-import { Search, X } from "lucide-react";
-import SortSheet from "@/components/SortSheet";
+import { Search, X, Check, ChevronDown } from "lucide-react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+// Sort Options
+const SORT_OPTIONS = [
+    { label: "Featured", value: "featured" },
+    { label: "Price: Low to High", value: "price-asc" },
+    { label: "Price: High to Low", value: "price-desc" },
+    { label: "Name: A to Z", value: "name-asc" },
+];
 
 // Helper to capitalize first letter
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
@@ -100,8 +113,30 @@ export default function ShopPage() {
                     </div>
 
                     {/* Sort */}
-                    <div className="relative w-full md:w-auto min-w-[200px] flex-shrink-0">
-                        <SortSheet currentSort={sortBy} onSortChange={setSortBy} />
+                    <div className="relative flex-shrink-0">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-accent-500 transition-colors focus:outline-none">
+                                    Sort by: <span className="text-gray-900">{SORT_OPTIONS.find(o => o.value === sortBy)?.label || "Featured"}</span>
+                                    <ChevronDown className="h-4 w-4" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56 bg-white shadow-xl rounded-xl border-gray-100 p-2">
+                                {SORT_OPTIONS.map((option) => (
+                                    <DropdownMenuItem
+                                        key={option.value}
+                                        onClick={() => setSortBy(option.value)}
+                                        className={`
+                                            flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-colors
+                                            ${sortBy === option.value ? "bg-accent-50 text-accent-600" : "text-gray-700 focus:bg-gray-50 focus:text-gray-900"}
+                                        `}
+                                    >
+                                        {option.label}
+                                        {sortBy === option.value && <Check className="h-4 w-4 text-accent-500" />}
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
 
