@@ -19,190 +19,147 @@ export type Product = {
     featured?: boolean;
 };
 
-export const products: Product[] = [
-    // Heels (Sizes 36-41)
-    {
-        id: "h1",
-        slug: "classic-black-pumps",
-        name: "Classic Black Pumps",
-        price: 4999,
-        category: "heels",
-        images: [
-            `https://images.unsplash.com/photo-1584473457417-bd0afe798ae1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGNsYXNzaWMlMjBibGFjayUyMHB1bXBzJTIwaGVlbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1584473457417-bd0afe798ae1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGNsYXNzaWMlMjBibGFjayUyMHB1bXBzJTIwaGVlbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1584473457417-bd0afe798ae1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGNsYXNzaWMlMjBibGFjayUyMHB1bXBzJTIwaGVlbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`
-        ],
-        sizes: ["36", "37", "38", "39", "40", "41"],
-        featured: true,
-        description: "Timeless elegance meets modern comfort in our Classic Black Pumps. Featuring a perfect 3-inch heel and cushioned insole for all-day wear.",
-    },
-    {
-        id: "h2",
-        slug: "nude-block-heels",
-        name: "Nude Block Heels",
-        price: 5499,
-        category: "heels",
-        images: [
-            `https://images.unsplash.com/photo-1543163521-1bf539c55dd2${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1543163521-1bf539c55dd2${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1543163521-1bf539c55dd2${OPTIMIZE}`
-        ],
-        sizes: ["36", "37", "38", "39", "40"],
-        description: "Versatile and chic, these Nude Block Heels are your go-to for both office days and weekend brunches. The sturdy block heel ensures stability.",
-    },
-    {
-        id: "h3",
-        slug: "red-stilettos",
-        name: "Statement Red Stilettos",
-        price: 6999,
-        category: "heels",
-        images: [
-            `https://images.unsplash.com/photo-1542185185-47838d6b00c9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fFN0YXRlbWVudCUyMFJlZCUyMFN0aWxldHRvc3xlbnwwfHwwfHx8Mg%3D%3D${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1542185185-47838d6b00c9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fFN0YXRlbWVudCUyMFJlZCUyMFN0aWxldHRvc3xlbnwwfHwwfHx8Mg%3D%3D${OPTIMIZE}`
-        ],
-        sizes: ["37", "38", "39", "40"],
-        description: "Make a bold entrance with our Statement Red Stilettos. Crafted from premium materials designed to turn heads.",
-    },
+// Image Assets (Reusing high-quality existing ones)
+const IMG = {
+    heels: [
+        `https://images.unsplash.com/photo-1584473457417-bd0afe798ae1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGNsYXNzaWMlMjBibGFjayUyMHB1bXBzJTIwaGVlbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
+        `https://images.unsplash.com/photo-1543163521-1bf539c55dd2${OPTIMIZE}`,
+        `https://images.unsplash.com/photo-1542185185-47838d6b00c9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fFN0YXRlbWVudCUyMFJlZCUyMFN0aWxldHRvc3xlbnwwfHwwfHx8Mg%3D%3D${OPTIMIZE}`
+    ],
+    sandals: [
+        `https://images.unsplash.com/photo-1728973702902-9cd4c75eebdb?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8U3VtbWVyJTIwU3RyYXBweSUyMFNhbmRhbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
+        `https://images.unsplash.com/photo-1568347619798-2008f2ce5b94?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8VGFuJTIwTGVhdGhlciUyMFNhbmRhbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
+        `https://images.unsplash.com/photo-1702413094780-4bfd4b0d873c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fFdoaXRlJTIwUGxhdGZvcm0lMjBTYW5kYWxzfGVufDB8fDB8fHwy${OPTIMIZE}`
+    ],
+    sneakers: [
+        `https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a${OPTIMIZE}`,
+        `https://images.unsplash.com/photo-1572293276811-1f27592be0a8?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Qmx1c2glMjBQaW5rJTIwVHJhaW5lcnN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
+        `https://images.unsplash.com/photo-1560769629-975ec94e6a86${OPTIMIZE}`
+    ],
+    flats: [
+        `https://images.unsplash.com/photo-1560343090-f0409e92791a${OPTIMIZE}`,
+        `https://images.unsplash.com/photo-1511556820780-d912e42b4980${OPTIMIZE}`,
+        `https://images.unsplash.com/photo-1608629601270-a0007becead3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fENoaWMlMjBTdWVkZSUyME11bGVzJTIwc2hvZXN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`
+    ],
+    boots: [
+        `https://images.unsplash.com/photo-1608629601270-a0007becead3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fENoaWMlMjBTdWVkZSUyME11bGVzJTIwc2hvZXN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}` // Reusing suede mule image for suede boot context as placeholder
+    ]
+};
 
-    // Sandals (Sizes 36-42)
-    {
-        id: "s1",
-        slug: "summer-strappy-sandals",
-        name: "Summer Strappy Sandals",
-        price: 2999,
-        category: "sandals",
-        images: [
-            `https://images.unsplash.com/photo-1728973702902-9cd4c75eebdb?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8U3VtbWVyJTIwU3RyYXBweSUyMFNhbmRhbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1728973702902-9cd4c75eebdb?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8U3VtbWVyJTIwU3RyYXBweSUyMFNhbmRhbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`
-        ],
-        sizes: ["36", "37", "38", "39", "40", "41", "42"],
-        featured: true,
-        description: "Light, airy, and effortlessly stylish. These strappy sandals are the ultimate summer companion.",
-    },
-    {
-        id: "s2",
-        slug: "tan-leather-slides",
-        name: "Tan Leather Slides",
-        price: 3499,
-        category: "sandals",
-        images: [
-            `https://images.unsplash.com/photo-1568347619798-2008f2ce5b94?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8VGFuJTIwTGVhdGhlciUyMFNhbmRhbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1568347619798-2008f2ce5b94?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8VGFuJTIwTGVhdGhlciUyMFNhbmRhbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`
-        ],
-        sizes: ["37", "38", "39", "40", "41"],
-        description: "Minimalist luxury. Our Tan Leather Slides feature soft, genuine leather that molds to your feet.",
-    },
-    {
-        id: "s3",
-        slug: "white-platform-sandals",
-        name: "White Platform Sandals",
-        price: 3999,
-        category: "sandals",
-        images: [
-            `https://images.unsplash.com/photo-1702413094780-4bfd4b0d873c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fFdoaXRlJTIwUGxhdGZvcm0lMjBTYW5kYWxzfGVufDB8fDB8fHwy${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1702413094780-4bfd4b0d873c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fFdoaXRlJTIwUGxhdGZvcm0lMjBTYW5kYWxzfGVufDB8fDB8fHwy${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1702413094780-4bfd4b0d873c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fFdoaXRlJTIwUGxhdGZvcm0lMjBTYW5kYWxzfGVufDB8fDB8fHwy${OPTIMIZE}`
-        ],
-        sizes: ["36", "37", "38", "39"],
-        description: "Elevate your look literally and figuratively with these trendy White Platform Sandals. Comfortable height for everyday wear.",
-    },
+// Helper generator function
+const generateProducts = (): Product[] => {
+    const categories = ["heels", "sandals", "sneakers", "flats", "boots"] as const;
+    const allProducts: Product[] = [];
 
-    // Sneakers (Sizes 37-41)
-    {
-        id: "sn1",
-        slug: "minimal-white-sneakers",
-        name: "Minimal White Sneakers",
-        price: 4499,
-        category: "sneakers",
-        images: [
-            `https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1560769629-975ec94e6a86${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77${OPTIMIZE}`
-        ],
-        sizes: ["37", "38", "39", "40", "41"],
-        featured: true,
-        description: "The essential white sneaker. Clean lines, premium materials, and versatile enough to pair with dresses or jeans.",
-    },
-    {
-        id: "sn2",
-        slug: "blush-pink-trainers",
-        name: "Blush Pink Trainers",
-        price: 4999,
-        category: "sneakers",
-        images: [
-            `https://images.unsplash.com/photo-1572293276811-1f27592be0a8?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Qmx1c2glMjBQaW5rJTIwVHJhaW5lcnN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1521093470119-a3acdc43374a${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2${OPTIMIZE}`
-        ],
-        sizes: ["36", "37", "38", "39", "40"],
-        description: "Add a soft touch of color to your sporty look with our functional yet fashionable Blush Pink Trainers.",
-    },
-    {
-        id: "sn3",
-        slug: "retro-high-tops",
-        name: "Retro High Tops",
-        price: 5999,
-        category: "sneakers",
-        images: [
-            `https://images.unsplash.com/photo-1560769629-975ec94e6a86${OPTIMIZE}`
-        ],
-        sizes: ["37", "38", "39", "40"],
-        description: "Vintage vibes for the modern woman. These Retro High Tops bring a nostalgic flair to your casual wardrobe.",
-    },
+    // Distribution Targets (Total 100)
+    // Heels: 20 | Sandals: 20 | Sneakers: 20 | Flats: 20 | Boots: 20
+    // Price breakdown approx: 30% <4k, 35% 4-6k, 35% >6k
 
-    // Flats (Sizes 36-41)
-    {
-        id: "f1",
-        slug: "classic-ballet-flats",
-        name: "Classic Ballet Flats",
-        price: 2499,
-        category: "flats",
+    const createProduct = (
+        i: number,
+        cat: typeof categories[number],
+        nameBase: string,
+        price: number,
+        featured = false
+    ): Product => ({
+        id: `${cat.slice(0, 2)}${i}`,
+        slug: `${nameBase.toLowerCase().replace(/ /g, "-")}-${i}`,
+        name: nameBase,
+        price,
+        category: cat,
         images: [
-            `https://images.unsplash.com/photo-1560343090-f0409e92791a${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1560343090-f0409e92791a${OPTIMIZE}`
+            IMG[cat][i % IMG[cat].length],
+            IMG[cat][(i + 1) % IMG[cat].length]
         ],
-        sizes: ["36", "37", "38", "39", "40", "41"],
-        featured: true,
-        description: "Simple, sophisticated, and surprisingly comfortable. The Classic Ballet Flat is a wardrobe staple.",
-    },
-    {
-        id: "f2",
-        slug: "pointed-toe-loafers",
-        name: "Pointed Toe Loafers",
-        price: 3999,
-        category: "flats",
-        images: [
-            `https://images.unsplash.com/photo-1511556820780-d912e42b4980${OPTIMIZE}`,
-            `https://images.unsplash.com/photo-1511556820780-d912e42b4980${OPTIMIZE}`
-        ],
-        sizes: ["37", "38", "39", "40"],
-        description: "Professional polish without the heel. Sharp, structured, and perfect for the 9-to-5.",
-    },
-    {
-        id: "f3",
-        slug: "suede-mules",
-        name: "Chic Suede Mules",
-        price: 3499,
-        category: "flats",
-        images: [
-            `https://images.unsplash.com/photo-1608629601270-a0007becead3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fENoaWMlMjBTdWVkZSUyME11bGVzJTIwc2hvZXN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`
-        ],
-        sizes: ["36", "37", "38", "39", "40"],
-        description: "Slide into style. These Suede Mules offer an effortless chic look that works with everything.",
-    },
-    {
-        id: "f4",
-        slug: "suede-boots",
-        name: "Brown Suede Boots",
-        price: 3499,
-        category: "boots",
-        images: [
-            `https://images.unsplash.com/photo-1608629601270-a0007becead3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fENoaWMlMjBTdWVkZSUyME11bGVzJTIwc2hvZXN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`
-        ],
-        sizes: ["36", "37", "38", "39", "40"],
-        description: "Slide into style. These Suede Boots offer an effortless chic look that works with everything.",
-    }
-];
+        sizes: cat === "sneakers" || cat === "boots" ? ["37", "38", "39", "40", "41"] : ["36", "37", "38", "39", "40"],
+        description: `Experience perfect comfort and style with our ${nameBase}. Designed for the modern woman who values both elegance and ease.`,
+        featured
+    });
+
+    // 1. HEELS (20 items)
+    // Low: 5, Mid: 7, High: 8
+    const heelsData = [
+        { n: "Classic Black Pumps", p: 4999, f: true }, { n: "Nude Block Heels", p: 5499, f: false },
+        { n: "Red Statement Stilettos", p: 6999, f: false }, { n: "Midnight Velvet Pumps", p: 5800, f: false },
+        { n: "Silver Glitter Heels", p: 7500, f: true }, { n: "Office Comfort Heels", p: 3500, f: false },
+        { n: "Strappy Evening Heels", p: 8999, f: false }, { n: "Rose Gold Sandals", p: 6200, f: false },
+        { n: "White Wedding Pumps", p: 9500, f: false }, { n: "Navy Blue Courts", p: 4500, f: false },
+        { n: "Tan Work Heels", p: 3999, f: false }, { n: "Leopard Print Stilettos", p: 7800, f: false },
+        { n: "Chunky Platform Heels", p: 6500, f: false }, { n: "Satin Bow Pumps", p: 5200, f: false },
+        { n: "Clear Strap Heels", p: 4800, f: false }, { n: "Gold Metallic Heels", p: 7200, f: false },
+        { n: "Burgundy Velvet Heels", p: 5900, f: false }, { n: "Emerald Green Pumps", p: 6100, f: false },
+        { n: "Low Kitten Heels", p: 3200, f: false }, { n: "Designer Inspired Heels", p: 12500, f: true }
+    ];
+    heelsData.forEach((d, i) => allProducts.push(createProduct(i + 1, "heels", d.n, d.p, d.f)));
+
+    // 2. SANDALS (20 items)
+    // Low: 8, Mid: 7, High: 5
+    const sandalsData = [
+        { n: "Summer Strappy Sandals", p: 2999, f: true }, { n: "Tan Leather Slides", p: 3499, f: false },
+        { n: "White Platform Sandals", p: 3999, f: false }, { n: "Greek Goddess Gladiators", p: 4500, f: false },
+        { n: "Boho Fringe Sandals", p: 3200, f: false }, { n: "Beach Ready Flip Flops", p: 2500, f: false },
+        { n: "Metallic Gold Slides", p: 3800, f: false }, { n: "Comfort Walk Sandals", p: 4200, f: false },
+        { n: "Jeweled Evening Sandals", p: 6500, f: false }, { n: "Woven Leather Mules", p: 5500, f: false },
+        { n: "Espadrille Wedges", p: 5999, f: false }, { n: "Cork Sole Sandals", p: 4800, f: false },
+        { n: "Minimalist Black Slides", p: 3100, f: false }, { n: "Rope Tie Sandals", p: 3600, f: false },
+        { n: "Luxury Resin Slides", p: 8500, f: true }, { n: "Bridal Pearl Sandals", p: 7800, f: false },
+        { n: "Chunky Sport Sandals", p: 5200, f: false }, { n: "Ankle Strap Flats", p: 3300, f: false },
+        { n: "Python Print Sandals", p: 4600, f: false }, { n: "Velvet Pool Slides", p: 6200, f: false }
+    ];
+    sandalsData.forEach((d, i) => allProducts.push(createProduct(i + 1, "sandals", d.n, d.p, d.f)));
+
+    // 3. SNEAKERS (20 items)
+    // Low: 4, Mid: 10, High: 6
+    const sneakersData = [
+        { n: "Minimal White Sneakers", p: 4499, f: true }, { n: "Blush Pink Trainers", p: 4999, f: false },
+        { n: "Retro High Tops", p: 5999, f: false }, { n: "Urban Grey Runners", p: 5500, f: false },
+        { n: "Chunky Dad Sneakers", p: 6500, f: false }, { n: "Canvas Slip Ons", p: 3500, f: false },
+        { n: "Performance Sport Shoes", p: 7200, f: false }, { n: "Limited Edition Kicks", p: 14500, f: true },
+        { n: "Metallic Silver Sneakers", p: 5800, f: false }, { n: "Pastel Colorblock Trainers", p: 5200, f: false },
+        { n: "Black Knit Runners", p: 4800, f: false }, { n: "Platform Canvas Shoes", p: 4200, f: false },
+        { n: "Gum Sole Sneakers", p: 5600, f: false }, { n: "Vintage Court Shoes", p: 6800, f: false },
+        { n: "Neon Accent Trainers", p: 5400, f: false }, { n: "Luxury Leather Sneakers", p: 9800, f: false },
+        { n: "High Fashion Runners", p: 11000, f: false }, { n: "Everyday Walking Shoes", p: 3900, f: false },
+        { n: "Mesh Breathable Sneakers", p: 4100, f: false }, { n: "Suede Detail Trainers", p: 6300, f: false }
+    ];
+    sneakersData.forEach((d, i) => allProducts.push(createProduct(i + 1, "sneakers", d.n, d.p, d.f)));
+
+    // 4. FLATS (20 items)
+    // Low: 9, Mid: 7, High: 4
+    const flatsData = [
+        { n: "Classic Ballet Flats", p: 2499, f: true }, { n: "Pointed Toe Loafers", p: 3999, f: false },
+        { n: "Chic Suede Mules", p: 3499, f: false }, { n: "Patent Leather Mary Janes", p: 4500, f: false },
+        { n: "Leopard Print Flats", p: 3200, f: false }, { n: "Nude Everyday Flats", p: 2800, f: false },
+        { n: "Black Office Loafers", p: 4200, f: false }, { n: "Metallic Silver Ballerinas", p: 3100, f: false },
+        { n: "Quilted Leather Flats", p: 5500, f: false }, { n: "Tassel Driving Shoes", p: 4800, f: false },
+        { n: "Slingback Flats", p: 3600, f: false }, { n: "Embroidered Mules", p: 5200, f: false },
+        { n: "Velvet Smoking Slippers", p: 5800, f: false }, { n: "Two Tone Chanel Style", p: 6500, f: false },
+        { n: "Studded Caged Flats", p: 6900, f: false }, { n: "Soft Leather Moccasins", p: 4100, f: false },
+        { n: "Croc Effect Loafers", p: 4600, f: false }, { n: "Designer Look Flats", p: 8900, f: true },
+        { n: "Canvas Espadrilles", p: 2900, f: false }, { n: "Bow Detail Flats", p: 3300, f: false }
+    ];
+    flatsData.forEach((d, i) => allProducts.push(createProduct(i + 1, "flats", d.n, d.p, d.f)));
+
+    // 5. BOOTS (20 items)
+    // Low: 4, Mid: 9, High: 7
+    const bootsData = [
+        { n: "Brown Suede Boots", p: 3499, f: false }, { n: "Classic Chelsea Boots", p: 4999, f: true },
+        { n: "Knee High Leather Boots", p: 8500, f: false }, { n: "Combat Style Boots", p: 5500, f: false },
+        { n: "Heeled Ankle Boots", p: 5800, f: false }, { n: "Western Cowboy Boots", p: 6500, f: false },
+        { n: "Sock Fit Boots", p: 4500, f: false }, { n: "Chunky Platform Boots", p: 6200, f: false },
+        { n: "Over The Knee Boots", p: 9500, f: false }, { n: "Rain Ready Wellies", p: 2800, f: false },
+        { n: "Snake Print Booties", p: 5200, f: false }, { n: "White Mod Boots", p: 5900, f: false },
+        { n: "Lace Up Hiker Boots", p: 6800, f: false }, { n: "Premium Leather Riding Boots", p: 13500, f: true },
+        { n: "Studded Biker Boots", p: 7200, f: false }, { n: "Velvet Ankle Boots", p: 4800, f: false },
+        { n: "Pointed Toe Stiletto Boots", p: 8200, f: false }, { n: "Winter Fur Lined Boots", p: 5600, f: false },
+        { n: "Cut Out Summer Boots", p: 3900, f: false }, { n: "Patent Leather Booties", p: 6100, f: false }
+    ];
+    bootsData.forEach((d, i) => allProducts.push(createProduct(i + 1, "boots", d.n, d.p, d.f)));
+
+    return allProducts;
+};
+
+export const products = generateProducts();
 
 export function getAllProducts() {
     return products;
@@ -222,4 +179,4 @@ export function getRelatedProducts(slug: string) {
     return products
         .filter((p) => p.category === product.category && p.slug !== slug)
         .slice(0, 4);
-} 
+}
