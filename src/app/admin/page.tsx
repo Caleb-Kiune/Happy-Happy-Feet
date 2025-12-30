@@ -73,8 +73,8 @@ export default function AdminDashboardPage() {
 
     return (
         <div className="min-h-screen">
-            {/* Header */}
-            <header className="bg-white border-b border-[#E5E5E5]">
+            {/* Header - Mobile Only (Desktop has Sidebar) */}
+            <header className="bg-white border-b border-[#E5E5E5] md:hidden">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center gap-3">
@@ -85,15 +85,9 @@ export default function AdminDashboardPage() {
                                 Admin
                             </span>
                         </div>
+                        {/* Mobile Logout is in Bottom Bar, checking if we need this div */}
                         <div className="flex items-center gap-4">
                             <span className="text-sm text-[#666666]">{user.email}</span>
-                            <button
-                                onClick={handleSignOut}
-                                className="flex items-center gap-2 text-sm text-[#666666] hover:text-[#111111] transition-colors"
-                            >
-                                <LogOut className="w-4 h-4" />
-                                Sign out
-                            </button>
                         </div>
                     </div>
                 </div>
