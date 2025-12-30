@@ -16,7 +16,8 @@ import {
     SelectValue
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Plus, X, UploadCloud } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import ImageUpload from "./ImageUpload";
 
 // Types matching the form needs
 type ProductFormProps = {
@@ -47,7 +48,6 @@ export default function ProductForm({ initialData, action }: ProductFormProps) {
     const [category, setCategory] = useState(initialData?.category || "heels");
     const [sizes, setSizes] = useState<string[]>(initialData?.sizes || []);
     const [images, setImages] = useState<string[]>(initialData?.images || []);
-    const [imageUrlInput, setImageUrlInput] = useState("");
 
     // Auto-generate slug
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,17 +63,6 @@ export default function ProductForm({ initialData, action }: ProductFormProps) {
         setSizes(prev =>
             prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size].sort()
         );
-    };
-
-    // Image Management
-    const addImage = () => {
-        if (!imageUrlInput) return;
-        setImages(prev => [...prev, imageUrlInput]);
-        setImageUrlInput("");
-    };
-
-    const removeImage = (index: number) => {
-        setImages(prev => prev.filter((_, i) => i !== index));
     };
 
     // Submission Wrapper
@@ -205,65 +194,11 @@ export default function ProductForm({ initialData, action }: ProductFormProps) {
                 {/* Right Column: Images */}
                 <div className="space-y-6">
                     <Label>Product Images</Label>
-
-                    {/* Image List */}
-                    <div className="grid grid-cols-2 gap-4 min-h-[100px] content-start">
-                        {images.map((url, idx) => (
-                            <div key={idx} className="relative group aspect-square bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                                <Image
-                                    src={url}
-                                    alt={`Product ${idx + 1}`}
-                                    fill
-                                    className="object-cover"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => removeImage(idx)}
-                                    className="absolute top-2 right-2 bg-white/90 text-red-500 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
-                                {idx === 0 && (
-                                    <div className="absolute bottom-2 left-2 bg-[#111111]/80 text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded">
-                                        Main
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-
-                        {/* Placeholder if empty */}
-                        {images.length === 0 && (
-                            <div className="col-span-2 flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-200 rounded-lg text-gray-400">
-                                <UploadCloud className="w-8 h-8 mb-2" />
-                                <span className="text-sm">No images added yet</span>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Add Image Input */}
-                    <div className="space-y-2 pt-4 border-t border-gray-100">
-                        <Label className="text-xs text-gray-500 uppercase tracking-wide">Add Image URL</Label>
-                        <div className="flex gap-2">
-                            <Input
-                                value={imageUrlInput}
-                                onChange={(e) => setImageUrlInput(e.target.value)}
-                                placeholder="https://..."
-                                className="flex-1"
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        e.preventDefault();
-                                        addImage();
-                                    }
-                                }}
-                            />
-                            <Button type="button" onClick={addImage} variant="outline" size="icon">
-                                <Plus className="w-4 h-4" />
-                            </Button>
-                        </div>
-                        <p className="text-[10px] text-gray-400">
-                            Paste a direct link to an image (e.g. from Supabase Storage or Unsplash).
-                        </p>
-                    </div>
+                    <ImageUpload
+                        images={images}
+                        onChange={(newImages) => setImages(newImages)}
+                        disabled={isPending}
+                    />
                 </div>
             </div>
 
