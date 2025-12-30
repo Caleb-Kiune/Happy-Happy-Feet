@@ -3,15 +3,10 @@
 import { useCallback, useState } from "react";
 import { UploadCloud, X, Loader2, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
-import { useDropzone } from "react-dropzone"; // Note: We might need to install this or implement raw drag/drop if strict on dependencies. 
-// User prompt said "shadcn/ui or custom", usually raw react-dropzone is best, but to stay lightweight I'll do custom logic first to avoid npm install if not needed, 
-// BUT for robust drag/drop, react-dropzone is standard. I'll stick to a custom implementation to reduce dependency bloat unless requested.
-// Wait - standard practice is to use a library for files. I will use a simple input type=file hidden trigger for now to be safe, 
-// and wrap it in a custom drag/drop div. 
-
 import { createClient } from "@/lib/supabase";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import imageCompression from "browser-image-compression";
 
 type ImageUploadProps = {
     images: string[];
@@ -26,43 +21,54 @@ export default function ImageUpload({
 }: ImageUploadProps) {
     const [isUploading, setIsUploading] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
+    const [uploadStatus, setUploadStatus] = useState("Uploading...");
 
     const onUpload = async (file: File) => {
         // 1. Validate
-        if (file.size > 5 * 1024 * 1024) { // 5MB
-            toast.error("File size too large (Max 5MB)");
-            return;
-        }
         if (!file.type.startsWith("image/")) {
             toast.error("Invalid file type. Please upload an image.");
             return;
         }
 
         setIsUploading(true);
+        setUploadStatus("Optimizing...");
 
         try {
+            // 2. Compress Image
+            const options = {
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1200,
+                useWebWorker: true,
+                fileType: "image/webp",
+                initialQuality: 0.8,
+            };
+
+            const compressedFile = await imageCompression(file, options);
+            console.log(`Original: ${(file.size / 1024 / 1024).toFixed(2)}MB, Compressed: ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
+
+            setUploadStatus("Uploading...");
+
             const supabase = createClient();
 
-            // 2. Generate Unique Name: uuid + sanitized original name
-            const fileExt = file.name.split(".").pop();
-            const fileName = `${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9]/g, "-")}.${fileExt}`;
+            // 3. Generate Unique Name: uuid + sanitized original name (forced .webp)
+            const fileName = `${crypto.randomUUID()}-${file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9]/g, "-")}.webp`;
             const filePath = `${fileName}`;
 
-            // 3. Upload to Supabase Storage
+            // 4. Upload to Supabase Storage
             const { error: uploadError } = await supabase.storage
                 .from("product-images")
-                .upload(filePath, file);
+                .upload(filePath, compressedFile);
 
             if (uploadError) {
                 throw uploadError;
             }
 
-            // 4. Get Public URL
+            // 5. Get Public URL
             const { data: { publicUrl } } = supabase.storage
                 .from("product-images")
                 .getPublicUrl(filePath);
 
-            // 5. Update State
+            // 6. Update State
             onChange([...images, publicUrl]);
             toast.success("Image uploaded");
 
@@ -71,6 +77,7 @@ export default function ImageUpload({
             toast.error(error.message || "Failed to upload image");
         } finally {
             setIsUploading(false);
+            setUploadStatus("Uploading...");
         }
     };
 
@@ -150,7 +157,7 @@ export default function ImageUpload({
                 {isUploading ? (
                     <div className="flex flex-col items-center gap-2 text-[#666666]">
                         <Loader2 className="w-8 h-8 animate-spin text-[#E07A8A]" />
-                        <p className="text-sm font-medium">Uploading...</p>
+                        <p className="text-sm font-medium">{uploadStatus}</p>
                     </div>
                 ) : (
                     <>
@@ -162,7 +169,7 @@ export default function ImageUpload({
                                 Click to upload <span className="text-[#999999] font-normal">or drag & drop</span>
                             </p>
                             <p className="text-xs text-[#999999] mt-1">
-                                PNG, JPG, WEBP up to 5MB
+                                JPG, PNG, WEBP (auto-compressed to WebP)
                             </p>
                         </div>
                     </>
