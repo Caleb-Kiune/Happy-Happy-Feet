@@ -107,6 +107,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                                     alt={`${product.name} thumbnail ${idx + 1}`}
                                     fill
                                     className="object-cover"
+                                    sizes="80px"
                                 />
                             </button>
                         ))}
