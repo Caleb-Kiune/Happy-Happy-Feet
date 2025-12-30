@@ -4,12 +4,16 @@
 import { createServerSupabaseClient } from "./supabase-server";
 import { createStaticClient } from "./supabase-static";
 
+export const CATEGORY_VALUES = ["heels", "flats", "wedge", "open"] as const;
+export type ProductCategory = typeof CATEGORY_VALUES[number];
+
 export type Product = {
     id: string;
     slug: string;
     name: string;
     price: number;
-    category: "heels" | "sandals" | "sneakers" | "flats" | "boots";
+    // Allow strict union for new types but string for legacy data compatibility
+    category: ProductCategory | string;
     images: string[];
     sizes: string[];
     description?: string;
@@ -41,7 +45,7 @@ type ProductRow = {
     slug: string;
     name: string;
     price: number;
-    category: "heels" | "sandals" | "sneakers" | "flats" | "boots";
+    category: string; // Database returns string
     sizes: string[];
     description: string | null;
     featured: boolean;

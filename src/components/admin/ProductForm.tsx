@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import ImageUpload from "./ImageUpload";
 
-import { PRODUCT_SIZES } from "@/lib/constants";
+import { PRODUCT_SIZES, PRODUCT_CATEGORIES } from "@/lib/constants";
 
 // Types matching the form needs
 type ProductFormProps = {
@@ -36,8 +36,6 @@ type ProductFormProps = {
     };
     action: (currentState: any, formData: FormData) => Promise<any>;
 };
-
-const CATEGORIES = ["heels", "sandals", "sneakers", "flats", "boots"];
 
 export default function ProductForm({ initialData, action }: ProductFormProps) {
     const router = useRouter();
@@ -141,7 +139,7 @@ export default function ProductForm({ initialData, action }: ProductFormProps) {
                                     <SelectValue placeholder="Select category" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {CATEGORIES.map(c => (
+                                    {PRODUCT_CATEGORIES.map(c => (
                                         <SelectItem key={c} value={c} className="capitalize">
                                             {c}
                                         </SelectItem>
