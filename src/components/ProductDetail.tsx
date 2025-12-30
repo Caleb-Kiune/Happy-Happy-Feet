@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Phone, Check, Plus, Minus, ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
+import { PRODUCT_SIZES } from "@/lib/constants";
 
 type ProductDetailProps = {
     product: Product;
@@ -137,31 +138,43 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                     </p>
                 </div>
 
+
+
                 {/* Size Selector */}
-                {sizes.length > 0 && (
-                    <div className="mt-8">
-                        <h3 className="text-sm font-medium text-gray-900">Select Size</h3>
-                        <div className="mt-3 flex flex-wrap gap-3">
-                            {sizes.map((size) => (
+                <div className="mt-8">
+                    <h3 className="text-sm font-medium text-gray-900">Select Size</h3>
+                    <div className="mt-3 flex flex-wrap gap-3">
+                        {PRODUCT_SIZES.map((size) => {
+                            const isAvailable = sizes.includes(size);
+                            const isSelected = selectedSize === size;
+
+                            return (
                                 <button
                                     key={size}
-                                    onClick={() => setSelectedSize(size)}
-                                    className={`flex h-12 w-12 items-center justify-center rounded-md border text-sm font-medium transition-all ${selectedSize === size
-                                        ? "border-accent-500 bg-accent-500 text-white"
-                                        : "border-gray-200 bg-white text-gray-900 hover:border-accent-500 hover:text-accent-500"
-                                        }`}
+                                    onClick={() => isAvailable && setSelectedSize(size)}
+                                    disabled={!isAvailable}
+                                    className={`
+                                        flex h-12 w-12 items-center justify-center rounded-md border text-sm font-medium transition-all
+                                        ${isSelected
+                                            ? "border-accent-500 bg-accent-500 text-white"
+                                            : isAvailable
+                                                ? "border-gray-200 bg-white text-gray-900 hover:border-accent-500 hover:text-accent-500 cursor-pointer"
+                                                : "border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed decoration-slice line-through decoration-gray-300"
+                                        }
+                                    `}
+                                    title={isAvailable ? "In Stock" : "Out of Stock"}
                                 >
                                     {size}
                                 </button>
-                            ))}
-                        </div>
-                        {selectedSize && (
-                            <p className="mt-2 text-sm text-success flex items-center gap-1">
-                                <Check className="h-3 w-3" /> Size {selectedSize} selected
-                            </p>
-                        )}
+                            );
+                        })}
                     </div>
-                )}
+                    {selectedSize && (
+                        <p className="mt-2 text-sm text-success flex items-center gap-1">
+                            <Check className="h-3 w-3" /> Size {selectedSize} selected
+                        </p>
+                    )}
+                </div>
 
                 {/* Quantity Selector */}
                 <div className="mt-8">

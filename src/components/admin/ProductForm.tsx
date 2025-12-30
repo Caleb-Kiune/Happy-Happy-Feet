@@ -19,6 +19,8 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import ImageUpload from "./ImageUpload";
 
+import { PRODUCT_SIZES } from "@/lib/constants";
+
 // Types matching the form needs
 type ProductFormProps = {
     initialData?: {
@@ -36,7 +38,6 @@ type ProductFormProps = {
 };
 
 const CATEGORIES = ["heels", "sandals", "sneakers", "flats", "boots"];
-const AVAILABLE_SIZES = ["36", "37", "38", "39", "40", "41", "42"];
 
 export default function ProductForm({ initialData, action }: ProductFormProps) {
     const router = useRouter();
@@ -151,24 +152,31 @@ export default function ProductForm({ initialData, action }: ProductFormProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Available Sizes</Label>
+                        <Label>Available Sizes (In Stock)</Label>
                         <div className="flex flex-wrap gap-2">
-                            {AVAILABLE_SIZES.map(size => (
-                                <button
-                                    key={size}
-                                    type="button"
-                                    onClick={() => toggleSize(size)}
-                                    className={`
-                                        h-10 w-10 rounded-full border text-sm font-medium transition-colors
-                                        ${sizes.includes(size)
-                                            ? "bg-[#111111] text-white border-[#111111]"
-                                            : "bg-white text-[#666666] border-[#E5E5E5] hover:border-[#111111]"}
+                            {PRODUCT_SIZES.map(size => {
+                                const isSelected = sizes.includes(size);
+                                return (
+                                    <button
+                                        key={size}
+                                        type="button"
+                                        onClick={() => toggleSize(size)}
+                                        className={`
+                                        h-10 w-10 rounded-full border text-sm font-medium transition-all
+                                        ${isSelected
+                                                ? "bg-green-600 text-white border-green-600 shadow-sm"
+                                                : "bg-white text-gray-400 border-gray-200 hover:border-gray-400"}
                                     `}
-                                >
-                                    {size}
-                                </button>
-                            ))}
+                                        title={isSelected ? "In Stock" : "Out of Stock"}
+                                    >
+                                        {size}
+                                    </button>
+                                );
+                            })}
                         </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                            Green = In Stock (Visible). Gray = Out of Stock (Disabled but visible).
+                        </p>
                     </div>
 
                     <div className="space-y-2">
