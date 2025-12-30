@@ -3,12 +3,60 @@
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { Product } from "@/lib/products";
 
-// Types
-type ActionState = {
+export type ActionState = {
     error?: string;
     success?: boolean;
 };
+
+// ... existing ActionState definition ...
+
+export async function quickUpdateProduct(id: string, updates: Partial<Product>): Promise<ActionState> {
+    const supabase = await createServerSupabaseClient();
+
+    // Auth Check
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Unauthorized" };
+
+    try {
+        // Filter out fields that shouldn't be updated directly or need transformation if any
+        // For now, we trust the Partial<Product> matches DB columns mostly, 
+        // but let's be explicit about what we allow to be safe.
+        const safeUpdates: any = {};
+        if (updates.name !== undefined) safeUpdates.name = updates.name;
+        if (updates.price !== undefined) safeUpdates.price = updates.price;
+        if (updates.category !== undefined) safeUpdates.category = updates.category;
+        if (updates.featured !== undefined) safeUpdates.featured = updates.featured;
+        if (updates.sizes !== undefined) safeUpdates.sizes = updates.sizes;
+
+        if (Object.keys(safeUpdates).length === 0) {
+            return { success: true }; // Nothing to update
+        }
+
+        const { error } = await supabase
+            .from("products")
+            .update(safeUpdates)
+            .eq("id", id);
+
+        if (error) throw error;
+
+    } catch (error: any) {
+        console.error("Quick Update Error:", error);
+        return { error: error.message || "Failed to update product" };
+    }
+
+    revalidatePath("/admin/products");
+    revalidatePath("/shop");
+    revalidatePath("/");
+
+    return { success: true };
+}
+
+// Types
+// Types
+// ActionState is defined at the top of the file
+
 
 export async function createProduct(currentState: ActionState | null, formData: FormData): Promise<ActionState> {
     const supabase = await createServerSupabaseClient();

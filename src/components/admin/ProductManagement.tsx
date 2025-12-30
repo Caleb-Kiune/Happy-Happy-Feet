@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { deleteProduct, deleteProducts } from "@/app/admin/products/actions";
 import DeleteProductButton from "@/components/admin/DeleteProductButton";
+import ProductRow from "@/components/admin/ProductRow";
 import { Product } from "@/lib/products";
 import { PLACEHOLDER_IMAGE } from "@/lib/placeholder";
 import { toast } from "sonner";
@@ -228,67 +229,12 @@ export default function ProductManagement({ initialProducts }: ProductManagement
                     </TableHeader>
                     <TableBody>
                         {filteredProducts.map((product) => (
-                            <TableRow key={product.id} className={selectedIds.has(product.id) ? "bg-gray-50" : ""}>
-                                <TableCell>
-                                    <input
-                                        type="checkbox"
-                                        className="rounded border-gray-300 text-[#111111] focus:ring-[#111111]"
-                                        checked={selectedIds.has(product.id)}
-                                        onChange={() => toggleSelect(product.id)}
-                                    />
-                                </TableCell>
-                                <TableCell>
-                                    <div className="relative h-10 w-10 rounded-md overflow-hidden bg-gray-100 border border-gray-200">
-                                        {product.images[0] ? (
-                                            <Image
-                                                src={product.images[0]}
-                                                alt={product.name}
-                                                fill
-                                                placeholder="blur"
-                                                blurDataURL={PLACEHOLDER_IMAGE}
-                                                className="object-cover"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-[10px]">
-                                                No Img
-                                            </div>
-                                        )}
-                                    </div>
-                                </TableCell>
-                                <TableCell className="font-medium text-[#111111]">
-                                    {product.name}
-                                </TableCell>
-                                <TableCell className="capitalize text-gray-600">
-                                    {product.category}
-                                </TableCell>
-                                <TableCell>KSh {product.price.toLocaleString()}</TableCell>
-                                <TableCell>
-                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                        {product.sizes.length} sizes
-                                    </span>
-                                </TableCell>
-                                <TableCell>
-                                    {product.featured && (
-                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#FDF2F4] text-[#D16A7A]">
-                                            Featured
-                                        </span>
-                                    )}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <div className="flex items-center justify-end gap-2">
-                                        <Link href={`/admin/products/${product.id}/edit`}>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-8 w-8 text-gray-500 hover:text-[#111111]"
-                                            >
-                                                <Pencil className="w-4 h-4" />
-                                            </Button>
-                                        </Link>
-                                        <DeleteProductButton id={product.id} />
-                                    </div>
-                                </TableCell>
-                            </TableRow>
+                            <ProductRow
+                                key={product.id}
+                                product={product}
+                                isSelected={selectedIds.has(product.id)}
+                                onToggleSelect={toggleSelect}
+                            />
                         ))}
                         {filteredProducts.length === 0 && (
                             <TableRow>
