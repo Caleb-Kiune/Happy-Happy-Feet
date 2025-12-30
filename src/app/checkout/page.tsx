@@ -9,6 +9,7 @@ import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/utils";
 import { Phone, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { PLACEHOLDER_IMAGE } from "@/lib/placeholder";
 
 export default function CheckoutPage() {
     const { state, dispatch, totalPrice, totalItems } = useCart();
@@ -249,6 +250,8 @@ Please confirm availability and delivery fee. Thank you!`;
                                                 src={item.image}
                                                 alt={item.name}
                                                 fill
+                                                placeholder="blur"
+                                                blurDataURL={PLACEHOLDER_IMAGE}
                                                 className="object-cover"
                                             />
                                         </div>

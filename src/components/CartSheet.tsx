@@ -16,6 +16,7 @@ import { formatPrice } from "@/lib/utils";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
+import { PLACEHOLDER_IMAGE } from "@/lib/placeholder";
 
 export default function CartSheet() {
     const { state, dispatch, totalItems, totalPrice } = useCart();
@@ -101,6 +102,8 @@ export default function CartSheet() {
                                             src={item.image}
                                             alt={item.name}
                                             fill
+                                            placeholder="blur"
+                                            blurDataURL={PLACEHOLDER_IMAGE}
                                             className="object-cover"
                                         />
                                     </div>

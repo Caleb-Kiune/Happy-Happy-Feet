@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Product } from "@/lib/products";
+import { PLACEHOLDER_IMAGE } from "@/lib/placeholder";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Phone, Check, Plus, Minus, ShoppingBag } from "lucide-react";
@@ -85,6 +86,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                         alt={product.name}
                         fill
                         priority
+                        placeholder="blur"
+                        blurDataURL={PLACEHOLDER_IMAGE}
                         className="h-full w-full object-cover object-center"
                         sizes="(min-width: 1024px) 50vw, 100vw"
                     />
@@ -106,6 +109,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                                     src={img}
                                     alt={`${product.name} thumbnail ${idx + 1}`}
                                     fill
+                                    placeholder="blur"
+                                    blurDataURL={PLACEHOLDER_IMAGE}
                                     className="object-cover"
                                     sizes="80px"
                                 />

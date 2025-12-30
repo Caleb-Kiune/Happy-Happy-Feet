@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
 import { Product } from "@/lib/products";
+import { PLACEHOLDER_IMAGE } from "@/lib/placeholder";
 
 type ShoeCardProps = {
     product: Product;
@@ -15,6 +16,8 @@ export default function ShoeCard({ product }: ShoeCardProps) {
                     src={product.images[0]}
                     alt={product.name}
                     fill
+                    placeholder="blur"
+                    blurDataURL={PLACEHOLDER_IMAGE}
                     className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
                     sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                 />

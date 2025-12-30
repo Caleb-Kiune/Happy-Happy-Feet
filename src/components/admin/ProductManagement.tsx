@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import DeleteProductButton from "@/components/admin/DeleteProductButton";
 import { Product } from "@/lib/products";
+import { PLACEHOLDER_IMAGE } from "@/lib/placeholder";
 
 // Debounce hook implementation inline for simplicity
 function useDebounce<T>(value: T, delay: number): T {
@@ -160,6 +161,8 @@ export default function ProductManagement({ initialProducts }: ProductManagement
                                                 src={product.images[0]}
                                                 alt={product.name}
                                                 fill
+                                                placeholder="blur"
+                                                blurDataURL={PLACEHOLDER_IMAGE}
                                                 className="object-cover"
                                             />
                                         ) : (
@@ -234,6 +237,8 @@ export default function ProductManagement({ initialProducts }: ProductManagement
                                     src={product.images[0]}
                                     alt={product.name}
                                     fill
+                                    placeholder="blur"
+                                    blurDataURL={PLACEHOLDER_IMAGE}
                                     className="object-cover"
                                 />
                             )}
