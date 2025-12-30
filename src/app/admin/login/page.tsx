@@ -3,17 +3,27 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function AdminLoginPage() {
     const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [isEmailSent, setIsEmailSent] = useState(false);
+    const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        // Basic Validation
         if (!email) {
-            toast.error("Please enter your email address");
+            toast.error("Please enter your email");
+            return;
+        }
+        if (!password || password.length < 8) {
+            toast.error("Password must be at least 8 characters");
             return;
         }
 
@@ -21,142 +31,90 @@ export default function AdminLoginPage() {
 
         try {
             const supabase = createClient();
-            const { error } = await supabase.auth.signInWithOtp({
+
+            // Attempt Sign In
+            const { error } = await supabase.auth.signInWithPassword({
                 email,
-                options: {
-                    emailRedirectTo: `${window.location.origin}/auth/callback`,
-                },
+                password,
             });
 
             if (error) {
-                throw error;
+                console.error("Login attempt failed:", error.message);
+                // Vague error for security
+                toast.error("Wrong email or password.");
+                return;
             }
 
-            setIsEmailSent(true);
-            toast.success("Magic link sent! Check your email.");
+            // Success
+            toast.success("Welcome back!");
+            router.push("/admin");
+
         } catch (error) {
-            console.error("Login error:", error);
-            toast.error("Failed to send magic link. Please try again.");
+            console.error("Unexpected login error:", error);
+            toast.error("Something went wrong. Please try again.");
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA] px-4">
             <div className="w-full max-w-md">
                 {/* Logo / Brand */}
                 <div className="text-center mb-12">
                     <h1 className="text-2xl font-semibold tracking-tight text-[#111111]">
                         Happy Happy Feet
                     </h1>
-                    <p className="text-sm text-[#666666] mt-1">Admin Dashboard</p>
+                    <p className="text-sm text-[#666666] mt-1">Admin Login</p>
                 </div>
 
-                {/* Card */}
+                {/* Login Card */}
                 <div className="bg-white rounded-2xl shadow-sm border border-[#E5E5E5] p-8">
-                    {!isEmailSent ? (
-                        <>
-                            <h2 className="text-xl font-medium text-[#111111] mb-2">
-                                Welcome back
-                            </h2>
-                            <p className="text-sm text-[#666666] mb-8">
-                                Enter your email to receive a magic link
-                            </p>
-
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div>
-                                    <label
-                                        htmlFor="email"
-                                        className="block text-sm font-medium text-[#111111] mb-2"
-                                    >
-                                        Email address
-                                    </label>
-                                    <input
-                                        id="email"
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="you@example.com"
-                                        className="w-full px-4 py-3 rounded-xl border border-[#E5E5E5] bg-white text-[#111111] placeholder:text-[#999999] focus:outline-none focus:ring-2 focus:ring-[#E07A8A]/50 focus:border-[#E07A8A] transition-all duration-200"
-                                        disabled={isLoading}
-                                        autoComplete="email"
-                                        autoFocus
-                                    />
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={isLoading}
-                                    className="w-full py-3 px-4 bg-[#E07A8A] hover:bg-[#D66A7A] text-white font-medium rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    {isLoading ? (
-                                        <span className="flex items-center justify-center gap-2">
-                                            <svg
-                                                className="animate-spin h-4 w-4"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                            >
-                                                <circle
-                                                    className="opacity-25"
-                                                    cx="12"
-                                                    cy="12"
-                                                    r="10"
-                                                    stroke="currentColor"
-                                                    strokeWidth="4"
-                                                />
-                                                <path
-                                                    className="opacity-75"
-                                                    fill="currentColor"
-                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                />
-                                            </svg>
-                                            Sending...
-                                        </span>
-                                    ) : (
-                                        "Send Magic Link"
-                                    )}
-                                </button>
-                            </form>
-                        </>
-                    ) : (
-                        /* Success State */
-                        <div className="text-center py-4">
-                            <div className="w-16 h-16 bg-[#E07A8A]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <svg
-                                    className="w-8 h-8 text-[#E07A8A]"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                    />
-                                </svg>
-                            </div>
-                            <h2 className="text-xl font-medium text-[#111111] mb-2">
-                                Check your email
-                            </h2>
-                            <p className="text-sm text-[#666666] mb-6">
-                                We sent a magic link to{" "}
-                                <span className="font-medium text-[#111111]">{email}</span>
-                            </p>
-                            <button
-                                onClick={() => setIsEmailSent(false)}
-                                className="text-sm text-[#E07A8A] hover:text-[#D66A7A] font-medium transition-colors"
-                            >
-                                Use a different email
-                            </button>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Email address</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                placeholder="name@example.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                disabled={isLoading}
+                                className="h-11 bg-white"
+                                required
+                            />
                         </div>
-                    )}
+
+                        <div className="space-y-2">
+                            <Label htmlFor="password">Password</Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                disabled={isLoading}
+                                className="h-11 bg-white"
+                                required
+                            />
+                            <p className="text-xs text-[#999999]">
+                                Must be at least 8 characters
+                            </p>
+                        </div>
+
+                        <Button
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full h-11 bg-[#E07A8A] hover:bg-[#D66A7A] text-white font-medium rounded-full text-base transition-all duration-200"
+                        >
+                            {isLoading ? "Signing in..." : "Sign In"}
+                        </Button>
+                    </form>
                 </div>
 
                 {/* Footer */}
                 <p className="text-center text-xs text-[#999999] mt-8">
-                    Only authorized admins can access this dashboard
+                    Authorized personnel only
                 </p>
             </div>
         </div>
