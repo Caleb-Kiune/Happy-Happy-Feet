@@ -172,3 +172,63 @@ export async function deleteProduct(id: string): Promise<ActionState> {
     revalidatePath("/shop");
     return { success: true };
 }
+
+export async function deleteProducts(ids: string[]): Promise<ActionState> {
+    const supabase = await createServerSupabaseClient();
+
+    // Auth Check
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Unauthorized" };
+
+    if (!ids || ids.length === 0) return { error: "No products selected" };
+
+    try {
+        // 1. Fetch Images to delete from Storage
+        const { data: images } = await supabase
+            .from("product_images")
+            .select("url")
+            .in("product_id", ids);
+
+        if (images && images.length > 0) {
+            const pathsToDelete = images
+                .map((img) => {
+                    // Extract path: "https://.../product-images/folder/file.jpg" -> "folder/file.jpg"
+                    // Or "file.jpg" if root.
+                    const url = new URL(img.url);
+                    const pathParts = url.pathname.split("/product-images/");
+                    return pathParts.length > 1 ? pathParts[1] : null;
+                })
+                .filter((p): p is string => p !== null);
+
+            if (pathsToDelete.length > 0) {
+                const { error: storageError } = await supabase.storage
+                    .from("product-images")
+                    .remove(pathsToDelete);
+
+                if (storageError) {
+                    console.error("Storage Batch Delete Error:", storageError);
+                    // Continue to delete DB records even if storage fails slightly
+                }
+            }
+        }
+
+        // 2. Delete Images from DB (Explicit)
+        await supabase.from("product_images").delete().in("product_id", ids);
+
+        // 3. Delete Products
+        const { error } = await supabase
+            .from("products")
+            .delete()
+            .in("id", ids);
+
+        if (error) throw error;
+
+    } catch (error: any) {
+        console.error("Bulk Delete Error:", error);
+        return { error: error.message || "Failed to delete products" };
+    }
+
+    revalidatePath("/admin/products");
+    revalidatePath("/shop");
+    return { success: true };
+}
