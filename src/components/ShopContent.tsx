@@ -158,8 +158,19 @@ export default function ShopContent({ products }: ShopContentProps) {
                     return b.price - a.price;
                 case "name-asc":
                     return a.name.localeCompare(b.name);
+                case "featured":
                 default:
-                    return 0; // Keep original order for "featured"
+                    // Featured first (true > false/undefined)
+                    const isFeaturedA = !!a.featured;
+                    const isFeaturedB = !!b.featured;
+
+                    if (isFeaturedA !== isFeaturedB) {
+                        return isFeaturedA ? -1 : 1;
+                    }
+
+                    // Secondary sort: Newest (created_at desc)
+                    // Use string comparison for ISO dates
+                    return b.createdAt.localeCompare(a.createdAt);
             }
         });
     }, [filteredProducts, sortBy]);

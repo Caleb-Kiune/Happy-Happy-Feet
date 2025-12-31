@@ -18,6 +18,7 @@ export type Product = {
     sizes: string[];
     description?: string;
     featured?: boolean;
+    createdAt: string;
 };
 
 /**
@@ -49,6 +50,7 @@ type ProductRow = {
     sizes: string[];
     description: string | null;
     featured: boolean;
+    created_at: string;
 };
 
 type ProductImageRow = {
@@ -70,6 +72,7 @@ function transformProduct(
         sizes: row.sizes,
         description: row.description ?? undefined,
         featured: row.featured,
+        createdAt: row.created_at,
         images: images
             .sort((a, b) => a.sort_order - b.sort_order)
             .map((img) => img.url),
