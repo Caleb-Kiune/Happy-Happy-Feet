@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Container from "@/components/Container";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/utils";
-import { Phone, CheckCircle2 } from "lucide-react";
+import { Phone, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { PLACEHOLDER_IMAGE } from "@/lib/placeholder";
+import { createOrder } from "./actions";
 
 export default function CheckoutPage() {
     const { state, dispatch, totalPrice, totalItems } = useCart();
@@ -41,6 +42,8 @@ export default function CheckoutPage() {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const [isPending, startTransition] = useTransition();
+
     const handlePlaceOrder = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -52,20 +55,49 @@ export default function CheckoutPage() {
             return;
         }
 
-        // Construct WhatsApp Message
-        const itemsList = state.items
-            .map(
-                (item, index) =>
-                    `${index + 1}. ${item.name} (Size: ${item.size}) x ${item.quantity} - ${formatPrice(
-                        item.price * item.quantity
-                    )}`
-            )
-            .join("\n");
+        startTransition(async () => {
+            // 1. Create Order in Database
+            const result = await createOrder({
+                customer: {
+                    name: formData.name,
+                    phone: formData.phone,
+                    location: formData.location,
+                    notes: formData.notes,
+                },
+                items: state.items.map(item => ({
+                    product_id: item.id,
+                    product_name: item.name,
+                    size: item.size,
+                    quantity: item.quantity,
+                    price: item.price
+                })),
+                total: totalPrice,
+            });
 
-        const subtotal = formatPrice(totalPrice);
+            if (result.error) {
+                toast.error("Failed to save order", {
+                    description: result.error,
+                });
+                return;
+            }
 
-        const message = `*New Order from Happy Happy Feet* 🛍️
+            const orderId = result.orderId;
+
+            // 2. Construct WhatsApp Message
+            const itemsList = state.items
+                .map(
+                    (item, index) =>
+                        `${index + 1}. ${item.name} (Size: ${item.size}) x ${item.quantity} - ${formatPrice(
+                            item.price * item.quantity
+                        )}`
+                )
+                .join("\n");
+
+            const subtotal = formatPrice(totalPrice);
+
+            const message = `*New Order from Happy Happy Feet* 🛍️
 --------------------------------
+*Order ID:* #${orderId?.slice(0, 8)}
 *Customer:* ${formData.name}
 *Phone:* ${formData.phone}
 *Location:* ${formData.location}
@@ -78,18 +110,19 @@ ${itemsList}
 --------------------------------
 Please confirm availability and delivery fee. Thank you!`;
 
-        const whatsappUrl = `https://wa.me/254705774171?text=${encodeURIComponent(
-            message
-        )}`;
+            const whatsappUrl = `https://wa.me/254705774171?text=${encodeURIComponent(
+                message
+            )}`;
 
-        // Open WhatsApp
-        window.open(whatsappUrl, "_blank");
+            // 3. Open WhatsApp
+            window.open(whatsappUrl, "_blank");
 
-        // Clear Cart and Show Success
-        dispatch({ type: "CLEAR_CART" });
-        setIsSuccess(true);
-        toast.success("Order Drafted!", {
-            description: "Please hit send in WhatsApp to complete your order.",
+            // 4. Clear Cart and Show Success
+            dispatch({ type: "CLEAR_CART" });
+            setIsSuccess(true);
+            toast.success("Order Saved!", {
+                description: "Opening WhatsApp to complete your order...",
+            });
         });
     };
 
@@ -284,10 +317,20 @@ Please confirm availability and delivery fee. Thank you!`;
 
                             <Button
                                 onClick={handlePlaceOrder}
-                                className="w-full rounded-full py-6 text-lg font-semibold bg-success hover:bg-success/90 text-white shadow-sm hover:shadow-md transition-all"
+                                disabled={isPending}
+                                className="w-full rounded-full py-6 text-lg font-semibold bg-success hover:bg-success/90 text-white shadow-sm hover:shadow-md transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                                <Phone className="mr-2 h-5 w-5 fill-current" />
-                                Order via WhatsApp
+                                {isPending ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                        Saving Order...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Phone className="mr-2 h-5 w-5 fill-current" />
+                                        Order via WhatsApp
+                                    </>
+                                )}
                             </Button>
                         </div>
                     </div>
