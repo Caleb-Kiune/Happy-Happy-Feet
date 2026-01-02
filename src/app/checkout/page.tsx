@@ -64,13 +64,19 @@ export default function CheckoutPage() {
                     location: formData.location,
                     notes: formData.notes,
                 },
-                items: state.items.map(item => ({
-                    product_id: item.id,
-                    product_name: item.name,
-                    size: item.size,
-                    quantity: item.quantity,
-                    price: item.price
-                })),
+                items: state.items.map(item => {
+                    // Use explicit productId if available, otherwise fallback to parsing the composite ID (legacy support)
+                    // Composite ID format: "${uuid}-${size}"
+                    const validProductId = item.productId || item.id.split('-')[0];
+
+                    return {
+                        product_id: validProductId,
+                        product_name: item.name,
+                        size: item.size,
+                        quantity: item.quantity,
+                        price: item.price
+                    };
+                }),
                 total: totalPrice,
             });
 

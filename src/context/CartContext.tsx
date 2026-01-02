@@ -6,6 +6,7 @@ import { createContext, useContext, useReducer, useEffect, ReactNode, Dispatch }
 
 export type CartItem = {
     id: string;      // Unique identifier (e.g., product.id + size)
+    productId: string; // Original Product UUID for DB linking
     slug: string;
     name: string;
     price: number;   // Price in smallest unit (e.g., KES cents or exact KES)

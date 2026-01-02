@@ -44,6 +44,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             type: "ADD_ITEM",
             payload: {
                 id: `${product.id}-${sizeToUse}`,
+                productId: product.id,
                 slug: product.slug,
                 name: product.name,
                 price: product.price,
