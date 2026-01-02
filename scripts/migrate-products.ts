@@ -40,6 +40,16 @@ const IMG = {
         `https://images.unsplash.com/photo-1543163521-1bf539c55dd2${OPTIMIZE}`,
         `https://images.unsplash.com/photo-1542185185-47838d6b00c9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fFN0YXRlbWVudCUyMFJlZCUyMFN0aWxldHRvc3xlbnwwfHwwfHx8Mg%3D%3D${OPTIMIZE}`,
     ],
+    "pencil heels": [
+        // Placeholder reuse
+        `https://images.unsplash.com/photo-1543163521-1bf539c55dd2${OPTIMIZE}`,
+    ],
+    "block heels": [
+        // Placeholder reuse
+        `https://images.unsplash.com/photo-1584473457417-bd0afe798ae1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGNsYXNzaWMlMjBibGFjayUyMHB1bXBzJTIwaGVlbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
+    ],
+    wedge: [],
+    open: [],
     sandals: [
         `https://images.unsplash.com/photo-1728973702902-9cd4c75eebdb?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8U3VtbWVyJTIwU3RyYXBweSUyMFNhbmRhbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
         `https://images.unsplash.com/photo-1568347619798-2008f2ce5b94?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8VGFuJTIwTGVhdGhlciUyMFNhbmRhbHN8ZW58MHx8MHx8fDI%3D${OPTIMIZE}`,
@@ -60,7 +70,7 @@ const IMG = {
     ],
 };
 
-type Category = "heels" | "sandals" | "sneakers" | "flats" | "boots";
+type Category = "block heels" | "pencil heels" | "flats" | "wedge" | "open" | "heels" | "sandals" | "sneakers" | "boots";
 
 interface ProductData {
     slug: string;

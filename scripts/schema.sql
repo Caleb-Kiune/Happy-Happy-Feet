@@ -9,7 +9,7 @@ CREATE TABLE products (
   slug TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
   price INTEGER NOT NULL,
-  category TEXT NOT NULL CHECK (category IN ('heels', 'sandals', 'sneakers', 'flats', 'boots')),
+  category TEXT NOT NULL, -- Flexible category text
   sizes TEXT[] NOT NULL DEFAULT '{}',
   description TEXT,
   featured BOOLEAN DEFAULT FALSE,

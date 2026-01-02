@@ -44,7 +44,7 @@ export default function ProductForm({ initialData, action }: ProductFormProps) {
     // Form State
     const [name, setName] = useState(initialData?.name || "");
     const [slug, setSlug] = useState(initialData?.slug || "");
-    const [category, setCategory] = useState(initialData?.category || "heels");
+    const [category, setCategory] = useState(initialData?.category ?? PRODUCT_CATEGORIES[0]);
     const [sizes, setSizes] = useState<string[]>(initialData?.sizes || []);
     const [images, setImages] = useState<string[]>(initialData?.images || []);
 

@@ -3,23 +3,16 @@
 
 import { createServerSupabaseClient } from "./supabase-server";
 import { createStaticClient } from "./supabase-static";
+import { Product, CATEGORY_VALUES } from "./types";
+// Export them so other files don't break immediately if they import from here (though we should update them)
+// Actually, better to force update, but let's re-export to be safe or just import in other files.
+// The plan said "Update src/lib/products.ts to import them".
+// I will just import them for internal use, but I won't re-export them unless necessary.
+// Wait, if I don't re-export, I break every file that imports { Product } from "@/lib/products".
+// So I MUST re-export them.
 
-export const CATEGORY_VALUES = ["heels", "flats", "wedge", "open"] as const;
-export type ProductCategory = typeof CATEGORY_VALUES[number];
-
-export type Product = {
-    id: string;
-    slug: string;
-    name: string;
-    price: number;
-    // Allow strict union for new types but string for legacy data compatibility
-    category: ProductCategory | string;
-    images: string[];
-    sizes: string[];
-    description?: string;
-    featured?: boolean;
-    createdAt: string;
-};
+export { CATEGORY_VALUES };
+export type { Product, ProductCategory } from "./types";
 
 /**
  * Get all product slugs for static generation (build-time)
