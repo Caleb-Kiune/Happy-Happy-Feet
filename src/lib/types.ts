@@ -1,4 +1,4 @@
-export const CATEGORY_VALUES = ["block heels", "pencil heels", "flats", "wedge", "open"] as const;
+export const CATEGORY_VALUES = ["block heels", "pencil heels", "flats", "wedge", "open", "sneakers", "orthopedic"] as const;
 export type ProductCategory = typeof CATEGORY_VALUES[number];
 
 export type Product = {

@@ -38,6 +38,7 @@ type ProductFormProps = {
 };
 
 export default function ProductForm({ initialData, action }: ProductFormProps) {
+    console.log("Current Categories:", PRODUCT_CATEGORIES); // DIAGNOSTIC LOG
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
