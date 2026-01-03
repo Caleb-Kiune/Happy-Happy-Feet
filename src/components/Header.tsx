@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import Container from "@/components/Container";
 import { Button } from "@/components/ui/button";
 import CartSheet from "@/components/CartSheet";
@@ -28,14 +29,21 @@ export default function Header() {
     return (
         <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all">
             <Container>
-                <div className="flex h-16 items-center justify-between">
+                <div className="flex h-16 md:h-20 items-center justify-between">
                     {/* Logo */}
                     <div className="flex-shrink-0">
-                        <Link
-                            href="/"
-                            className="font-sans text-xl font-bold tracking-tight text-gray-900"
-                        >
-                            Happy <span className="text-accent-500">Happy</span> Feet
+                        <Link href="/" className="block">
+                            <div className="relative h-10 md:h-14 w-auto aspect-[3/1]">
+                                <Image
+                                    src="/logo.png"
+                                    alt="Happy Happy Feet"
+                                    width={168}
+                                    height={56}
+                                    className="h-full w-auto object-contain"
+                                    priority
+                                    quality={100}
+                                />
+                            </div>
                         </Link>
                     </div>
 
@@ -77,7 +85,17 @@ export default function Header() {
                             <SheetContent side="right" className="w-[320px] border-l border-gray-200 bg-white p-8">
                                 <SheetHeader>
                                     <SheetTitle className="text-left font-sans text-xl font-bold tracking-tight text-gray-900">
-                                        Happy <span className="text-accent-500">Happy</span> Feet
+                                        <div className="relative h-10 w-auto aspect-[3/1]">
+                                            <Image
+                                                src="/logo.png"
+                                                alt="Happy Happy Feet"
+                                                width={168}
+                                                height={56}
+                                                className="h-full w-auto object-contain"
+                                                priority
+                                                quality={100}
+                                            />
+                                        </div>
                                     </SheetTitle>
                                 </SheetHeader>
                                 <div className="mt-12 flex flex-col gap-y-8">

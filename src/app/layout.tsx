@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   description: "Discover our curated collection of women's shoes designed for joy and comfort. Heels, sandals, sneakers, and flats for every occasion.",
   icons: {
-    icon: "/icon.svg",
+    icon: "/logo.png",
   },
 };
 

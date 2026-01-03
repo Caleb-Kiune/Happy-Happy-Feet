@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import {
     LayoutDashboard,
@@ -57,10 +58,18 @@ export default function AdminNav() {
                 {/* Brand */}
                 <div className="h-16 flex items-center px-6 border-b border-[#E5E5E5]">
                     <div className="flex flex-col">
-                        <span className="font-semibold text-[#111111]">
-                            Happy Happy Feet
-                        </span>
-                        <span className="text-xs font-medium text-[#999999] bg-[#F5F5F5] px-2 py-0.5 rounded-full w-fit mt-1">
+                        <div className="relative h-8 w-auto aspect-[3/1] mb-1">
+                            <Image
+                                src="/logo.png"
+                                alt="Happy Happy Feet Admin"
+                                width={96}
+                                height={32}
+                                className="h-full w-auto object-contain"
+                                priority
+                                quality={100}
+                            />
+                        </div>
+                        <span className="text-xs font-medium text-[#999999] bg-[#F5F5F5] px-2 py-0.5 rounded-full w-fit">
                             Admin
                         </span>
                     </div>
