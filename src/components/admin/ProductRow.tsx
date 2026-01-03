@@ -81,12 +81,7 @@ export default function ProductRow({ product, isSelected, onToggleSelect }: Prod
         }
     };
 
-    // Category Change
-    const handleCategoryChange = (val: string) => {
-        if (val !== product.category) {
-            handleQuickUpdate({ category: val });
-        }
-    };
+
 
     // Size Toggle
     const toggleSize = (size: string) => {
@@ -155,18 +150,58 @@ export default function ProductRow({ product, isSelected, onToggleSelect }: Prod
                 )}
             </TableCell>
 
-            {/* Category (Dropdown) */}
+            {/* Category (Popover Multi-select) */}
             <TableCell className="capitalize text-gray-600">
-                <Select value={product.category} onValueChange={handleCategoryChange} disabled={isPending}>
-                    <SelectTrigger className="h-8 w-[110px] border-none shadow-none bg-transparent hover:bg-gray-100 focus:ring-0 px-2 text-gray-600 capitalize">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {PRODUCT_CATEGORIES.map((c) => (
-                            <SelectItem key={c} value={c} className="capitalize">{c}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <button
+                            disabled={isPending}
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium transition-colors hover:bg-gray-200 text-left max-w-[150px] truncate
+                                ${product.categories && product.categories.length > 0 ? "bg-blue-50 text-blue-700 hover:bg-blue-100" : "bg-gray-100 text-gray-500"}
+                            `}
+                        >
+                            {product.categories && product.categories.length > 0
+                                ? product.categories.join(", ")
+                                : "Select..."}
+                        </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-56 p-3 bg-[#0F172A] border-slate-700" align="start">
+                        <div className="space-y-2">
+                            <h4 className="font-medium text-sm text-white">Manage Categories</h4>
+                            <div className="flex flex-col gap-1 max-h-60 overflow-y-auto">
+                                {PRODUCT_CATEGORIES.map((c) => {
+                                    const isActive = product.categories?.includes(c) || false;
+                                    return (
+                                        <div key={c} className="flex items-center space-x-2">
+                                            <input
+                                                type="checkbox"
+                                                id={`row-cat-${product.id}-${c}`}
+                                                className="rounded border-slate-500 bg-slate-800 text-blue-500 focus:ring-blue-500 h-4 w-4"
+                                                checked={isActive}
+                                                onChange={() => {
+                                                    const current = product.categories || [];
+                                                    let newCategories;
+                                                    if (current.includes(c)) {
+                                                        newCategories = current.filter(cat => cat !== c);
+                                                    } else {
+                                                        newCategories = [...current, c];
+                                                    }
+                                                    handleQuickUpdate({ categories: newCategories });
+                                                }}
+                                            />
+                                            <label
+                                                htmlFor={`row-cat-${product.id}-${c}`}
+                                                className="text-sm text-gray-200 font-medium cursor-pointer capitalize flex-1 hover:text-white select-none"
+                                            >
+                                                {c}
+                                            </label>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </PopoverContent>
+                </Popover>
             </TableCell>
 
             {/* Price (Editable) */}
@@ -242,8 +277,8 @@ export default function ProductRow({ product, isSelected, onToggleSelect }: Prod
                     onClick={toggleFeatured}
                     disabled={isPending}
                     className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium transition-colors ${product.featured
-                            ? "bg-[#FDF2F4] text-[#D16A7A] hover:bg-[#FCEEF1]"
-                            : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                        ? "bg-[#FDF2F4] text-[#D16A7A] hover:bg-[#FCEEF1]"
+                        : "bg-gray-100 text-gray-400 hover:bg-gray-200"
                         }`}
                 >
                     {isPending ? (

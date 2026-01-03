@@ -47,12 +47,13 @@ export default function ShopContent({ products }: ShopContentProps) {
     const pathname = usePathname();
 
     // Derive unique categories from products
-    const uniqueCategories = useMemo(() =>
-        Array.from(new Set(products.map((p) => p.category))),
-        [products]
-    );
+    const uniqueCategories = useMemo(() => {
+        const allCats = products.flatMap(p => p.categories || []);
+        return Array.from(new Set(allCats));
+    }, [products]);
+
     const CATEGORIES = useMemo(() =>
-        ["All", ...uniqueCategories.map(capitalize)],
+        ["All", ...uniqueCategories.map(capitalize).sort()],
         [uniqueCategories]
     );
 
@@ -126,10 +127,13 @@ export default function ShopContent({ products }: ShopContentProps) {
     // Filter products
     const filteredProducts = useMemo(() => {
         return products.filter((product) => {
-            // 1. Category Filter
+            // 1. Category Filter (OR Logic / Single Select Check)
+            // If "All" is selected, show all.
+            // Otherwise, check if the product's categories array INCLUDES the selected category.
+            // Using case-insensitive check for robustness, assuming product categories are lowercase or normalized.
             const matchesCategory =
                 activeCategory === "All" ||
-                product.category.toLowerCase() === activeCategory.toLowerCase();
+                (product.categories && product.categories.some(cat => cat.toLowerCase() === activeCategory.toLowerCase()));
 
             // 2. Search Filter (Name or Description)
             const q = debouncedQuery.toLowerCase();
@@ -182,7 +186,7 @@ export default function ShopContent({ products }: ShopContentProps) {
         if (activeCategory !== "All") {
             filters.push({
                 id: "category",
-                label: activeCategory,
+                label: capitalize(activeCategory),
                 onRemove: () => setActiveCategory("All"),
             });
         }
@@ -226,6 +230,8 @@ export default function ShopContent({ products }: ShopContentProps) {
         setSortBy("featured");
         setPriceRange("all");
     };
+
+
 
 
     const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);

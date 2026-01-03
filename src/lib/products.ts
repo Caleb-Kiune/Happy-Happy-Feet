@@ -39,7 +39,8 @@ type ProductRow = {
     slug: string;
     name: string;
     price: number;
-    category: string; // Database returns string
+    category: string; // Legacy column (kept for now)
+    categories: string[]; // New array column
     sizes: string[];
     description: string | null;
     featured: boolean;
@@ -56,12 +57,17 @@ function transformProduct(
     row: ProductRow,
     images: ProductImageRow[]
 ): Product {
+    // Fallback: If categories array is empty/null (migration lag), use the single category
+    const categories = (row.categories && row.categories.length > 0)
+        ? row.categories
+        : (row.category ? [row.category] : []);
+
     return {
         id: row.id,
         slug: row.slug,
         name: row.name,
         price: row.price,
-        category: row.category,
+        categories: categories,
         sizes: row.sizes,
         description: row.description ?? undefined,
         featured: row.featured,
@@ -180,10 +186,12 @@ export async function getRelatedProducts(slug: string): Promise<Product[]> {
 
     const supabase = await createServerSupabaseClient();
 
+    // Find products that share at least one category with the current product
+    // Postgres '&&' operator checks for array overlap
     const { data: related, error } = await supabase
         .from("products")
         .select("*")
-        .eq("category", product.category)
+        .overlaps("categories", product.categories) // Overlap check
         .neq("slug", slug)
         .limit(4);
 
@@ -218,12 +226,16 @@ export async function getCategories(): Promise<string[]> {
 
     const { data } = await supabase
         .from("products")
-        .select("category")
-        .order("category");
+        .select("categories") // Fetch the array
+        .order("categories");
 
     if (!data) return [];
 
-    // Get unique categories
-    const categories = [...new Set(data.map((d) => d.category))];
-    return categories;
+    // Get unique categories from all arrays
+    // Use flatMap to flatten the array of arrays, then Set to dedupe
+    const allCategories = data.flatMap((d) => d.categories || []);
+    const uniqueCategories = [...new Set(allCategories)];
+
+    // Sort alphabetically
+    return uniqueCategories.sort();
 }

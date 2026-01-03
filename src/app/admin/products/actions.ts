@@ -26,7 +26,7 @@ export async function quickUpdateProduct(id: string, updates: Partial<Product>):
         const safeUpdates: any = {};
         if (updates.name !== undefined) safeUpdates.name = updates.name;
         if (updates.price !== undefined) safeUpdates.price = updates.price;
-        if (updates.category !== undefined) safeUpdates.category = updates.category;
+        if (updates.categories !== undefined) safeUpdates.categories = updates.categories;
         if (updates.featured !== undefined) safeUpdates.featured = updates.featured;
         if (updates.sizes !== undefined) safeUpdates.sizes = updates.sizes;
 
@@ -72,13 +72,13 @@ export async function createProduct(currentState: ActionState | null, formData: 
     const slug = formData.get("slug") as string;
     const description = formData.get("description") as string;
     const price = Number(formData.get("price"));
-    const category = formData.get("category") as string;
+    const categories = (formData.get("categories") as string).split(",").filter(Boolean);
     const sizes = (formData.get("sizes") as string).split(",").filter(Boolean);
     const featured = formData.get("featured") === "on";
     const imageUrls = (formData.get("imageUrls") as string).split(",").filter(Boolean);
 
     // Basic Validation
-    if (!name || !slug || !price || !category || imageUrls.length === 0) {
+    if (!name || !slug || !price || categories.length === 0 || imageUrls.length === 0) {
         return { error: "Missing required fields" };
     }
 
@@ -91,7 +91,7 @@ export async function createProduct(currentState: ActionState | null, formData: 
                 slug,
                 description,
                 price,
-                category,
+                categories, // Use array
                 sizes,
                 featured,
             })
@@ -135,12 +135,12 @@ export async function updateProduct(id: string, currentState: ActionState | null
     const slug = formData.get("slug") as string;
     const description = formData.get("description") as string;
     const price = Number(formData.get("price"));
-    const category = formData.get("category") as string;
+    const categories = (formData.get("categories") as string).split(",").filter(Boolean);
     const sizes = (formData.get("sizes") as string).split(",").filter(Boolean);
     const featured = formData.get("featured") === "on";
     const imageUrls = (formData.get("imageUrls") as string).split(",").filter(Boolean);
 
-    if (!name || !slug || !price || !category || imageUrls.length === 0) {
+    if (!name || !slug || !price || categories.length === 0 || imageUrls.length === 0) {
         return { error: "Missing required fields" };
     }
 
@@ -153,7 +153,7 @@ export async function updateProduct(id: string, currentState: ActionState | null
                 slug,
                 description,
                 price,
-                category,
+                categories, // Use array
                 sizes,
                 featured,
             })

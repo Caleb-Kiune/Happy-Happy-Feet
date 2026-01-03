@@ -61,7 +61,8 @@ export default function ProductManagement({ initialProducts }: ProductManagement
 
     // Derive categories dynamically from products
     const categories = useMemo(() => {
-        const uniqueCategories = new Set(initialProducts.map((p) => p.category));
+        const allCategories = initialProducts.flatMap((p) => p.categories || []);
+        const uniqueCategories = new Set(allCategories);
         return Array.from(uniqueCategories).sort();
     }, [initialProducts]);
 
@@ -76,7 +77,7 @@ export default function ProductManagement({ initialProducts }: ProductManagement
 
             // 2. Category Filter
             const matchesCategory =
-                selectedCategory === "all" || product.category === selectedCategory;
+                selectedCategory === "all" || (product.categories && product.categories.includes(selectedCategory));
 
             return matchesSearch && matchesCategory;
         });
@@ -150,10 +151,16 @@ export default function ProductManagement({ initialProducts }: ProductManagement
                         <SelectTrigger className="w-full md:w-48 bg-white">
                             <SelectValue placeholder="Category" />
                         </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Categories</SelectItem>
+                        <SelectContent className="bg-[#0F172A] border-slate-700">
+                            <SelectItem value="all" className="text-gray-200 focus:bg-slate-800 focus:text-white cursor-pointer">
+                                All Categories
+                            </SelectItem>
                             {categories.map((category) => (
-                                <SelectItem key={category} value={category} className="capitalize">
+                                <SelectItem
+                                    key={category}
+                                    value={category}
+                                    className="capitalize text-gray-200 focus:bg-slate-800 focus:text-white cursor-pointer"
+                                >
                                     {category}
                                 </SelectItem>
                             ))}
@@ -317,7 +324,7 @@ export default function ProductManagement({ initialProducts }: ProductManagement
                                         {product.name}
                                     </h3>
                                     <p className="text-sm text-gray-500 capitalize">
-                                        {product.category}
+                                        {product.categories ? product.categories.join(", ") : ""}
                                     </p>
                                 </div>
                                 {product.featured && (

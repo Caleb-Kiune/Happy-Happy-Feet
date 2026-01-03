@@ -7,7 +7,7 @@ export type Product = {
     name: string;
     price: number;
     // Allow strict union for new types but string for legacy data compatibility
-    category: ProductCategory | string;
+    categories: string[];
     images: string[];
     sizes: string[];
     description?: string;

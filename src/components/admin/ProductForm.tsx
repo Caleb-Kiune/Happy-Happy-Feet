@@ -29,7 +29,7 @@ type ProductFormProps = {
         slug: string;
         description: string;
         price: number;
-        category: string;
+        categories: string[];
         sizes: string[];
         featured: boolean;
         images: string[];
@@ -38,14 +38,13 @@ type ProductFormProps = {
 };
 
 export default function ProductForm({ initialData, action }: ProductFormProps) {
-    console.log("Current Categories:", PRODUCT_CATEGORIES); // DIAGNOSTIC LOG
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
     // Form State
     const [name, setName] = useState(initialData?.name || "");
     const [slug, setSlug] = useState(initialData?.slug || "");
-    const [category, setCategory] = useState(initialData?.category ?? PRODUCT_CATEGORIES[0]);
+    const [categories, setCategories] = useState<string[]>(initialData?.categories || []);
     const [sizes, setSizes] = useState<string[]>(initialData?.sizes || []);
     const [images, setImages] = useState<string[]>(initialData?.images || []);
 
@@ -74,9 +73,14 @@ export default function ProductForm({ initialData, action }: ProductFormProps) {
             return;
         }
 
+        if (categories.length === 0) {
+            toast.error("Please select at least one category");
+            return;
+        }
+
         const formData = new FormData(e.currentTarget);
-        // Append controlled fields that might not be in the form naturally or need formatting
-        formData.set("category", category);
+        // Append controlled fields
+        formData.set("categories", categories.join(","));
         formData.set("sizes", sizes.join(","));
         formData.set("imageUrls", images.join(","));
         // Checkbox "featured" is handled natively by the browser if named properly
@@ -133,20 +137,37 @@ export default function ProductForm({ initialData, action }: ProductFormProps) {
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="category">Category</Label>
-                            <Select value={category} onValueChange={setCategory} name="category">
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select category" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {PRODUCT_CATEGORIES.map(c => (
-                                        <SelectItem key={c} value={c} className="capitalize">
-                                            {c}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                        <div className="space-y-3 col-span-2">
+                            <Label>Categories</Label>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 border rounded-lg bg-gray-50/50">
+                                {PRODUCT_CATEGORIES.map(c => {
+                                    const isChecked = categories.includes(c);
+                                    return (
+                                        <div key={c} className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id={`cat-${c}`}
+                                                checked={isChecked}
+                                                onCheckedChange={(checked) => {
+                                                    if (checked) {
+                                                        setCategories([...categories, c]);
+                                                    } else {
+                                                        setCategories(categories.filter(cat => cat !== c));
+                                                    }
+                                                }}
+                                            />
+                                            <Label
+                                                htmlFor={`cat-${c}`}
+                                                className="text-sm font-normal cursor-pointer capitalize"
+                                            >
+                                                {c}
+                                            </Label>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            {categories.length === 0 && (
+                                <p className="text-xs text-red-500 font-medium">Please select at least one category.</p>
+                            )}
                         </div>
                     </div>
 
