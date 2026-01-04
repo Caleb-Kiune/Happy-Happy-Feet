@@ -28,13 +28,13 @@ export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all h-16 sm:h-20 md:h-20 lg:h-20 xl:h-20">
+        <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all h-16 sm:h-20 md:h-20">
             <Container className="h-full">
                 <div className="flex h-full items-center justify-between">
                     {/* Logo - Left Aligned */}
                     <div className="flex-shrink-0">
                         <Link href="/" className="block">
-                            <div className="relative h-24 sm:h-28 md:h-36 lg:h-40 flex items-center w-auto py-4">
+                            <div className="relative h-10 sm:h-12 md:h-16 w-auto flex items-center">
                                 <Image
                                     src="/logo.svg"
                                     alt="Happy Happy Feet"
