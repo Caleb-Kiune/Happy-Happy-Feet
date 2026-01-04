@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Container from "@/components/Container";
@@ -12,10 +13,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet";
-import { Menu, Phone } from "lucide-react";
-
-// Real WhatsApp link
-const WHATSAPP_LINK = "https://wa.me/254705774171";
+import { Menu, Instagram, Smartphone } from "lucide-react";
 
 const NAV_LINKS = [
     { name: "Home", href: "/" },
@@ -26,8 +24,10 @@ const NAV_LINKS = [
 ];
 
 export default function Header() {
+    const [isOpen, setIsOpen] = useState(false);
+
     return (
-        <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all h-16 sm:h-20 md:h-20 lg:h-20 xl:h-20"> {/* Maintaining responsiveness but aiming for slim look */}
+        <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all h-16 sm:h-20 md:h-20 lg:h-20 xl:h-20">
             <Container className="h-full">
                 <div className="flex h-full items-center justify-between">
                     {/* Logo - Left Aligned */}
@@ -64,21 +64,21 @@ export default function Header() {
                     <div className="flex items-center md:hidden gap-4">
                         <CartSheet />
 
-                        <Sheet>
+                        <Sheet open={isOpen} onOpenChange={setIsOpen}>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" aria-label="Open menu" className="-mr-2">
-                                    <Menu className="h-6 w-6 text-gray-900" />
+                                <Button variant="ghost" size="icon" aria-label="Open menu" className="-mr-2 hover:bg-transparent text-gray-900">
+                                    <Menu className="h-6 w-6" strokeWidth={1.5} />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="right" className="w-[320px] border-l border-gray-200 bg-white p-8">
-                                <SheetHeader>
-                                    <SheetTitle className="text-left font-sans text-xl font-bold tracking-tight text-gray-900">
-                                        <div className="relative h-8 w-auto aspect-[3/1]">
+                            <SheetContent side="right" className="w-[320px] border-l border-gray-200 bg-white p-0 flex flex-col h-full">
+                                <SheetHeader className="p-6 border-b border-gray-100">
+                                    <SheetTitle className="text-left">
+                                        <div className="relative h-7 w-auto aspect-[3/1]">
                                             <Image
                                                 src="/logo.png"
                                                 alt="Happy Happy Feet"
-                                                width={140}
-                                                height={46}
+                                                width={120}
+                                                height={40}
                                                 className="h-full w-auto object-contain"
                                                 priority
                                                 quality={100}
@@ -86,16 +86,46 @@ export default function Header() {
                                         </div>
                                     </SheetTitle>
                                 </SheetHeader>
-                                <div className="mt-12 flex flex-col gap-y-6">
-                                    {NAV_LINKS.map((link) => (
-                                        <Link
-                                            key={link.name}
-                                            href={link.href}
-                                            className="text-sm font-medium uppercase tracking-widest text-gray-900 hover:text-gray-600 transition-colors"
-                                        >
-                                            {link.name}
-                                        </Link>
-                                    ))}
+
+                                <div className="flex-1 flex flex-col px-6 py-8">
+                                    <nav className="flex flex-col gap-y-8">
+                                        {NAV_LINKS.map((link) => (
+                                            <Link
+                                                key={link.name}
+                                                href={link.href}
+                                                onClick={() => setIsOpen(false)}
+                                                className="text-lg font-light uppercase tracking-[0.15em] text-gray-900 hover:text-gray-500 transition-colors border-b border-transparent hover:border-gray-100 pb-1 w-fit"
+                                            >
+                                                {link.name}
+                                            </Link>
+                                        ))}
+                                    </nav>
+
+                                    <div className="mt-auto pt-8 border-t border-gray-50">
+                                        <div className="flex gap-6 justify-start">
+                                            <a
+                                                href="https://instagram.com"
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="text-gray-400 hover:text-gray-900 transition-colors"
+                                            >
+                                                <Instagram className="h-5 w-5" />
+                                                <span className="sr-only">Instagram</span>
+                                            </a>
+                                            <a
+                                                href="https://wa.me/254705774171"
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="text-gray-400 hover:text-gray-900 transition-colors"
+                                            >
+                                                <Smartphone className="h-5 w-5" />
+                                                <span className="sr-only">WhatsApp</span>
+                                            </a>
+                                        </div>
+                                        <p className="mt-6 text-[10px] text-gray-400 uppercase tracking-widest font-light">
+                                            © 2024 Happy Happy Feet
+                                        </p>
+                                    </div>
                                 </div>
                             </SheetContent>
                         </Sheet>
