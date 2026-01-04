@@ -103,7 +103,7 @@ export default function Header() {
                                                 key={link.name}
                                                 href={link.href}
                                                 onClick={() => setIsOpen(false)}
-                                                className="text-lg font-light uppercase tracking-[0.15em] text-gray-900 hover:text-gray-500 transition-colors border-b border-transparent hover:border-gray-100 pb-1 w-fit"
+                                                className="text-lg font-light uppercase tracking-[0.2em] text-gray-900 hover:text-gray-500 transition-colors border-b border-transparent hover:border-gray-100 pb-1 w-fit"
                                             >
                                                 {link.name}
                                             </Link>

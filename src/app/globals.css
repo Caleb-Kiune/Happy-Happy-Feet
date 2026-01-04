@@ -163,3 +163,20 @@
 [data-state="closed"].data-\[state\=closed\]\:animate-out {
   animation: exit 0.3s ease-in forwards;
 }
+
+@layer components {
+  /* The "Editorial" Heading Style */
+  .type-h1 {
+    @apply font-sans font-bold uppercase tracking-[0.2em] text-gray-900;
+  }
+  
+  /* The "Micro" Tech Label (Nav, Filters, Buttons) */
+  .type-label {
+    @apply font-sans text-xs font-bold uppercase tracking-[0.2em] text-gray-900;
+  }
+  
+  /* The "Narrative" Body Text */
+  .type-body {
+    @apply font-sans text-sm font-light leading-relaxed text-gray-600;
+  }
+}

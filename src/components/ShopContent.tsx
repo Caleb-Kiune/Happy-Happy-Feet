@@ -196,7 +196,7 @@ export default function ShopContent({ products }: ShopContentProps) {
                         {/* Category Dropdown */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1">
+                                <button className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 hover:text-gray-600 transition-colors flex items-center gap-1">
                                     Category
                                     <ChevronDown className="h-3 w-3 opacity-50" />
                                 </button>
@@ -205,7 +205,7 @@ export default function ShopContent({ products }: ShopContentProps) {
                                 <DropdownMenuItem
                                     onClick={() => updateParams({ category: "All" })}
                                     className={`
-                                        flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
+                                        flex items-center justify-between px-4 py-3 text-xs uppercase tracking-[0.2em] cursor-pointer transition-colors rounded-none
                                         ${activeCategory === "All" ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
                                     `}
                                 >
@@ -218,7 +218,7 @@ export default function ShopContent({ products }: ShopContentProps) {
                                         key={category}
                                         onClick={() => updateParams({ category: category })}
                                         className={`
-                                            flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
+                                            flex items-center justify-between px-4 py-3 text-xs uppercase tracking-[0.2em] cursor-pointer transition-colors rounded-none
                                             ${activeCategory === category ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
                                         `}
                                     >
@@ -232,7 +232,7 @@ export default function ShopContent({ products }: ShopContentProps) {
                         {/* Price Filter */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1">
+                                <button className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 hover:text-gray-600 transition-colors flex items-center gap-1">
                                     Price
                                     <ChevronDown className="h-3 w-3 opacity-50" />
                                 </button>
@@ -243,7 +243,7 @@ export default function ShopContent({ products }: ShopContentProps) {
                                         key={range.value}
                                         onClick={() => updateParams({ price: range.value })}
                                         className={`
-                                            flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
+                                            flex items-center justify-between px-4 py-3 text-xs uppercase tracking-[0.2em] cursor-pointer transition-colors rounded-none
                                             ${priceRange === range.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
                                         `}
                                     >
@@ -259,7 +259,7 @@ export default function ShopContent({ products }: ShopContentProps) {
                     <div className="flex items-center justify-end shrink-0">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1">
+                                <button className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 hover:text-gray-600 transition-colors flex items-center gap-1">
                                     Sort By
                                     <ChevronDown className="h-3 w-3 opacity-50" />
                                 </button>
@@ -270,7 +270,7 @@ export default function ShopContent({ products }: ShopContentProps) {
                                         key={option.value}
                                         onClick={() => updateParams({ sort: option.value })}
                                         className={`
-                                            flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
+                                            flex items-center justify-between px-4 py-3 text-xs uppercase tracking-[0.2em] cursor-pointer transition-colors rounded-none
                                             ${sortBy === option.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
                                         `}
                                     >
@@ -289,7 +289,7 @@ export default function ShopContent({ products }: ShopContentProps) {
                         {activeFilters.map((filter) => (
                             <span
                                 key={filter.id}
-                                className="inline-flex items-center gap-2 border border-gray-200 px-3 py-1 text-xs font-medium uppercase tracking-wide text-gray-900 transition-colors"
+                                className="inline-flex items-center gap-2 border border-gray-200 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-900 transition-colors"
                             >
                                 {filter.label}
                                 <button
@@ -322,7 +322,7 @@ export default function ShopContent({ products }: ShopContentProps) {
                     <div className="mt-20 flex justify-center">
                         <button
                             onClick={() => updateParams({ page: (currentPage + 1).toString() })}
-                            className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 border-b border-gray-900 pb-1 hover:opacity-60 transition-opacity"
+                            className="group relative px-8 py-3 bg-gray-900 text-white text-xs font-bold uppercase tracking-[0.2em] transition-all hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             Load More
                         </button>

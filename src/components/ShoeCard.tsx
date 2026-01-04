@@ -26,10 +26,10 @@ export default function ShoeCard({ product }: ShoeCardProps) {
 
             {/* Persistent Details - Clean & Minimalist */}
             <div className="flex flex-col items-center gap-1 text-center">
-                <h3 className="text-sm font-medium uppercase tracking-widest text-gray-900 group-hover:text-gray-600 transition-colors">
+                <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 group-hover:text-gray-600 transition-colors">
                     {product.name}
                 </h3>
-                <p className="text-lg font-bold text-gray-900">
+                <p className="text-sm font-normal text-gray-500">
                     {formatPrice(product.price)}
                 </p>
             </div>

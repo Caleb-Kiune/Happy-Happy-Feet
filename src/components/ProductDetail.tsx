@@ -153,26 +153,26 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             {/* Right Column: Product Info (Sticky) */}
             <div className="lg:col-span-5 lg:sticky lg:top-32 h-fit flex flex-col pt-2 lg:pt-0">
                 <div className="mb-2">
-                    <h1 className="font-sans text-3xl md:text-4xl font-semibold tracking-wide text-gray-900 uppercase">
+                    <h1 className="font-sans text-3xl md:text-4xl font-bold tracking-[0.2em] text-gray-900 uppercase">
                         {product.name}
                     </h1>
                 </div>
 
                 <div className="mt-2 mb-6">
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-2xl font-light text-gray-900">
                         {formatPrice(product.price)}
                     </p>
                 </div>
 
                 {/* Description - Clean & Open */}
-                <div className="mb-8 text-gray-600 leading-relaxed font-light text-sm md:text-base">
+                <div className="mb-8 text-gray-600 leading-relaxed font-light text-sm">
                     {product.description || "Timeless design meets exceptional comfort. Handcrafted for the modern wardrobe."}
                 </div>
 
                 {/* Size Selector */}
                 <div className="mb-8">
                     <div className="flex justify-between items-center mb-3">
-                        <span className="text-xs font-bold uppercase tracking-widest text-gray-900">Select Size</span>
+                        <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900">Select Size</span>
                         {selectedSize && (
                             <span className="text-xs text-gray-500">Selected: {selectedSize}</span>
                         )}
@@ -207,7 +207,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
                 {/* Quantity Control (Subtle, Reintroduced) */}
                 <div className="mb-10">
-                    <span className="text-xs font-bold uppercase tracking-widest text-gray-900 block mb-3">Quantity</span>
+                    <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 block mb-3">Quantity</span>
                     <div className="flex items-center gap-4">
                         <div className="flex items-center border border-gray-200 rounded-sm">
                             <button
@@ -232,7 +232,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 <div className="flex flex-col gap-3 mt-auto">
                     <Button
                         onClick={handleAddToCart}
-                        className="w-full rounded-none h-14 text-sm font-bold uppercase tracking-[0.15em] bg-gray-900 hover:bg-gray-800 text-white shadow-none transition-all"
+                        className="w-full rounded-none h-14 text-sm font-bold uppercase tracking-[0.2em] bg-gray-900 hover:bg-gray-800 text-white shadow-none transition-all"
                     >
                         Add to Bag
                     </Button>
@@ -240,7 +240,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                     <Button
                         asChild
                         variant="outline"
-                        className="w-full rounded-none h-12 text-xs font-medium uppercase tracking-widest text-gray-900 border-gray-200 hover:border-gray-900 hover:bg-transparent transition-all"
+                        className="w-full rounded-none h-12 text-xs font-bold uppercase tracking-[0.2em] text-gray-900 border-gray-200 hover:border-gray-900 hover:bg-transparent transition-all"
                     >
                         <a
                             href={whatsappUrl}
@@ -255,7 +255,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                     </Button>
                 </div>
 
-                {/* Trust / Shipping Note */}
                 <div className="mt-8 pt-6 border-t border-gray-100">
                     <ul className="space-y-2 text-xs text-gray-500 font-light tracking-wide uppercase">
                         <li className="flex items-center gap-2">
