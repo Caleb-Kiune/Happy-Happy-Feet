@@ -49,13 +49,8 @@ export default function ShopContent({ products }: ShopContentProps) {
     // Derive unique categories from products
     const uniqueCategories = useMemo(() => {
         const allCats = products.flatMap(p => p.categories || []);
-        return Array.from(new Set(allCats));
+        return Array.from(new Set(allCats)).sort();
     }, [products]);
-
-    const CATEGORIES = useMemo(() =>
-        ["All", ...uniqueCategories.map(capitalize).sort()],
-        [uniqueCategories]
-    );
 
     // Initialize state from URL params or defaults
     const [activeCategory, setActiveCategory] = useState(searchParams.get("category") || "All");
@@ -264,20 +259,31 @@ export default function ShopContent({ products }: ShopContentProps) {
                 {/* Controls Bar: Search (Left/Right) & Sort/Filter (Right) */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 w-full mb-12 border-b border-gray-100 pb-4">
 
-                    {/* Categories Left - Text Links */}
-                    <div className="flex flex-wrap gap-x-6 gap-y-2 order-2 md:order-1">
-                        {CATEGORIES.map((category) => (
-                            <button
-                                key={category}
-                                onClick={() => setActiveCategory(category)}
-                                className={`text-sm font-medium uppercase tracking-wider transition-all border-b-2 pb-0.5 ${activeCategory === category
-                                    ? "text-gray-900 border-gray-900"
-                                    : "text-gray-500 border-transparent hover:text-gray-900"
-                                    }`}
-                            >
-                                {category}
-                            </button>
-                        ))}
+                    {/* Categories Left - Horizontal Scroll */}
+                    <div className="relative flex-1 min-w-0 order-2 md:order-1 -mx-4 md:mx-0">
+                        {/* Gradient Masks */}
+                        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white z-10 hidden md:block" />
+                        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white z-10" />
+
+                        <div className="flex items-center gap-8 overflow-x-auto px-4 md:px-8 pb-2 scrollbar-hide snap-x snap-mandatory [-ms-overflow-style:'none'] [scrollbar-width:'none'] [&::-webkit-scrollbar]:hidden">
+                            {uniqueCategories.map((category) => (
+                                <button
+                                    key={category}
+                                    onClick={() => setActiveCategory(activeCategory === category ? "All" : category)}
+                                    className={`
+                                        snap-start flex-shrink-0 text-sm font-medium uppercase tracking-wider transition-all border-b-2 pb-0.5 whitespace-nowrap
+                                        ${activeCategory === category
+                                            ? "text-gray-900 border-gray-900"
+                                            : "text-gray-500 border-transparent hover:text-gray-700"
+                                        }
+                                    `}
+                                >
+                                    {capitalize(category)}
+                                </button>
+                            ))}
+                            {/* Spacer for right mask */}
+                            <div className="w-4 flex-shrink-0" />
+                        </div>
                     </div>
 
                     {/* Tools Right */}
