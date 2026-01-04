@@ -6,6 +6,7 @@ import Image from "next/image";
 import Container from "@/components/Container";
 import { Button } from "@/components/ui/button";
 import CartSheet from "@/components/CartSheet";
+import SearchToggle from "@/components/SearchToggle";
 import {
     Sheet,
     SheetContent,
@@ -47,8 +48,8 @@ export default function Header() {
                         </Link>
                     </div>
 
-                    {/* Desktop Navigation - Minimalist (Just Shop) */}
-                    <nav className="hidden md:flex items-center gap-x-12">
+                    {/* Desktop Navigation - Minimalist (Just Shop + Search) */}
+                    <nav className="hidden md:flex items-center gap-x-8">
                         <Link
                             href="/shop"
                             className="text-sm font-medium tracking-[0.2em] uppercase text-gray-900 hover:opacity-70 transition-opacity"
@@ -56,12 +57,20 @@ export default function Header() {
                             Shop
                         </Link>
 
+                        {/* Global Search (Inline) */}
+                        <div className="flex items-center">
+                            <SearchToggle />
+                        </div>
+
                         {/* Cart Button (Desktop) */}
                         <CartSheet />
                     </nav>
 
                     {/* Mobile Menu Trigger & Cart */}
                     <div className="flex items-center md:hidden gap-4">
+                        {/* Global Search (Mobile Slide-Down) */}
+                        <SearchToggle mobile />
+
                         <CartSheet />
 
                         <Sheet open={isOpen} onOpenChange={setIsOpen}>

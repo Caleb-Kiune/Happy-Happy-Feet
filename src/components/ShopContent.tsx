@@ -46,93 +46,50 @@ export default function ShopContent({ products }: ShopContentProps) {
     const router = useRouter();
     const pathname = usePathname();
 
+    // Derive state directly from URL Params (Single Source of Truth)
+    const activeCategory = searchParams.get("category") || "All";
+    const searchQuery = searchParams.get("search") || "";
+    const sortBy = searchParams.get("sort") || "featured";
+    const priceRange = searchParams.get("price") || "all";
+    const currentPage = Number(searchParams.get("page")) || 1;
+
+    // Helper to update URL params
+    const updateParams = (updates: Record<string, string | null>) => {
+        const params = new URLSearchParams(searchParams.toString());
+        Object.entries(updates).forEach(([key, value]) => {
+            if (value === null) {
+                params.delete(key);
+            } else {
+                params.set(key, value);
+            }
+        });
+
+        // Always reset to page 1 when filters change (unless we are explicitly changing page)
+        if (!updates.hasOwnProperty("page")) {
+            params.delete("page");
+        }
+
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    };
+
     // Derive unique categories from products
     const uniqueCategories = useMemo(() => {
         const allCats = products.flatMap(p => p.categories || []);
         return Array.from(new Set(allCats)).sort();
     }, [products]);
 
-    // Initialize state from URL params or defaults
-    const [activeCategory, setActiveCategory] = useState(searchParams.get("category") || "All");
-    const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
-    const [debouncedQuery, setDebouncedQuery] = useState(searchParams.get("search") || "");
-    const [sortBy, setSortBy] = useState(searchParams.get("sort") || "featured");
-    const [priceRange, setPriceRange] = useState(searchParams.get("price") || "all");
-    const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
-
-    // Debounce search query
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedQuery(searchQuery);
-        }, 300);
-
-        return () => clearTimeout(timer);
-    }, [searchQuery]);
-
-    // Sync state to URL
-    useEffect(() => {
-        const params = new URLSearchParams(searchParams.toString());
-
-        // Category
-        if (activeCategory === "All") {
-            params.delete("category");
-        } else {
-            params.set("category", activeCategory);
-        }
-
-        // Search
-        if (debouncedQuery) {
-            params.set("search", debouncedQuery);
-        } else {
-            params.delete("search");
-        }
-
-        // Sort
-        if (sortBy === "featured") {
-            params.delete("sort");
-        } else {
-            params.set("sort", sortBy);
-        }
-
-        // Price
-        if (priceRange === "all") {
-            params.delete("price");
-        } else {
-            params.set("price", priceRange);
-        }
-
-        // Page
-        if (currentPage > 1) {
-            params.set("page", currentPage.toString());
-        } else {
-            params.delete("page");
-        }
-
-        // Update URL
-        if (params.toString() !== searchParams.toString()) {
-            router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-        }
-    }, [activeCategory, debouncedQuery, sortBy, priceRange, currentPage, pathname, router, searchParams]);
-
-    // Reset page when filters change
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [activeCategory, debouncedQuery, priceRange, sortBy]);
-
     // Filter products
     const filteredProducts = useMemo(() => {
         return products.filter((product) => {
-            // 1. Category Filter (OR Logic / Single Select Check)
-            // If "All" is selected, show all.
-            // Otherwise, check if the product's categories array INCLUDES the selected category.
-            // Using case-insensitive check for robustness, assuming product categories are lowercase or normalized.
+            // 1. Category Filter
             const matchesCategory =
                 activeCategory === "All" ||
                 (product.categories && product.categories.some(cat => cat.toLowerCase() === activeCategory.toLowerCase()));
 
-            // 2. Search Filter (Name or Description)
-            const q = debouncedQuery.toLowerCase();
+            // 2. Search Filter
+            const q = searchQuery.toLowerCase();
             const matchesSearch =
+                !q ||
                 product.name.toLowerCase().includes(q) ||
                 (product.description && product.description.toLowerCase().includes(q));
 
@@ -145,7 +102,7 @@ export default function ShopContent({ products }: ShopContentProps) {
 
             return matchesCategory && matchesSearch && matchesPrice;
         });
-    }, [products, activeCategory, debouncedQuery, priceRange]);
+    }, [products, activeCategory, searchQuery, priceRange]);
 
     // Sort products
     const sortedProducts = useMemo(() => {
@@ -159,16 +116,9 @@ export default function ShopContent({ products }: ShopContentProps) {
                     return a.name.localeCompare(b.name);
                 case "featured":
                 default:
-                    // Featured first (true > false/undefined)
                     const isFeaturedA = !!a.featured;
                     const isFeaturedB = !!b.featured;
-
-                    if (isFeaturedA !== isFeaturedB) {
-                        return isFeaturedA ? -1 : 1;
-                    }
-
-                    // Secondary sort: Newest (created_at desc)
-                    // Use string comparison for ISO dates
+                    if (isFeaturedA !== isFeaturedB) return isFeaturedA ? -1 : 1;
                     return b.createdAt.localeCompare(a.createdAt);
             }
         });
@@ -182,7 +132,7 @@ export default function ShopContent({ products }: ShopContentProps) {
             filters.push({
                 id: "category",
                 label: capitalize(activeCategory),
-                onRemove: () => setActiveCategory("All"),
+                onRemove: () => updateParams({ category: "All" }),
             });
         }
 
@@ -190,10 +140,7 @@ export default function ShopContent({ products }: ShopContentProps) {
             filters.push({
                 id: "search",
                 label: `Search: "${searchQuery}"`,
-                onRemove: () => {
-                    setSearchQuery("");
-                    setDebouncedQuery("");
-                },
+                onRemove: () => updateParams({ search: null }),
             });
         }
 
@@ -202,7 +149,7 @@ export default function ShopContent({ products }: ShopContentProps) {
             filters.push({
                 id: "sort",
                 label: label,
-                onRemove: () => setSortBy("featured"),
+                onRemove: () => updateParams({ sort: "featured" }),
             });
         }
 
@@ -211,7 +158,7 @@ export default function ShopContent({ products }: ShopContentProps) {
             filters.push({
                 id: "price",
                 label: label,
-                onRemove: () => setPriceRange("all"),
+                onRemove: () => updateParams({ price: "all" }),
             });
         }
 
@@ -219,28 +166,13 @@ export default function ShopContent({ products }: ShopContentProps) {
     }, [activeCategory, searchQuery, sortBy, priceRange]);
 
     const handleClearAll = () => {
-        setActiveCategory("All");
-        setSearchQuery("");
-        setDebouncedQuery("");
-        setSortBy("featured");
-        setPriceRange("all");
+        router.replace(pathname, { scroll: false });
     };
-
-
-
 
     const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);
     const paginatedProducts = useMemo(() => {
-        // Load More logic: Show from 0 up to current page * limit
         return sortedProducts.slice(0, currentPage * ITEMS_PER_PAGE);
     }, [currentPage, sortedProducts]);
-
-    // Handle out of bounds
-    useEffect(() => {
-        if (currentPage > totalPages && totalPages > 0) {
-            setCurrentPage(totalPages);
-        }
-    }, [currentPage, totalPages]);
 
     return (
         <div className="bg-white pb-24 pt-16 md:pt-24">
@@ -256,134 +188,98 @@ export default function ShopContent({ products }: ShopContentProps) {
                     </p>
                 </div>
 
-                {/* Controls Bar: Minimalist Single Row */}
+                {/* Controls Bar: Split Layout (Filters Left, Sort Right) */}
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4 w-full mb-12 border-b border-gray-100 pb-4">
 
-                    {/* Search (Left aligned for balance or keep with tools?) 
-                        Let's keep the user's current pattern but consolidated. 
-                        Actually, moving Search to the left might be nice, but let's keep all checks together for now, 
-                        OR simplify the container to just be the tools since the "Left" part is gone.
-                    */}
-                    <div className="w-full flex items-center justify-between">
-                        {/* Search Left */}
-                        <div className={`relative transition-all duration-300 ${searchQuery ? "w-full md:w-64" : "w-auto"}`}>
-                            {searchQuery ? (
-                                <div className="relative w-full flex items-center border-b border-gray-300 focus-within:border-gray-900">
-                                    <input
-                                        type="text"
-                                        autoFocus
-                                        className="w-full bg-transparent py-2 pr-8 text-sm text-gray-900 placeholder-gray-400 focus:outline-none"
-                                        placeholder="Search styles..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                    />
-                                    <button
-                                        onClick={() => { setSearchQuery(""); setDebouncedQuery(""); }}
-                                        className="absolute right-0 text-gray-400 hover:text-gray-900"
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </button>
-                                </div>
-                            ) : (
-                                <button
-                                    onClick={() => setSearchQuery(" ")}
-                                    className="flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-gray-900 hover:text-gray-600 transition-colors"
-                                    aria-label="Open search"
-                                >
-                                    <Search className="h-4 w-4" />
-                                    <span className="hidden md:inline">Search</span>
+                    {/* Left: Filter Tools */}
+                    <div className="w-full md:w-auto flex items-center justify-center md:justify-start gap-6">
+                        {/* Category Dropdown */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1">
+                                    Category
+                                    <ChevronDown className="h-3 w-3 opacity-50" />
                                 </button>
-                            )}
-                        </div>
-
-                        {/* Filters Right (Category, Sort, Price) */}
-                        <div className="flex items-center gap-4 md:gap-8">
-                            {/* Category Dropdown (New Unified Control) */}
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1">
-                                        Category
-                                        <ChevronDown className="h-3 w-3 opacity-50" />
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56 bg-white shadow-lg rounded-none border border-gray-100 p-0 max-h-[60vh] overflow-y-auto">
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start" className="w-56 bg-white shadow-lg rounded-none border border-gray-100 p-0 max-h-[60vh] overflow-y-auto">
+                                <DropdownMenuItem
+                                    onClick={() => updateParams({ category: "All" })}
+                                    className={`
+                                        flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
+                                        ${activeCategory === "All" ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
+                                    `}
+                                >
+                                    All Categories
+                                    {activeCategory === "All" && <Check className="h-3 w-3" />}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator className="my-0 bg-gray-100" />
+                                {uniqueCategories.map((category) => (
                                     <DropdownMenuItem
-                                        onClick={() => setActiveCategory("All")}
+                                        key={category}
+                                        onClick={() => updateParams({ category: category })}
                                         className={`
                                             flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
-                                            ${activeCategory === "All" ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
+                                            ${activeCategory === category ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
                                         `}
                                     >
-                                        All Categories
-                                        {activeCategory === "All" && <Check className="h-3 w-3" />}
+                                        {capitalize(category)}
+                                        {activeCategory === category && <Check className="h-3 w-3" />}
                                     </DropdownMenuItem>
-                                    <DropdownMenuSeparator className="my-0 bg-gray-100" />
-                                    {uniqueCategories.map((category) => (
-                                        <DropdownMenuItem
-                                            key={category}
-                                            onClick={() => setActiveCategory(category)}
-                                            className={`
-                                                flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
-                                                ${activeCategory === category ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
-                                            `}
-                                        >
-                                            {capitalize(category)}
-                                            {activeCategory === category && <Check className="h-3 w-3" />}
-                                        </DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
 
-                            {/* Sort */}
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1">
-                                        Sort
-                                        <ChevronDown className="h-3 w-3 opacity-50" />
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-48 bg-white shadow-lg rounded-none border border-gray-100 p-0">
-                                    {SORT_OPTIONS.map((option) => (
-                                        <DropdownMenuItem
-                                            key={option.value}
-                                            onClick={() => setSortBy(option.value)}
-                                            className={`
-                                                flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
-                                                ${sortBy === option.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
-                                            `}
-                                        >
-                                            {option.label}
-                                            {sortBy === option.value && <Check className="h-3 w-3" />}
-                                        </DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                        {/* Price Filter */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1">
+                                    Price
+                                    <ChevronDown className="h-3 w-3 opacity-50" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start" className="w-56 bg-white shadow-lg rounded-none border border-gray-100 p-0">
+                                {PRICE_RANGES.map((range) => (
+                                    <DropdownMenuItem
+                                        key={range.value}
+                                        onClick={() => updateParams({ price: range.value })}
+                                        className={`
+                                            flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
+                                            ${priceRange === range.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
+                                        `}
+                                    >
+                                        {range.label}
+                                        {priceRange === range.value && <Check className="h-3 w-3" />}
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
 
-                            {/* Filter (Price) */}
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1">
-                                        Price
-                                        <ChevronDown className="h-3 w-3 opacity-50" />
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56 bg-white shadow-lg rounded-none border border-gray-100 p-0">
-                                    {PRICE_RANGES.map((range) => (
-                                        <DropdownMenuItem
-                                            key={range.value}
-                                            onClick={() => setPriceRange(range.value)}
-                                            className={`
-                                                flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
-                                                ${priceRange === range.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
-                                            `}
-                                        >
-                                            {range.label}
-                                            {priceRange === range.value && <Check className="h-3 w-3" />}
-                                        </DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
+                    {/* Right: Sort Tool */}
+                    <div className="w-full md:w-auto flex items-center justify-center md:justify-end">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1">
+                                    Sort By
+                                    <ChevronDown className="h-3 w-3 opacity-50" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48 bg-white shadow-lg rounded-none border border-gray-100 p-0">
+                                {SORT_OPTIONS.map((option) => (
+                                    <DropdownMenuItem
+                                        key={option.value}
+                                        onClick={() => updateParams({ sort: option.value })}
+                                        className={`
+                                            flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
+                                            ${sortBy === option.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
+                                        `}
+                                    >
+                                        {option.label}
+                                        {sortBy === option.value && <Check className="h-3 w-3" />}
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
 
@@ -416,7 +312,7 @@ export default function ShopContent({ products }: ShopContentProps) {
 
                 {/* Grid - 2 cols mobile, 4 desktop */}
                 <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:gap-x-8 md:gap-y-12 lg:grid-cols-4">
-                    {paginatedProducts.map((product) => ( // paginatedProducts logic updated below to slice(0, end)
+                    {paginatedProducts.map((product) => (
                         <ShoeCard key={product.id} product={product} />
                     ))}
                 </div>
@@ -425,7 +321,7 @@ export default function ShopContent({ products }: ShopContentProps) {
                 {paginatedProducts.length < sortedProducts.length && (
                     <div className="mt-20 flex justify-center">
                         <button
-                            onClick={() => setCurrentPage((prev) => prev + 1)}
+                            onClick={() => updateParams({ page: (currentPage + 1).toString() })}
                             className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 border-b border-gray-900 pb-1 hover:opacity-60 transition-opacity"
                         >
                             Load More
