@@ -19,22 +19,17 @@ export default async function Home() {
       <Hero />
 
       {/* Featured Section */}
-      <section className="py-20 md:py-28 bg-white">
+      <section className="py-24 md:py-32 bg-white">
         <Container>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
-            <div>
-              <h2 className="font-sans text-3xl font-medium tracking-tight text-gray-900 sm:text-4xl">
-                Featured Collection
-              </h2>
-              <p className="mt-2 text-gray-500">
-                Our most loved styles for the season.
-              </p>
-            </div>
+          <div className="flex flex-col items-center justify-center text-center mb-16 space-y-4">
+            <h2 className="font-sans text-3xl md:text-4xl font-bold tracking-widest text-gray-900 uppercase">
+              Featured Collection
+            </h2>
             <Link
               href="/shop"
-              className="text-accent-500 font-medium hover:text-accent-600 transition-colors"
+              className="text-sm font-medium text-gray-500 hover:text-gray-900 border-b border-transparent hover:border-gray-900 transition-all uppercase tracking-wider"
             >
-              View all shoes &rarr;
+              View All Styles
             </Link>
           </div>
 
@@ -45,12 +40,7 @@ export default async function Home() {
           </div>
 
           <div className="mt-16 text-center md:hidden">
-            <Link
-              href="/shop"
-              className="inline-block rounded-full border border-gray-200 px-8 py-3 text-sm font-medium text-gray-900 hover:border-accent-500 hover:text-accent-500 transition-colors"
-            >
-              View full collection
-            </Link>
+            {/* Mobile-only extra CTA if needed, but top link covers it. Keeping minimal. */}
           </div>
         </Container>
       </section>
