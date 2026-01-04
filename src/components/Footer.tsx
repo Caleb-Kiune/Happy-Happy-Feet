@@ -20,7 +20,7 @@ const FOOTER_LINKS = {
 
 export default function Footer() {
     return (
-        <footer className="bg-gray-50 border-t border-gray-200 pt-16 pb-8 md:pt-24 md:pb-12">
+        <footer className="bg-gray-100 border-t border-gray-200 pt-16 pb-8 md:pt-24 md:pb-12">
             <Container>
                 {/* Main Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 mb-16 md:mb-24">
