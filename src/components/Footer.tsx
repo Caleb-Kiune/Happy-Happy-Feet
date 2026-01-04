@@ -24,7 +24,7 @@ const FOOTER_LINKS = {
 
 export default function Footer() {
     return (
-        <footer className="bg-white border-t border-gray-100 pt-16 pb-8 md:pt-24 md:pb-12">
+        <footer className="bg-gray-50 border-t border-gray-200 pt-16 pb-8 md:pt-24 md:pb-12">
             <Container>
                 {/* Main Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 mb-16 md:mb-24">
@@ -115,7 +115,7 @@ export default function Footer() {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="border-t border-gray-50 pt-8 mt-12 md:mt-0 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div className="border-t border-gray-200 pt-8 mt-12 md:mt-0 flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-[10px] uppercase tracking-widest text-gray-400 font-light">
                         © 2025 Happy Happy Feet. All rights reserved.
                     </p>
