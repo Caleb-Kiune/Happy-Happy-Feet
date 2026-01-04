@@ -189,10 +189,10 @@ export default function ShopContent({ products }: ShopContentProps) {
                 </div>
 
                 {/* Controls Bar: Split Layout (Filters Left, Sort Right) */}
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4 w-full mb-12 border-b border-gray-100 pb-4">
+                <div className="flex flex-row justify-between items-center gap-2 md:gap-4 w-full mb-12 border-b border-gray-100 pb-4 overflow-x-auto no-scrollbar">
 
                     {/* Left: Filter Tools */}
-                    <div className="w-full md:w-auto flex items-center justify-center md:justify-start gap-6">
+                    <div className="flex items-center gap-3 md:gap-6 shrink-0">
                         {/* Category Dropdown */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -256,7 +256,7 @@ export default function ShopContent({ products }: ShopContentProps) {
                     </div>
 
                     {/* Right: Sort Tool */}
-                    <div className="w-full md:w-auto flex items-center justify-center md:justify-end">
+                    <div className="flex items-center justify-end shrink-0">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1">
