@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import { Product } from "@/lib/products";
 import { PLACEHOLDER_IMAGE } from "@/lib/placeholder";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Phone, Check, Plus, Minus, ShoppingBag } from "lucide-react";
+import { Phone, Check, ShoppingBag, Plus, Minus } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
 import { PRODUCT_SIZES } from "@/lib/constants";
@@ -19,9 +19,10 @@ const PHONE_NUMBER = "254705774171";
 
 export default function ProductDetail({ product }: ProductDetailProps) {
     const { dispatch } = useCart();
-    const [activeImage, setActiveImage] = useState(product.images[0]);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [quantity, setQuantity] = useState(1);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     // Fallback if product has no sizes defined
     const sizes = product.sizes || [];
@@ -32,8 +33,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
     const handleAddToCart = () => {
         if (!selectedSize && sizes.length > 0) {
-            toast.error("Size required", {
-                description: "Please select a size before adding to cart.",
+            toast.error("Size selection required", {
+                description: "Please choose your size to continue.",
             });
             return;
         }
@@ -54,24 +55,32 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             }
         });
 
-        toast.success("Added to cart! 🛍️", {
-            description: "Your shoes are waiting in the cart.",
+        toast.success("Added to cart", {
+            description: "View your bag to checkout.",
         });
-        setQuantity(1);
+        setQuantity(1); // Reset quantity
     };
 
     const handleWhatsAppClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         if (!selectedSize && sizes.length > 0) {
             e.preventDefault();
-            toast.error("Size required", {
-                description: "Please select a size before ordering.",
+            toast.error("Size selection required", {
+                description: "Please choose your size first.",
             });
             return;
         }
     };
 
+    const handleScroll = () => {
+        if (scrollContainerRef.current) {
+            const { scrollLeft, clientWidth } = scrollContainerRef.current;
+            const index = Math.round(scrollLeft / clientWidth);
+            setCurrentImageIndex(index);
+        }
+    };
+
     const message = selectedSize
-        ? `Hi! I'd like to order the ${product.name} in size ${selectedSize}. Thank you!`
+        ? `Hi! I'd like to order the ${product.name} in size ${selectedSize} (Qty: ${quantity}). Thank you!`
         : `Hi! I'm interested in the ${product.name}. Please send size options.`;
 
     const whatsappUrl = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(
@@ -79,72 +88,97 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     )}`;
 
     return (
-        <div className="grid grid-cols-1 gap-x-12 gap-y-10 lg:grid-cols-2">
-            {/* Image Gallery */}
-            <div className="flex flex-col gap-y-4">
-                <div className="relative aspect-square w-full overflow-hidden rounded-sm bg-gray-100">
-                    <Image
-                        src={activeImage}
-                        alt={product.name}
-                        fill
-                        priority
-                        placeholder="blur"
-                        blurDataURL={PLACEHOLDER_IMAGE}
-                        className="h-full w-full object-cover object-center"
-                        sizes="(min-width: 1024px) 50vw, 100vw"
-                    />
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-8 lg:gap-x-16">
+            {/* Left Column: Image Gallery (Editorial Scroll) */}
+            <div className="lg:col-span-7 flex flex-col gap-4">
 
-                {/* Thumbnails */}
-                {product.images.length > 1 && (
-                    <div className="flex gap-x-4 overflow-x-auto pb-2">
+                {/* Mobile: Swipeable Carousel */}
+                <div className="relative lg:hidden group -mx-4 sm:mx-0">
+                    <div
+                        ref={scrollContainerRef}
+                        onScroll={handleScroll}
+                        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide aspect-[4/5] w-full bg-gray-50"
+                    >
                         {product.images.map((img, idx) => (
-                            <button
-                                key={idx}
-                                onClick={() => setActiveImage(img)}
-                                className={`relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-sm border-2 transition-all ${activeImage === img
-                                    ? "border-accent-500 opacity-100"
-                                    : "border-transparent opacity-70 hover:opacity-100"
-                                    }`}
-                            >
+                            <div key={idx} className="w-full flex-shrink-0 snap-center relative h-full">
                                 <Image
                                     src={img}
-                                    alt={`${product.name} thumbnail ${idx + 1}`}
+                                    alt={`${product.name} view ${idx + 1}`}
                                     fill
+                                    priority={idx === 0}
                                     placeholder="blur"
                                     blurDataURL={PLACEHOLDER_IMAGE}
-                                    className="object-cover"
-                                    sizes="80px"
+                                    className="object-cover object-center"
+                                    sizes="(min-width: 1024px) 60vw, 100vw"
                                 />
-                            </button>
+                            </div>
                         ))}
                     </div>
-                )}
+
+                    {/* Carousel Dots */}
+                    {product.images.length > 1 && (
+                        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                            {product.images.map((_, idx) => (
+                                <div
+                                    key={idx}
+                                    className={`h-1.5 rounded-full transition-all shadow-sm ${currentImageIndex === idx
+                                        ? "w-6 bg-white"
+                                        : "w-1.5 bg-white/50"
+                                        }`}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Desktop: Vertical Stack */}
+                <div className="hidden lg:flex flex-col gap-6">
+                    {product.images.map((img, idx) => (
+                        <div key={idx} className="relative aspect-[4/5] w-full bg-gray-50">
+                            <Image
+                                src={img}
+                                alt={`${product.name} view ${idx + 1}`}
+                                fill
+                                priority={idx === 0}
+                                placeholder="blur"
+                                blurDataURL={PLACEHOLDER_IMAGE}
+                                className="object-cover object-center"
+                                sizes="60vw"
+                            />
+                        </div>
+                    ))}
+                </div>
             </div>
 
-            {/* Product Info */}
-            <div className="flex flex-col">
-                <h1 className="font-sans text-3xl font-medium tracking-tight text-gray-900 sm:text-4xl">
-                    {product.name}
-                </h1>
-                <div className="mt-4 flex items-end">
+            {/* Right Column: Product Info (Sticky) */}
+            <div className="lg:col-span-5 lg:sticky lg:top-32 h-fit flex flex-col pt-2 lg:pt-0">
+                <div className="mb-2">
+                    <h1 className="font-sans text-3xl md:text-4xl font-semibold tracking-wide text-gray-900 uppercase">
+                        {product.name}
+                    </h1>
+                </div>
+
+                <div className="mt-2 mb-6">
                     <p className="text-2xl font-bold text-gray-900">
                         {formatPrice(product.price)}
                     </p>
                 </div>
 
-                <div className="mt-6 border-t border-b border-gray-100 py-6">
-                    <p className="text-base text-gray-500 leading-relaxed">
-                        {product.description || "No description available."}
-                    </p>
+                {/* Description - Clean & Open */}
+                <div className="mb-8 text-gray-600 leading-relaxed font-light text-sm md:text-base">
+                    {product.description || "Timeless design meets exceptional comfort. Handcrafted for the modern wardrobe."}
                 </div>
 
-
-
                 {/* Size Selector */}
-                <div className="mt-8">
-                    <h3 className="text-sm font-medium text-gray-900">Select Size</h3>
-                    <div className="mt-3 flex flex-wrap gap-3">
+                <div className="mb-8">
+                    <div className="flex justify-between items-center mb-3">
+                        <span className="text-xs font-bold uppercase tracking-widest text-gray-900">Select Size</span>
+                        {selectedSize && (
+                            <span className="text-xs text-gray-500">Selected: {selectedSize}</span>
+                        )}
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
                         {PRODUCT_SIZES.map((size) => {
                             const isAvailable = sizes.includes(size);
                             const isSelected = selectedSize === size;
@@ -155,87 +189,82 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                                     onClick={() => isAvailable && setSelectedSize(size)}
                                     disabled={!isAvailable}
                                     className={`
-                                        flex h-12 w-12 items-center justify-center rounded-md border text-sm font-medium transition-all
+                                        h-11 w-11 flex items-center justify-center text-sm transition-all border
                                         ${isSelected
-                                            ? "border-accent-500 bg-accent-500 text-white"
+                                            ? "border-gray-900 bg-gray-900 text-white"
                                             : isAvailable
-                                                ? "border-gray-200 bg-white text-gray-900 hover:border-accent-500 hover:text-accent-500 cursor-pointer"
-                                                : "border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed decoration-slice line-through decoration-gray-300"
+                                                ? "border-gray-200 bg-transparent text-gray-900 hover:border-gray-900"
+                                                : "border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed line-through"
                                         }
                                     `}
-                                    title={isAvailable ? "In Stock" : "Out of Stock"}
                                 >
                                     {size}
                                 </button>
                             );
                         })}
                     </div>
-                    {selectedSize && (
-                        <p className="mt-2 text-sm text-success flex items-center gap-1">
-                            <Check className="h-3 w-3" /> Size {selectedSize} selected
-                        </p>
-                    )}
                 </div>
 
-                {/* Quantity Selector */}
-                <div className="mt-8">
-                    <h3 className="text-sm font-medium text-gray-900">Quantity</h3>
-                    <div className="mt-3 flex items-center">
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => handleQuantityChange(-1)}
-                            disabled={quantity <= 1}
-                            className="h-10 w-10"
-                        >
-                            <Minus className="h-4 w-4" />
-                        </Button>
-                        <span className="mx-4 text-lg font-medium min-w-[20px] text-center">
-                            {quantity}
-                        </span>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => handleQuantityChange(1)}
-                            className="h-10 w-10"
-                        >
-                            <Plus className="h-4 w-4" />
-                        </Button>
+                {/* Quantity Control (Subtle, Reintroduced) */}
+                <div className="mb-10">
+                    <span className="text-xs font-bold uppercase tracking-widest text-gray-900 block mb-3">Quantity</span>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center border border-gray-200 rounded-sm">
+                            <button
+                                onClick={() => handleQuantityChange(-1)}
+                                disabled={quantity <= 1}
+                                className="h-10 w-10 flex items-center justify-center text-gray-500 hover:text-gray-900 disabled:opacity-30 transition-colors"
+                            >
+                                <Minus className="h-3 w-3" />
+                            </button>
+                            <span className="w-8 text-center text-sm font-medium text-gray-900">{quantity}</span>
+                            <button
+                                onClick={() => handleQuantityChange(1)}
+                                className="h-10 w-10 flex items-center justify-center text-gray-500 hover:text-gray-900 transition-colors"
+                            >
+                                <Plus className="h-3 w-3" />
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="mt-10 flex flex-col gap-4">
-                    {/* Add to Cart */}
+                {/* Actions */}
+                <div className="flex flex-col gap-3 mt-auto">
                     <Button
                         onClick={handleAddToCart}
-                        className="w-full rounded-full py-6 text-lg font-semibold bg-gray-900 hover:bg-gray-800 text-white shadow-sm hover:shadow-md transition-all"
+                        className="w-full rounded-none h-14 text-sm font-bold uppercase tracking-[0.15em] bg-gray-900 hover:bg-gray-800 text-white shadow-none transition-all"
                     >
-                        <ShoppingBag className="mr-2 h-5 w-5" />
-                        Add to Cart
+                        Add to Bag
                     </Button>
 
-                    {/* WhatsApp */}
                     <Button
                         asChild
                         variant="outline"
-                        className="w-full rounded-full py-6 text-lg font-semibold border-success text-success hover:bg-success/5 hover:text-success transition-all"
+                        className="w-full rounded-none h-12 text-xs font-medium uppercase tracking-widest text-gray-900 border-gray-200 hover:border-gray-900 hover:bg-transparent transition-all"
                     >
                         <a
                             href={whatsappUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={handleWhatsAppClick}
-                            className="flex items-center justify-center gap-x-2"
+                            className="flex items-center justify-center gap-2"
                         >
-                            <Phone className="h-5 w-5" />
-                            {selectedSize ? "Order on WhatsApp" : "Select Size to Order"}
+                            <Phone className="h-4 w-4" />
+                            Quick Order via WhatsApp
                         </a>
                     </Button>
+                </div>
 
-                    <p className="mt-2 text-center text-xs text-gray-400">
-                        Secure checkout via WhatsApp. We'll confirm availability instantly.
-                    </p>
+                {/* Trust / Shipping Note */}
+                <div className="mt-8 pt-6 border-t border-gray-100">
+                    <ul className="space-y-2 text-xs text-gray-500 font-light tracking-wide uppercase">
+                        <li className="flex items-center gap-2">
+                            <Check className="h-3 w-3" /> Secure Checkout
+                        </li>
+                        <li className="flex items-center gap-2">
+                            <Check className="h-3 w-3" /> Local Delivery available
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
