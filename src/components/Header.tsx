@@ -34,12 +34,12 @@ export default function Header() {
                     {/* Logo - Left Aligned */}
                     <div className="flex-shrink-0">
                         <Link href="/" className="block">
-                            <div className="relative h-8 md:h-10 w-auto aspect-[3/1]">
+                            <div className="relative h-22 sm:h-12 md:h-32 w-auto">
                                 <Image
-                                    src="/logo.png"
+                                    src="/logo.svg"
                                     alt="Happy Happy Feet"
-                                    width={140}
-                                    height={46}
+                                    width={500}
+                                    height={500}
                                     className="h-full w-auto object-contain"
                                     priority
                                     quality={100}
@@ -82,12 +82,12 @@ export default function Header() {
                             <SheetContent side="right" className="w-[320px] border-l border-gray-200 bg-white p-0 flex flex-col h-full">
                                 <SheetHeader className="p-6 border-b border-gray-100">
                                     <SheetTitle className="text-left">
-                                        <div className="relative h-7 w-auto aspect-[3/1]">
+                                        <div className="relative h-11 w-auto">
                                             <Image
-                                                src="/logo.png"
+                                                src="/logo.svg"
                                                 alt="Happy Happy Feet"
-                                                width={120}
-                                                height={40}
+                                                width={500}
+                                                height={500}
                                                 className="h-full w-auto object-contain"
                                                 priority
                                                 quality={100}
