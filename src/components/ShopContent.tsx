@@ -256,39 +256,16 @@ export default function ShopContent({ products }: ShopContentProps) {
                     </p>
                 </div>
 
-                {/* Controls Bar: Search (Left/Right) & Sort/Filter (Right) */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 w-full mb-12 border-b border-gray-100 pb-4">
+                {/* Controls Bar: Minimalist Single Row */}
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4 w-full mb-12 border-b border-gray-100 pb-4">
 
-                    {/* Categories Left - Horizontal Scroll */}
-                    <div className="relative flex-1 min-w-0 order-2 md:order-1 -mx-4 md:mx-0">
-                        {/* Gradient Masks */}
-                        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white z-10 hidden md:block" />
-                        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white z-10" />
-
-                        <div className="flex items-center gap-8 overflow-x-auto px-4 md:px-8 pb-2 scrollbar-hide snap-x snap-mandatory [-ms-overflow-style:'none'] [scrollbar-width:'none'] [&::-webkit-scrollbar]:hidden">
-                            {uniqueCategories.map((category) => (
-                                <button
-                                    key={category}
-                                    onClick={() => setActiveCategory(activeCategory === category ? "All" : category)}
-                                    className={`
-                                        snap-start flex-shrink-0 text-sm font-medium uppercase tracking-wider transition-all border-b-2 pb-0.5 whitespace-nowrap
-                                        ${activeCategory === category
-                                            ? "text-gray-900 border-gray-900"
-                                            : "text-gray-500 border-transparent hover:text-gray-700"
-                                        }
-                                    `}
-                                >
-                                    {capitalize(category)}
-                                </button>
-                            ))}
-                            {/* Spacer for right mask */}
-                            <div className="w-4 flex-shrink-0" />
-                        </div>
-                    </div>
-
-                    {/* Tools Right */}
-                    <div className="flex items-center gap-6 order-1 md:order-2 self-end md:self-auto w-full md:w-auto justify-between md:justify-end">
-                        {/* Search */}
+                    {/* Search (Left aligned for balance or keep with tools?) 
+                        Let's keep the user's current pattern but consolidated. 
+                        Actually, moving Search to the left might be nice, but let's keep all checks together for now, 
+                        OR simplify the container to just be the tools since the "Left" part is gone.
+                    */}
+                    <div className="w-full flex items-center justify-between">
+                        {/* Search Left */}
                         <div className={`relative transition-all duration-300 ${searchQuery ? "w-full md:w-64" : "w-auto"}`}>
                             {searchQuery ? (
                                 <div className="relative w-full flex items-center border-b border-gray-300 focus-within:border-gray-900">
@@ -309,65 +286,104 @@ export default function ShopContent({ products }: ShopContentProps) {
                                 </div>
                             ) : (
                                 <button
-                                    onClick={() => setSearchQuery(" ")} // Trigger expanded state (temp space, cleaned up by debounce/input logic usually, but here we might want a boolean state for 'isSearchOpen'. using simple hack or state toggle is better. Let's stick to simple input focus logic or a separate state. For now, checking searchQuery isn't enough to Toggle open/close if empty. Let's use a state.)
-                                    className="p-1 text-gray-900 hover:text-gray-600"
+                                    onClick={() => setSearchQuery(" ")}
+                                    className="flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-gray-900 hover:text-gray-600 transition-colors"
                                     aria-label="Open search"
                                 >
-                                    <Search className="h-5 w-5" strokeWidth={1.5} />
+                                    <Search className="h-4 w-4" />
+                                    <span className="hidden md:inline">Search</span>
                                 </button>
                             )}
                         </div>
 
-                        {/* Divider */}
-                        <div className="h-4 w-px bg-gray-300 mx-2 hidden md:block"></div>
-
-                        {/* Sort */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors">
-                                    Sort
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-48 bg-white shadow-lg rounded-none border border-gray-100 p-0">
-                                {SORT_OPTIONS.map((option) => (
+                        {/* Filters Right (Category, Sort, Price) */}
+                        <div className="flex items-center gap-4 md:gap-8">
+                            {/* Category Dropdown (New Unified Control) */}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1">
+                                        Category
+                                        <ChevronDown className="h-3 w-3 opacity-50" />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56 bg-white shadow-lg rounded-none border border-gray-100 p-0 max-h-[60vh] overflow-y-auto">
                                     <DropdownMenuItem
-                                        key={option.value}
-                                        onClick={() => setSortBy(option.value)}
+                                        onClick={() => setActiveCategory("All")}
                                         className={`
                                             flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
-                                            ${sortBy === option.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
+                                            ${activeCategory === "All" ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
                                         `}
                                     >
-                                        {option.label}
-                                        {sortBy === option.value && <Check className="h-3 w-3" />}
+                                        All Categories
+                                        {activeCategory === "All" && <Check className="h-3 w-3" />}
                                     </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                    <DropdownMenuSeparator className="my-0 bg-gray-100" />
+                                    {uniqueCategories.map((category) => (
+                                        <DropdownMenuItem
+                                            key={category}
+                                            onClick={() => setActiveCategory(category)}
+                                            className={`
+                                                flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
+                                                ${activeCategory === category ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
+                                            `}
+                                        >
+                                            {capitalize(category)}
+                                            {activeCategory === category && <Check className="h-3 w-3" />}
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
 
-                        {/* Filter (Price) */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors">
-                                    Filter
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56 bg-white shadow-lg rounded-none border border-gray-100 p-0">
-                                {PRICE_RANGES.map((range) => (
-                                    <DropdownMenuItem
-                                        key={range.value}
-                                        onClick={() => setPriceRange(range.value)}
-                                        className={`
-                                            flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
-                                            ${priceRange === range.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
-                                        `}
-                                    >
-                                        {range.label}
-                                        {priceRange === range.value && <Check className="h-3 w-3" />}
-                                    </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                            {/* Sort */}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1">
+                                        Sort
+                                        <ChevronDown className="h-3 w-3 opacity-50" />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-48 bg-white shadow-lg rounded-none border border-gray-100 p-0">
+                                    {SORT_OPTIONS.map((option) => (
+                                        <DropdownMenuItem
+                                            key={option.value}
+                                            onClick={() => setSortBy(option.value)}
+                                            className={`
+                                                flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
+                                                ${sortBy === option.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
+                                            `}
+                                        >
+                                            {option.label}
+                                            {sortBy === option.value && <Check className="h-3 w-3" />}
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            {/* Filter (Price) */}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors flex items-center gap-1">
+                                        Price
+                                        <ChevronDown className="h-3 w-3 opacity-50" />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56 bg-white shadow-lg rounded-none border border-gray-100 p-0">
+                                    {PRICE_RANGES.map((range) => (
+                                        <DropdownMenuItem
+                                            key={range.value}
+                                            onClick={() => setPriceRange(range.value)}
+                                            className={`
+                                                flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
+                                                ${priceRange === range.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
+                                            `}
+                                        >
+                                            {range.label}
+                                            {priceRange === range.value && <Check className="h-3 w-3" />}
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                     </div>
                 </div>
 
