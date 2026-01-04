@@ -34,7 +34,7 @@ export default function Header() {
                     {/* Logo - Left Aligned */}
                     <div className="flex-shrink-0">
                         <Link href="/" className="block">
-                            <div className="relative h-22 sm:h-12 md:h-32 w-auto">
+                            <div className="relative h-24 sm:h-28 md:h-36 lg:h-40 flex items-center w-auto py-4">
                                 <Image
                                     src="/logo.svg"
                                     alt="Happy Happy Feet"
@@ -47,6 +47,7 @@ export default function Header() {
                             </div>
                         </Link>
                     </div>
+
 
                     {/* Desktop Navigation - Minimalist (Just Shop + Search) */}
                     <nav className="hidden md:flex items-center gap-x-8">
