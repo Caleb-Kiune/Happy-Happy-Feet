@@ -11,7 +11,8 @@ type ShoeCardProps = {
 export default function ShoeCard({ product }: ShoeCardProps) {
     return (
         <Link href={`/shop/${product.slug}`} className="group block">
-            <div className="relative aspect-square w-full overflow-hidden bg-gray-100">
+            {/* Image Container */}
+            <div className="relative aspect-[4/5] w-full overflow-hidden bg-gray-100 mb-4">
                 <Image
                     src={product.images[0]}
                     alt={product.name}
@@ -19,16 +20,16 @@ export default function ShoeCard({ product }: ShoeCardProps) {
                     placeholder="blur"
                     blurDataURL={PLACEHOLDER_IMAGE}
                     className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
-                    sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                    sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 50vw"
                 />
-                {/* Subtle overlay on hover */}
-                <div className="absolute inset-0 bg-black/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
             </div>
-            <div className="mt-4 flex flex-col gap-y-1 text-center">
-                <h3 className="text-sm font-medium uppercase tracking-wider text-gray-900 group-hover:text-gray-600 transition-colors">
+
+            {/* Persistent Details - Clean & Minimalist */}
+            <div className="flex flex-col items-center gap-1 text-center">
+                <h3 className="text-sm font-medium uppercase tracking-widest text-gray-900 group-hover:text-gray-600 transition-colors">
                     {product.name}
                 </h3>
-                <p className="text-sm font-light text-gray-500">
+                <p className="text-lg font-bold text-gray-900">
                     {formatPrice(product.price)}
                 </p>
             </div>

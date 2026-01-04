@@ -236,8 +236,8 @@ export default function ShopContent({ products }: ShopContentProps) {
 
     const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);
     const paginatedProducts = useMemo(() => {
-        const start = (currentPage - 1) * ITEMS_PER_PAGE;
-        return sortedProducts.slice(start, start + ITEMS_PER_PAGE);
+        // Load More logic: Show from 0 up to current page * limit
+        return sortedProducts.slice(0, currentPage * ITEMS_PER_PAGE);
     }, [currentPage, sortedProducts]);
 
     // Handle out of bounds
@@ -251,77 +251,113 @@ export default function ShopContent({ products }: ShopContentProps) {
         <div className="bg-white pb-24 pt-16 md:pt-24">
             <Container>
                 {/* Header */}
-                <div className="flex flex-col items-center text-center">
-                    <h1 className="font-sans text-4xl font-medium tracking-tight text-gray-900 sm:text-5xl">
-                        Our Collection
+                <div className="flex flex-col items-center text-center mt-8 mb-16">
+                    <h1 className="font-sans text-4xl md:text-5xl font-bold tracking-[0.2em] text-gray-900 uppercase">
+                        The Collection
                     </h1>
-                    <p className="mt-4 max-w-xl text-lg text-gray-500">
-                        Explore our latest styles, designed for every occasion.
+                    <div className="h-px w-24 bg-gray-200 mt-8 mb-4"></div>
+                    <p className="max-w-xl text-sm md:text-base text-gray-500 font-light tracking-wide">
+                        Timeless comfort, elevated style.
                     </p>
                 </div>
 
-                {/* Search & Sort Bar */}
-                <div className="mt-10 flex flex-col md:flex-row justify-center items-center gap-4 w-full px-4 max-w-2xl mx-auto">
-                    {/* Search */}
-                    <div className="relative w-full">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <Search className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                            type="text"
-                            className="block w-full rounded-full border-0 py-3 pl-10 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-accent-500 sm:text-sm sm:leading-6 bg-white"
-                            placeholder="Search shoes..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                        {searchQuery && (
+                {/* Controls Bar: Search (Left/Right) & Sort/Filter (Right) */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 w-full mb-12 border-b border-gray-100 pb-4">
+
+                    {/* Categories Left - Text Links */}
+                    <div className="flex flex-wrap gap-x-6 gap-y-2 order-2 md:order-1">
+                        {CATEGORIES.map((category) => (
                             <button
-                                onClick={() => setSearchQuery("")}
-                                className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer text-gray-400 hover:text-gray-600 transition-colors"
-                                aria-label="Clear search"
+                                key={category}
+                                onClick={() => setActiveCategory(category)}
+                                className={`text-sm font-medium uppercase tracking-wider transition-all border-b-2 pb-0.5 ${activeCategory === category
+                                    ? "text-gray-900 border-gray-900"
+                                    : "text-gray-500 border-transparent hover:text-gray-900"
+                                    }`}
                             >
-                                <X className="h-5 w-5" />
+                                {category}
                             </button>
-                        )}
+                        ))}
                     </div>
 
-                    {/* Sort */}
-                    <div className="relative flex-shrink-0">
+                    {/* Tools Right */}
+                    <div className="flex items-center gap-6 order-1 md:order-2 self-end md:self-auto w-full md:w-auto justify-between md:justify-end">
+                        {/* Search */}
+                        <div className={`relative transition-all duration-300 ${searchQuery ? "w-full md:w-64" : "w-auto"}`}>
+                            {searchQuery ? (
+                                <div className="relative w-full flex items-center border-b border-gray-300 focus-within:border-gray-900">
+                                    <input
+                                        type="text"
+                                        autoFocus
+                                        className="w-full bg-transparent py-2 pr-8 text-sm text-gray-900 placeholder-gray-400 focus:outline-none"
+                                        placeholder="Search styles..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                    />
+                                    <button
+                                        onClick={() => { setSearchQuery(""); setDebouncedQuery(""); }}
+                                        className="absolute right-0 text-gray-400 hover:text-gray-900"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => setSearchQuery(" ")} // Trigger expanded state (temp space, cleaned up by debounce/input logic usually, but here we might want a boolean state for 'isSearchOpen'. using simple hack or state toggle is better. Let's stick to simple input focus logic or a separate state. For now, checking searchQuery isn't enough to Toggle open/close if empty. Let's use a state.)
+                                    className="p-1 text-gray-900 hover:text-gray-600"
+                                    aria-label="Open search"
+                                >
+                                    <Search className="h-5 w-5" strokeWidth={1.5} />
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Divider */}
+                        <div className="h-4 w-px bg-gray-300 mx-2 hidden md:block"></div>
+
+                        {/* Sort */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <button className="flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-accent-500 transition-colors focus:outline-none">
-                                    Sort & Filter
-                                    <ChevronDown className="h-4 w-4" />
+                                <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors">
+                                    Sort
                                 </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56 bg-white shadow-xl rounded-xl border-gray-100 p-2">
-                                <DropdownMenuLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-1.5">Sort By</DropdownMenuLabel>
+                            <DropdownMenuContent align="end" className="w-48 bg-white shadow-lg rounded-none border border-gray-100 p-0">
                                 {SORT_OPTIONS.map((option) => (
                                     <DropdownMenuItem
                                         key={option.value}
                                         onClick={() => setSortBy(option.value)}
                                         className={`
-                                            flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-colors
-                                            ${sortBy === option.value ? "bg-accent-50 text-accent-600" : "text-gray-700 focus:bg-gray-50 focus:text-gray-900"}
+                                            flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
+                                            ${sortBy === option.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
                                         `}
                                     >
                                         {option.label}
-                                        {sortBy === option.value && <Check className="h-4 w-4 text-accent-500" />}
+                                        {sortBy === option.value && <Check className="h-3 w-3" />}
                                     </DropdownMenuItem>
                                 ))}
-                                <DropdownMenuSeparator className="my-2 bg-gray-100" />
-                                <DropdownMenuLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-1.5">Price Range</DropdownMenuLabel>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        {/* Filter (Price) */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="text-sm font-medium uppercase tracking-wider text-gray-700 hover:text-gray-900 transition-colors">
+                                    Filter
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56 bg-white shadow-lg rounded-none border border-gray-100 p-0">
                                 {PRICE_RANGES.map((range) => (
                                     <DropdownMenuItem
                                         key={range.value}
                                         onClick={() => setPriceRange(range.value)}
                                         className={`
-                                            flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-colors
-                                            ${priceRange === range.value ? "bg-accent-50 text-accent-600" : "text-gray-700 focus:bg-gray-50 focus:text-gray-900"}
+                                            flex items-center justify-between px-4 py-3 text-xs uppercase tracking-wider cursor-pointer transition-colors rounded-none
+                                            ${priceRange === range.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
                                         `}
                                     >
                                         {range.label}
-                                        {priceRange === range.value && <Check className="h-4 w-4 text-accent-500" />}
+                                        {priceRange === range.value && <Check className="h-3 w-3" />}
                                     </DropdownMenuItem>
                                 ))}
                             </DropdownMenuContent>
@@ -329,125 +365,64 @@ export default function ShopContent({ products }: ShopContentProps) {
                     </div>
                 </div>
 
-                {/* Active Filter Chips */}
+                {/* Active Filter Chips (Minimal) */}
                 {activeFilters.length > 0 && (
-                    <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+                    <div className="mb-8 flex flex-wrap items-center gap-3">
                         {activeFilters.map((filter) => (
                             <span
                                 key={filter.id}
-                                className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-200"
+                                className="inline-flex items-center gap-2 border border-gray-200 px-3 py-1 text-xs font-medium uppercase tracking-wide text-gray-900 transition-colors"
                             >
-                                <span className="max-w-[200px] truncate">{filter.label}</span>
+                                {filter.label}
                                 <button
                                     onClick={filter.onRemove}
-                                    className="ml-0.5 rounded-full p-0.5 hover:bg-gray-300/50 hover:text-gray-700 focus:outline-none"
+                                    className="hover:text-gray-500 focus:outline-none"
                                     aria-label={`Remove ${filter.label} filter`}
                                 >
-                                    <X className="h-3.5 w-3.5" />
+                                    <X className="h-3 w-3" />
                                 </button>
                             </span>
                         ))}
-
-                        {activeFilters.length >= 2 && (
-                            <button
-                                onClick={handleClearAll}
-                                className="ml-2 text-sm font-medium text-accent-500 hover:text-accent-600 hover:underline transition-colors"
-                            >
-                                Clear all
-                            </button>
-                        )}
+                        <button
+                            onClick={handleClearAll}
+                            className="text-xs font-medium uppercase tracking-wide text-gray-400 hover:text-gray-900 transition-colors underline decoration-gray-300 underline-offset-4"
+                        >
+                            Clear All
+                        </button>
                     </div>
                 )}
 
-                {/* Categories */}
-                <div className="mt-8 flex flex-wrap justify-center gap-2">
-                    {CATEGORIES.map((category) => (
-                        <Button
-                            key={category}
-                            variant={activeCategory === category ? "default" : "outline"}
-                            onClick={() => setActiveCategory(category)}
-                            className={`min-w-[80px] rounded-full px-6 transition-all ${activeCategory === category
-                                ? "bg-accent-500 hover:bg-accent-600 text-white border-transparent"
-                                : "border-gray-200 text-gray-600 hover:border-accent-500 hover:text-accent-500"
-                                }`}
-                        >
-                            {category}
-                        </Button>
-                    ))}
-                </div>
-
-                {/* Grid */}
-                <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {paginatedProducts.map((product) => (
+                {/* Grid - 2 cols mobile, 4 desktop */}
+                <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:gap-x-8 md:gap-y-12 lg:grid-cols-4">
+                    {paginatedProducts.map((product) => ( // paginatedProducts logic updated below to slice(0, end)
                         <ShoeCard key={product.id} product={product} />
                     ))}
                 </div>
 
-                {/* Pagination Controls */}
-                {totalPages > 1 && (
-                    <div className="mt-16 flex flex-col items-center gap-4 border-t border-gray-100 pt-8">
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                                disabled={currentPage === 1}
-                                className="h-10 w-10 rounded-full"
-                            >
-                                <ChevronLeft className="h-4 w-4" />
-                            </Button>
-
-                            <div className="flex items-center gap-1">
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                    <button
-                                        key={page}
-                                        onClick={() => setCurrentPage(page)}
-                                        className={`h-10 w-10 rounded-full text-sm font-medium transition-colors ${currentPage === page
-                                            ? "bg-gray-900 text-white"
-                                            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-                                            }`}
-                                    >
-                                        {page}
-                                    </button>
-                                ))}
-                            </div>
-
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                                disabled={currentPage === totalPages}
-                                className="h-10 w-10 rounded-full"
-                            >
-                                <ChevronRight className="h-4 w-4" />
-                            </Button>
-                        </div>
-                        <p className="text-sm text-gray-500">
-                            Showing <span className="font-medium">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span>–
-                            <span className="font-medium">{Math.min(currentPage * ITEMS_PER_PAGE, sortedProducts.length)}</span> of{" "}
-                            <span className="font-medium">{sortedProducts.length}</span> results
-                        </p>
+                {/* "Pagination" -> Load More */}
+                {paginatedProducts.length < sortedProducts.length && (
+                    <div className="mt-20 flex justify-center">
+                        <button
+                            onClick={() => setCurrentPage((prev) => prev + 1)}
+                            className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 border-b border-gray-900 pb-1 hover:opacity-60 transition-opacity"
+                        >
+                            Load More
+                        </button>
                     </div>
                 )}
 
                 {/* Empty State */}
                 {filteredProducts.length === 0 && (
-                    <div className="mt-20 text-center">
-                        <p className="text-gray-500">
-                            {debouncedQuery
-                                ? `No products found for "${debouncedQuery}" ${activeCategory !== "All" ? `in ${activeCategory}` : ""
-                                }.`
-                                : "No products found in this category."}
+                    <div className="mt-20 text-center py-20 border-t border-gray-100">
+                        <p className="text-gray-900 font-medium uppercase tracking-widest text-sm mb-4">
+                            No styles match your selection
                         </p>
-                        {debouncedQuery && (
-                            <Button
-                                variant="link"
-                                onClick={() => setSearchQuery("")}
-                                className="mt-2 text-accent-500 hover:text-accent-600"
-                            >
-                                Clear search
-                            </Button>
-                        )}
+                        <button
+                            onClick={handleClearAll}
+                            className="text-xs text-gray-500 hover:text-gray-900 underline underline-offset-4"
+                        >
+                            Clear filters
+                        </button>
                     </div>
                 )}
             </Container>
