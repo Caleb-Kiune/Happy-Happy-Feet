@@ -54,15 +54,12 @@ export default function CartSheet() {
     return (
         <Sheet>
             <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                    <ShoppingBag className="h-6 w-6" />
+                <Button variant="ghost" size="icon" className="relative hover:bg-transparent">
+                    <ShoppingBag className="h-5 w-5 text-gray-900" strokeWidth={1.5} />
                     {totalItems > 0 && (
-                        <Badge
-                            variant="secondary"
-                            className="absolute -top-1 -right-1 px-1.5 py-0.5 text-xs"
-                        >
+                        <span className="absolute top-0 -right-1 flex h-4 w-4 items-center justify-center text-[10px] font-medium text-gray-900">
                             {totalItems}
-                        </Badge>
+                        </span>
                     )}
                 </Button>
             </SheetTrigger>

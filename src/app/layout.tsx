@@ -1,3 +1,4 @@
+import FloatingWhatsApp from '@/components/FloatingWhatsApp';
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -38,6 +39,7 @@ export default function RootLayout({
           <main className="flex-grow">
             {children}
           </main>
+          <FloatingWhatsApp />
           <Footer />
           <Toaster position="bottom-center" richColors closeButton />
         </CartProvider>
