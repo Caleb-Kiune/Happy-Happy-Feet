@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 // Primary premium lifestyle image
-const HERO_IMAGE = "https://images.unsplash.com/photo-1596703263926-eb0762ee17e4?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=2400";
+const HERO_IMAGE = "/products/lexie-barnhorn-7HzqlpXhQWI-unsplash.jpg";
 
 export default function Hero() {
     return (
@@ -18,13 +18,18 @@ export default function Hero() {
                     sizes="100vw"
                     quality={95}
                 />
-                {/* Overlay for text legibility */}
-                <div className="absolute inset-0 bg-black/20" />
+                {/* Overlay 1: Base dark tint for general contrast */}
+                <div className="absolute inset-0 bg-black/30 z-[1]" />
+
+                {/* Overlay 2: Vertical gradient scrim (Darker top/bottom) for editorial framing */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60 z-[2]" />
+
+
             </div>
 
             {/* Content centered - Padding top accounts for the visual balance with the header */}
             <div className="relative z-10 w-full max-w-4xl px-6 pt-32 text-center text-white animate-in slide-in-from-bottom-4 duration-1000 delay-200 fill-mode-backwards">
-                <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 drop-shadow-md">
+                <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 drop-shadow-xl">
                     Step into <br className="hidden sm:block" />
                     Comfort & Style
                 </h1>
