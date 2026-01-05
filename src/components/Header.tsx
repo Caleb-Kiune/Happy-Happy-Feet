@@ -80,7 +80,7 @@ export default function Header() {
                 : 'translate-y-0 opacity-100'
                 } ${isTransparent
                     ? 'bg-transparent border-transparent'
-                    : 'bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm'
+                    : 'bg-white/95 backdrop-blur-md border-b border-black/[0.03] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]'
                 } ${textColorClass}`}
         >
             <Container className="h-full">
