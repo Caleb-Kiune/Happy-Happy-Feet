@@ -113,15 +113,16 @@ export default function Header() {
                                 </Button>
                             </SheetTrigger>
                             <SheetContent side="right" className="w-[320px] border-l border-gray-200 bg-white p-0 flex flex-col h-full z-[60]">
-                                <SheetHeader className="p-6 border-b border-gray-100">
+                                <SheetHeader className="p-6 py-2 border-b border-gray-100">
                                     <SheetTitle className="text-left">
-                                        <div className="relative h-16 w-auto">
+                                        <div className="relative h-24 w-auto flex items-center">
+
                                             <Image
                                                 src="/logo.svg"
                                                 alt="Happy Happy Feet"
                                                 width={500}
                                                 height={500}
-                                                className="h-full w-auto object-contain"
+                                                className="h-full w-auto object-contain scale-[1.1]"
                                                 priority
                                                 quality={100}
                                             />
