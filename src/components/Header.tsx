@@ -15,6 +15,7 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet";
 import { Menu, Instagram, Smartphone } from "lucide-react";
+import { useScrollDirection } from "@/hooks/useScrollDirection";
 
 const NAV_LINKS = [
     { name: "Home", href: "/" },
@@ -26,21 +27,39 @@ const NAV_LINKS = [
 
 export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
+    const { scrollDirection, isAtTop } = useScrollDirection();
+
+    // Logic for header state
+    const isHeaderHidden = !isAtTop && scrollDirection === 'down';
+    const isHeaderTransparent = isAtTop;
 
     return (
-        <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all h-20 sm:h-24 md:h-32">
+        <header
+            className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ease-in-out h-20 sm:h-24 md:h-32 ${isHeaderHidden
+                ? '-translate-y-full opacity-0'
+                : 'translate-y-0 opacity-100'
+                } ${isHeaderTransparent
+                    ? 'bg-transparent border-transparent'
+                    : 'bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm'
+                }`}
+        >
             <Container className="h-full">
-                <div className="flex h-full items-center justify-between">
+                {/* 
+                   Preserving User's Preferred Alignment: items-center 
+                   Preserving Massive Height: h-full of parent
+                */}
+                <div className="flex h-full items-center justify-between transition-colors duration-500">
+
                     {/* Logo - Left Aligned */}
                     <div className="flex-shrink-0">
-                        <Link href="/" className="block">
+                        <Link href="/" className="block group">
                             <div className="relative h-20 sm:h-24 md:h-32 w-auto flex items-center">
                                 <Image
                                     src="/logo.svg"
                                     alt="Happy Happy Feet"
                                     width={500}
                                     height={500}
-                                    className="h-full w-auto object-contain"
+                                    className="h-full w-auto object-contain transition-all duration-500 group-hover:opacity-90"
                                     priority
                                     quality={100}
                                 />
@@ -49,38 +68,44 @@ export default function Header() {
                     </div>
 
 
-                    {/* Desktop Navigation - Minimalist (Just Shop + Search) */}
+                    {/* Desktop Navigation */}
                     <nav className="hidden md:flex items-center gap-x-8">
                         <Link
                             href="/shop"
-                            className="text-sm font-medium tracking-[0.2em] uppercase text-gray-900 hover:opacity-70 transition-opacity"
+                            className={`text-sm font-medium tracking-[0.2em] uppercase transition-colors duration-300 ${isHeaderTransparent ? 'text-white hover:text-white/80' : 'text-gray-900 hover:opacity-70'
+                                }`}
                         >
                             Shop
                         </Link>
 
-                        {/* Global Search (Inline) */}
-                        <div className="flex items-center">
+                        {/* Global Search */}
+                        <div className={`flex items-center transition-colors duration-300 ${isHeaderTransparent ? 'text-white' : 'text-gray-900'
+                            }`}>
                             <SearchToggle />
                         </div>
 
-                        {/* Cart Button (Desktop) */}
-                        <CartSheet />
+                        {/* Cart Button */}
+                        <div className={`transition-colors duration-300 ${isHeaderTransparent ? 'text-white' : 'text-gray-900'
+                            }`}>
+                            <CartSheet />
+                        </div>
                     </nav>
 
                     {/* Mobile Menu Trigger & Cart */}
-                    <div className="flex items-center md:hidden gap-4">
-                        {/* Global Search (Mobile Slide-Down) */}
+                    <div className={`flex items-center md:hidden gap-4 transition-colors duration-300 ${isHeaderTransparent ? 'text-white' : 'text-gray-900'
+                        }`}>
                         <SearchToggle mobile />
 
                         <CartSheet />
 
                         <Sheet open={isOpen} onOpenChange={setIsOpen}>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" aria-label="Open menu" className="-mr-2 hover:bg-transparent text-gray-900">
+                                <Button variant="ghost" size="icon" aria-label="Open menu" className={`-mr-2 hover:bg-transparent transition-colors ${isHeaderTransparent ? 'text-white hover:text-white/80' : 'text-gray-900'
+                                    }`}>
                                     <Menu className="h-6 w-6" strokeWidth={1.5} />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="right" className="w-[320px] border-l border-gray-200 bg-white p-0 flex flex-col h-full">
+                            <SheetContent side="right" className="w-[320px] border-l border-gray-200 bg-white p-0 flex flex-col h-full z-[60]">
                                 <SheetHeader className="p-6 border-b border-gray-100">
                                     <SheetTitle className="text-left">
                                         <div className="relative h-16 w-auto">

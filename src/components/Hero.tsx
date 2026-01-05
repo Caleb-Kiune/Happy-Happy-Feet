@@ -6,52 +6,40 @@ const HERO_IMAGE = "https://images.unsplash.com/photo-1596703263926-eb0762ee17e4
 
 export default function Hero() {
     return (
-        <section className="relative w-full min-h-[90vh] md:min-h-screen grid grid-cols-1 md:grid-cols-2 bg-gray-50">
-
-            {/* Left Column: Brand & Content */}
-            <div className="order-1 md:order-1 flex flex-col justify-center items-center text-center p-8 pt-20 md:p-12 lg:p-16 relative">
-
-                {/* Massive Brand Logo */}
-                {/* Mobile: h-32 | Tablet: h-48 | Desktop: h-64 to h-80 */}
-                <div className="relative w-auto max-w-full h-32 sm:h-48 md:h-64 lg:h-80 mb-8 md:mb-12 animate-in fade-in zoom-in duration-700">
-                    <Image
-                        src="/logo.svg"
-                        alt="Happy Happy Feet"
-                        width={500}
-                        height={500}
-                        className="h-full w-auto object-contain drop-shadow-sm"
-                        priority
-                    />
-                </div>
-
-                <div className="max-w-md space-y-8 animate-in slide-in-from-bottom-4 duration-1000 delay-200 fill-mode-backwards">
-                    <h2 className="text-xl md:text-2xl text-gray-900 font-light tracking-wide leading-relaxed">
-                        Step into <br className="hidden sm:block" />
-                        comfort and style
-                    </h2>
-
-                    <Link
-                        href="/shop"
-                        className="group relative inline-flex items-center justify-center bg-gray-900 px-10 py-4 text-sm font-medium uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-lg"
-                    >
-                        Shop Collection
-                    </Link>
-                </div>
-            </div>
-
-            {/* Right Column: Lifestyle Image */}
-            <div className="order-2 md:order-2 relative h-[50vh] md:h-auto min-h-[400px] w-full bg-gray-200 overflow-hidden">
+        <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+            {/* Background Image - Full Bleed */}
+            <div className="absolute inset-0 z-0">
                 <Image
                     src={HERO_IMAGE}
                     alt="Woman wearing elegant comfortable heels"
                     fill
                     priority
-                    className="object-cover object-center transition-transform duration-1000 hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover object-center"
+                    sizes="100vw"
                     quality={95}
                 />
+                {/* Overlay for text legibility */}
+                <div className="absolute inset-0 bg-black/20" />
             </div>
 
+            {/* Content centered - Padding top accounts for the visual balance with the header */}
+            <div className="relative z-10 w-full max-w-4xl px-6 pt-32 text-center text-white animate-in slide-in-from-bottom-4 duration-1000 delay-200 fill-mode-backwards">
+                <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 drop-shadow-md">
+                    Step into <br className="hidden sm:block" />
+                    Comfort & Style
+                </h1>
+
+                <p className="text-lg md:text-xl font-light tracking-wide mb-10 text-white/90 max-w-lg mx-auto leading-relaxed drop-shadow-sm">
+                    Premium footwear designed for the modern lifestyle. Experience joy with every step.
+                </p>
+
+                <Link
+                    href="/shop"
+                    className="group relative inline-flex items-center justify-center bg-white px-10 py-4 text-sm font-bold uppercase tracking-[0.2em] text-gray-900 transition-all duration-300 hover:bg-gray-100 hover:scale-105 shadow-xl"
+                >
+                    Shop Collection
+                </Link>
+            </div>
         </section>
     );
 }
