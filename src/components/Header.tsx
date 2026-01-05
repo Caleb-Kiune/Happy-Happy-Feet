@@ -28,13 +28,13 @@ export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all h-16 sm:h-20 md:h-20">
+        <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all h-20 sm:h-24 md:h-32">
             <Container className="h-full">
                 <div className="flex h-full items-center justify-between">
                     {/* Logo - Left Aligned */}
                     <div className="flex-shrink-0">
                         <Link href="/" className="block">
-                            <div className="relative h-10 sm:h-12 md:h-16 w-auto flex items-center">
+                            <div className="relative h-20 sm:h-24 md:h-32 w-auto flex items-center">
                                 <Image
                                     src="/logo.svg"
                                     alt="Happy Happy Feet"
@@ -83,7 +83,7 @@ export default function Header() {
                             <SheetContent side="right" className="w-[320px] border-l border-gray-200 bg-white p-0 flex flex-col h-full">
                                 <SheetHeader className="p-6 border-b border-gray-100">
                                     <SheetTitle className="text-left">
-                                        <div className="relative h-11 w-auto">
+                                        <div className="relative h-16 w-auto">
                                             <Image
                                                 src="/logo.svg"
                                                 alt="Happy Happy Feet"
