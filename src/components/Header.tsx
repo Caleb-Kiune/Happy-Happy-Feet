@@ -59,7 +59,15 @@ export default function Header() {
                                     alt="Happy Happy Feet"
                                     width={500}
                                     height={500}
-                                    className="h-full w-auto object-contain transition-all duration-500 group-hover:opacity-90"
+                                    className="
+                                            h-full w-auto object-contain
+                                            scale-[1.6] sm:scale-[1.2] md:scale-[1.25]
+                                            translate-y-[6px] sm:translate-y-0
+                                            origin-left
+                                            transition-all duration-500
+                                            group-hover:opacity-90
+                                            "
+
                                     priority
                                     quality={100}
                                 />
