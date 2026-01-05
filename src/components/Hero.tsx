@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 // Primary premium lifestyle image
-const HERO_IMAGE = "https://images.unsplash.com/photo-1596703263926-eb0762ee17e4?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=2400";
+const HERO_IMAGE = "/products/portrait-woman-s-legs-with-stylish-high-heels-pantyhose.webp";
 
 export default function Hero() {
     return (
