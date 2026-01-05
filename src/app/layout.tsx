@@ -6,23 +6,13 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/context/CartContext";
 import { Toaster } from "@/components/ui/sonner";
+import PageWrapper from "@/components/PageWrapper";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
 });
-
-export const metadata: Metadata = {
-  title: {
-    template: "%s | Happy Happy Feet",
-    default: "Happy Happy Feet – Comfortable & Stylish Women's Shoes",
-  },
-  description: "Discover our curated collection of women's shoes designed for joy and comfort. Heels, sandals, sneakers, and flats for every occasion.",
-  icons: {
-    icon: "/logo.png",
-  },
-};
 
 export default function RootLayout({
   children,
@@ -37,7 +27,9 @@ export default function RootLayout({
         <CartProvider>
           <Header />
           <main className="flex-grow">
-            {children}
+            <PageWrapper>
+              {children}
+            </PageWrapper>
           </main>
           <FloatingWhatsApp />
           <Footer />
