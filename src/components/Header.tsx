@@ -102,7 +102,7 @@ export default function Header() {
                                             origin-left
                                             transition-all duration-300
                                             group-hover:opacity-90
-                                            ${isTransparent ? 'drop-shadow-[0_2px_12px_rgba(255,255,255,0.8)] brightness-110' : ''}
+                                            ${isTransparent ? 'brightness-0 invert' : ''}
                                     `}
                                     priority
                                     quality={100}
