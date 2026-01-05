@@ -6,7 +6,7 @@ const HERO_IMAGE = "https://images.unsplash.com/photo-1596703263926-eb0762ee17e4
 
 export default function Hero() {
     return (
-        <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+        <section id="homepage-hero" className="relative h-screen w-full flex items-center justify-center overflow-hidden">
             {/* Background Image - Full Bleed */}
             <div className="absolute inset-0 z-0">
                 <Image

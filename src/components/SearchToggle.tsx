@@ -50,7 +50,7 @@ export default function SearchToggle({ mobile = false }: SearchToggleProps) {
             <div ref={containerRef} className="">
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="text-gray-900 hover:opacity-70 transition-opacity p-1"
+                    className="text-current hover:opacity-70 transition-opacity p-1"
                     aria-label="Search"
                     aria-expanded={isOpen}
                 >
@@ -117,7 +117,7 @@ export default function SearchToggle({ mobile = false }: SearchToggleProps) {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={cn(
-                    "text-gray-900 hover:opacity-70 transition-opacity p-1",
+                    "text-current hover:opacity-70 transition-opacity p-1",
                     isOpen && "opacity-100" // Keep visible
                 )}
                 aria-label="Toggle search"
