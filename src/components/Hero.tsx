@@ -1,8 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-
-// Primary premium lifestyle image
-const HERO_IMAGE = "/products/portrait-woman-s-legs-with-stylish-high-heels-pantyhose.webp";
+import heroImage from "@/assets/images/portrait-woman-s-legs-with-stylish-high-heels-pantyhose.webp";
 
 export default function Hero() {
     return (
@@ -10,10 +8,11 @@ export default function Hero() {
             {/* Background Image - Full Bleed */}
             <div className="absolute inset-0 z-0">
                 <Image
-                    src={HERO_IMAGE}
+                    src={heroImage}
                     alt="Woman wearing elegant comfortable heels"
                     fill
                     priority
+                    placeholder="blur"
                     className="object-cover object-center"
                     sizes="100vw"
                     quality={95}
