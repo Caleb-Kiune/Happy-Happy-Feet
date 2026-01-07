@@ -35,7 +35,6 @@ export default function AdminLayout({
                         {children}
                     </div>
                 </div>
-                <Toaster position="bottom-right" richColors closeButton className="font-sans" />
             </AdminAuthProvider>
         </div>
     );
