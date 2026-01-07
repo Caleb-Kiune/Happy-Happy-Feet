@@ -109,7 +109,7 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
                             placeholder="Search orders..."
-                            className="pl-10 bg-gray-50 border-transparent focus:bg-white focus:border-gray-200 transition-all rounded-full h-10"
+                            className="pl-10 bg-white shadow-sm border-gray-200 focus:border-pink-200 focus:ring-2 focus:ring-pink-100 transition-all rounded-lg h-11 md:h-10 text-base md:text-sm"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -127,17 +127,17 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
                     <div className="flex items-center gap-2 w-full md:w-auto">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="gap-2 rounded-full border-transparent bg-gray-50 hover:bg-white hover:shadow-sm text-gray-600 w-full md:w-auto justify-between md:justify-start h-10 px-4">
+                                <Button variant="outline" className="gap-2 rounded-lg border-gray-200 bg-white shadow-sm hover:bg-gray-50 text-gray-700 w-full md:w-auto justify-between md:justify-start h-11 md:h-10 px-4">
                                     <div className="flex items-center gap-2">
                                         <Filter className="w-4 h-4" />
                                         <span>{activeStatusLabel}</span>
                                     </div>
-                                    <span className="ml-2 text-xs bg-white shadow-sm px-2 py-0.5 rounded-full text-gray-900 font-medium">
+                                    <span className="ml-2 text-xs bg-gray-100 px-2 py-0.5 rounded-full text-gray-900 font-medium">
                                         {statusFilter === 'all' ? orders.length : filteredOrders.length}
                                     </span>
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-lg border-gray-100">
+                            <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-lg border-gray-100 bg-white">
                                 <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {STATUS_OPTIONS.map((option) => (

@@ -21,16 +21,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-    SheetFooter,
-    SheetClose
-} from "@/components/ui/sheet";
+
 import { deleteProducts } from "@/app/admin/products/actions";
 import DeleteProductButton from "@/components/admin/DeleteProductButton";
 import ProductRow from "@/components/admin/ProductRow";
@@ -145,7 +136,7 @@ export default function ProductManagement({ initialProducts }: ProductManagement
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                     placeholder="Search by name..."
-                    className="pl-10 bg-gray-50 border-transparent focus:bg-white focus:border-gray-200 transition-all rounded-full"
+                    className="pl-10 bg-white shadow-sm border-gray-200 focus:border-pink-200 focus:ring-2 focus:ring-pink-100 transition-all rounded-lg h-11 md:h-10 text-base md:text-sm"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -156,10 +147,10 @@ export default function ProductManagement({ initialProducts }: ProductManagement
                 value={selectedCategory}
                 onValueChange={setSelectedCategory}
             >
-                <SelectTrigger className="w-full md:w-48 bg-gray-50 border-transparent focus:bg-white rounded-full">
+                <SelectTrigger className="w-full md:w-48 bg-white shadow-sm border-gray-200 focus:ring-pink-100 rounded-lg h-11 md:h-10">
                     <SelectValue placeholder="Category" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white shadow-lg border-gray-100">
                     <SelectItem value="all">All Categories</SelectItem>
                     {categories.map((category) => (
                         <SelectItem key={category} value={category} className="capitalize">
@@ -174,7 +165,7 @@ export default function ProductManagement({ initialProducts }: ProductManagement
                 <Button
                     variant="ghost"
                     onClick={clearFilters}
-                    className="text-gray-500 hover:text-red-500 self-start md:self-auto rounded-full px-4"
+                    className="text-gray-500 hover:text-red-500 self-start md:self-auto px-4 h-11 md:h-10"
                 >
                     Clear
                 </Button>
@@ -186,47 +177,30 @@ export default function ProductManagement({ initialProducts }: ProductManagement
         <div className="space-y-6">
             {/* Controls Bar */}
             <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-                {/* Desktop Filters (Hidden on Mobile) */}
-                <div className="hidden md:block">
-                    <FilterControls />
-                </div>
-
-                {/* Mobile Filter Trigger + Result Count */}
-                <div className="flex md:hidden items-center justify-between w-full">
-                    <div className="text-sm font-medium text-gray-500">
-                        {filteredProducts.length} Results
-                    </div>
-                    <Sheet>
-                        <SheetTrigger asChild>
-                            <Button variant="outline" size="sm" className="gap-2 rounded-full border-gray-200 bg-white shadow-sm">
-                                <Filter className="w-4 h-4" />
-                                Filters
-                                {hasActiveFilters && (
-                                    <span className="w-2 h-2 rounded-full bg-[#E07A8A]" />
-                                )}
-                            </Button>
-                        </SheetTrigger>
-                        <SheetContent side="bottom" className="rounded-t-3xl">
-                            <SheetHeader className="mb-6 text-left">
-                                <SheetTitle>Filter Products</SheetTitle>
-                                <SheetDescription>
-                                    Narrow down your search by name or category.
-                                </SheetDescription>
-                            </SheetHeader>
-                            <FilterControls mobile />
-                            <SheetFooter className="mt-8">
-                                <SheetClose asChild>
-                                    <Button className="w-full bg-[#111111] text-white rounded-full h-12">
-                                        Show {filteredProducts.length} Products
-                                    </Button>
-                                </SheetClose>
-                            </SheetFooter>
-                        </SheetContent>
-                    </Sheet>
+                {/* Desktop & Mobile Filters (Shared Layout) */}
+                <div className="w-full md:w-auto">
+                    <FilterControls mobile={false} />
+                    {/* Note: passing mobile=false keeps it flex-row on desktop via the cn logic above. 
+                        Wait, the updated FilterControls uses mobile prop to force flex-col. 
+                        Let's adjust usage: for mobile we want flex-col? 
+                        Actually, "Stacked filters at the top" means search then filters.
+                        Let's just use the responsive className in FilterControls: mobile ? "w-full" : "flex-col md:flex-row..."
+                        
+                        Actually, simplified approach:
+                        Always render FilterControls.
+                        On mobile, we want: Search (Row 1), Category + Clear (Row 2).
+                        On desktop: Search | Category | Clear (Row 1).
+                        
+                        Let's fix FilterControls to handle this responsive grid nicely.
+                    */}
                 </div>
 
                 <div className="hidden md:block text-sm text-gray-400 font-medium">
                     {filteredProducts.length} Products Found
+                </div>
+                {/* Mobile Count */}
+                <div className="md:hidden text-sm text-gray-400 font-medium px-1">
+                    {filteredProducts.length} Products
                 </div>
             </div>
 

@@ -107,32 +107,7 @@ export default function AdminNav() {
                     })}
                 </nav>
 
-                {/* Footer - Minimalist Profile */}
-                <div className="p-8">
-                    <div className="bg-gray-50 rounded-2xl p-4 flex items-center justify-between group hover:bg-gray-100 transition-colors">
-                        <div className="flex items-center gap-3 overflow-hidden">
-                            <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center border border-gray-100 shadow-sm text-xs font-bold text-gray-900">
-                                {user?.email?.charAt(0).toUpperCase()}
-                            </div>
-                            <div className="flex flex-col min-w-0">
-                                <p className="text-xs font-bold text-gray-900 truncate">
-                                    Admin
-                                </p>
-                                <p className="text-[10px] text-gray-500 truncate max-w-[100px]">
-                                    {user?.email}
-                                </p>
-                            </div>
-                        </div>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => signOut()}
-                            className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-transparent rounded-full transition-colors"
-                        >
-                            <LogOut className="w-4 h-4" />
-                        </Button>
-                    </div>
-                </div>
+
             </aside>
 
             {/* Mobile Layout - Premium Bottom Bar */}
