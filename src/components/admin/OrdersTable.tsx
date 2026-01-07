@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Order } from "@/lib/orders";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, cn } from "@/lib/utils";
 import OrderStatusBadge from "@/components/admin/OrderStatusBadge";
-import { Eye, Search, Filter, Check, X } from "lucide-react";
+import { Eye, Search, Filter, Check, X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -25,6 +25,8 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { deleteOrders } from "@/app/admin/orders/actions";
+import { toast } from "sonner";
 
 type OrdersTableProps = {
     orders: Order[];
@@ -46,6 +48,10 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
     // Initialize state from URL params
     const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
     const [statusFilter, setStatusFilter] = useState(searchParams.get("status") || "all");
+
+    // Selection & Deletion State
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [isDeleting, startTransition] = useTransition();
 
     // Sync state to URL with debounce
     useEffect(() => {
@@ -98,7 +104,43 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
         });
     }, [orders, searchQuery, statusFilter]);
 
+    // Selection Logic
+    const toggleSelectAll = () => {
+        if (selectedIds.size === filteredOrders.length) {
+            setSelectedIds(new Set());
+        } else {
+            setSelectedIds(new Set(filteredOrders.map((o) => o.id)));
+        }
+    };
+
+    const toggleSelect = (id: string) => {
+        const newSelected = new Set(selectedIds);
+        if (newSelected.has(id)) {
+            newSelected.delete(id);
+        } else {
+            newSelected.add(id);
+        }
+        setSelectedIds(newSelected);
+    };
+
+    const handleBulkDelete = () => {
+        if (!confirm(`Are you sure you want to delete ${selectedIds.size} orders? This cannot be undone.`)) {
+            return;
+        }
+
+        startTransition(async () => {
+            const result = await deleteOrders(Array.from(selectedIds));
+            if (result?.error) {
+                toast.error(result.error);
+            } else {
+                toast.success(`${selectedIds.size} orders deleted successfully`);
+                setSelectedIds(new Set());
+            }
+        });
+    };
+
     const activeStatusLabel = STATUS_OPTIONS.find(o => o.value === statusFilter)?.label || "Status";
+    const isAllSelected = filteredOrders.length > 0 && selectedIds.size === filteredOrders.length;
 
     return (
         <div className="space-y-6">
@@ -173,12 +215,50 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
                 </div>
             </div>
 
+            {/* Bulk Action Floating Bar */}
+            {selectedIds.size > 0 && (
+                <div className="fixed bottom-24 left-4 right-4 md:bottom-6 md:left-[calc(18rem+2rem)] md:right-8 flex justify-center z-[60] mb-[env(safe-area-inset-bottom)] pointer-events-none animate-in slide-in-from-bottom-5 fade-in">
+                    <div className="bg-[#111111] text-white rounded-full shadow-xl px-6 py-3 flex items-center gap-6 pointer-events-auto">
+                        <span className="text-sm font-medium pl-2">
+                            {selectedIds.size} selected
+                        </span>
+                        <div className="h-4 w-px bg-gray-700" />
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-gray-300 hover:text-white h-8 hover:bg-white/10 rounded-full px-3"
+                                onClick={() => setSelectedIds(new Set())}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                size="sm"
+                                className="bg-[#E07A8A] hover:bg-[#D16A7A] text-white h-8 rounded-full px-4 shadow-sm"
+                                onClick={handleBulkDelete}
+                                disabled={isDeleting}
+                            >
+                                {isDeleting ? "Deleting..." : "Delete"}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Desktop Table - Premium Style */}
             <div className="hidden md:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <Table>
                     <TableHeader className="bg-white sticky top-0 z-10">
                         <TableRow className="border-b border-gray-100 hover:bg-transparent">
-                            <TableHead className="w-[120px] pl-6 text-xs font-bold uppercase tracking-wider text-gray-400">Order ID</TableHead>
+                            <TableHead className="w-[50px] pl-6">
+                                <input
+                                    type="checkbox"
+                                    className="rounded border-gray-300 text-[#111111] focus:ring-0 focus:ring-offset-0 h-4 w-4 cursor-pointer"
+                                    checked={isAllSelected}
+                                    onChange={toggleSelectAll}
+                                />
+                            </TableHead>
+                            <TableHead className="w-[120px] text-xs font-bold uppercase tracking-wider text-gray-400">Order ID</TableHead>
                             <TableHead className="text-xs font-bold uppercase tracking-wider text-gray-400">Date</TableHead>
                             <TableHead className="text-xs font-bold uppercase tracking-wider text-gray-400">Customer</TableHead>
                             <TableHead className="text-xs font-bold uppercase tracking-wider text-gray-400">Status</TableHead>
@@ -189,7 +269,7 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
                     <TableBody>
                         {filteredOrders.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-64 text-center">
+                                <TableCell colSpan={7} className="h-64 text-center">
                                     <div className="flex flex-col items-center justify-center text-gray-500 gap-3">
                                         <div className="h-12 w-12 rounded-full bg-gray-50 flex items-center justify-center">
                                             <Search className="h-6 w-6 text-gray-400" />
@@ -203,8 +283,23 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
                             </TableRow>
                         ) : (
                             filteredOrders.map((order) => (
-                                <TableRow key={order.id} className="hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 group">
-                                    <TableCell className="font-mono text-xs text-gray-500 pl-6">
+                                <TableRow
+                                    key={order.id}
+                                    className={cn(
+                                        "hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 group cursor-pointer",
+                                        selectedIds.has(order.id) ? "bg-pink-50/10" : ""
+                                    )}
+                                    onClick={() => toggleSelect(order.id)}
+                                >
+                                    <TableCell className="pl-6" onClick={(e) => e.stopPropagation()}>
+                                        <input
+                                            type="checkbox"
+                                            className="rounded border-gray-300 text-[#111111] focus:ring-0 focus:ring-offset-0 h-4 w-4 cursor-pointer"
+                                            checked={selectedIds.has(order.id)}
+                                            onChange={() => toggleSelect(order.id)}
+                                        />
+                                    </TableCell>
+                                    <TableCell className="font-mono text-xs text-gray-500">
                                         #{order.id.slice(0, 8)}
                                     </TableCell>
                                     <TableCell className="text-sm text-gray-600">
@@ -226,7 +321,7 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
                                     <TableCell className="text-right font-medium text-[#111111] font-mono">
                                         {formatPrice(order.total)}
                                     </TableCell>
-                                    <TableCell className="text-right pr-6">
+                                    <TableCell className="text-right pr-6" onClick={(e) => e.stopPropagation()}>
                                         <Link href={`/admin/orders/${order.id}`}>
                                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full hover:bg-gray-100 text-gray-400 hover:text-[#E07A8A]">
                                                 <Eye className="w-4 h-4" />
@@ -244,9 +339,32 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
             {/* Mobile Cards (Visible only on mobile) */}
             <div className="grid grid-cols-1 gap-4 md:hidden pb-24">
                 {filteredOrders.map((order) => (
-                    <Link href={`/admin/orders/${order.id}`} key={order.id} className="block group">
-                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all active:scale-[0.98]">
-                            <div className="flex justify-between items-start mb-4">
+                    <div
+                        key={order.id}
+                        className={cn(
+                            "block group relative overflow-hidden bg-white rounded-2xl transition-all duration-200",
+                            selectedIds.has(order.id)
+                                ? "ring-2 ring-[#E07A8A] shadow-md bg-pink-50/10"
+                                : "shadow-sm border border-gray-100"
+                        )}
+                        onClick={() => toggleSelect(order.id)}
+                    >
+                        {/* Checkbox Overlay - FIX: Always visible, larger */}
+                        <div className="absolute top-3 left-3 z-20 p-2 -m-2">
+                            <input
+                                type="checkbox"
+                                className={cn(
+                                    "rounded-full border-gray-300 bg-white text-[#E07A8A] focus:ring-0 h-6 w-6 transition-all shadow-sm cursor-pointer",
+                                    selectedIds.has(order.id) ? "opacity-100" : "opacity-100" // Always visible
+                                )}
+                                checked={selectedIds.has(order.id)}
+                                onChange={() => toggleSelect(order.id)}
+                                onClick={(e) => e.stopPropagation()}
+                            />
+                        </div>
+
+                        <div className="p-5">
+                            <div className="flex justify-between items-start mb-4 pl-8"> {/* Added pl-8 for checkbox space */}
                                 <div>
                                     <div className="flex items-center gap-2 mb-1">
                                         <span className="font-mono text-xs text-gray-400">#{order.id.slice(0, 8)}</span>
@@ -265,12 +383,14 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
                                     <span className="text-xs text-gray-400 uppercase tracking-wide font-medium">Total</span>
                                     <span className="text-xl font-bold text-[#111111]">{formatPrice(order.total)}</span>
                                 </div>
-                                <div className="bg-gray-50 rounded-full p-2 text-gray-400 group-hover:bg-[#E07A8A] group-hover:text-white transition-colors">
-                                    <Eye className="w-5 h-5" />
-                                </div>
+                                <Link href={`/admin/orders/${order.id}`} onClick={(e) => e.stopPropagation()}>
+                                    <div className="bg-gray-50 rounded-full p-2 text-gray-400 hover:bg-[#E07A8A] hover:text-white transition-colors">
+                                        <Eye className="w-5 h-5" />
+                                    </div>
+                                </Link>
                             </div>
                         </div>
-                    </Link>
+                    </div>
                 ))}
 
                 {filteredOrders.length === 0 && (

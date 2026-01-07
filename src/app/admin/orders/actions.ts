@@ -51,3 +51,31 @@ export async function updateOrderStatus(orderId: string, status: string): Promis
 
     return { success: true };
 }
+
+export async function deleteOrders(ids: string[]): Promise<ActionState> {
+    const supabase = await createServerSupabaseClient();
+
+    // Auth Check
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Unauthorized" };
+
+    if (!ids || ids.length === 0) return { error: "No orders selected" };
+
+    try {
+        // Cascade delete should handle order_items automatically via foreign keys
+        // But we wrap in try/catch to be safe
+        const { error } = await supabase
+            .from("orders")
+            .delete()
+            .in("id", ids);
+
+        if (error) throw error;
+
+    } catch (error: any) {
+        console.error("Bulk Delete Orders Error:", error);
+        return { error: error.message || "Failed to delete orders" };
+    }
+
+    revalidatePath("/admin/orders");
+    return { success: true };
+}
