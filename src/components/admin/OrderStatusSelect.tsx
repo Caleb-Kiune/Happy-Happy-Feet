@@ -55,12 +55,16 @@ export default function OrderStatusSelect({
                 onValueChange={handleStatusChange}
                 disabled={isPending}
             >
-                <SelectTrigger className="w-[180px] bg-white">
+                <SelectTrigger className="w-[180px] bg-white shadow-sm border-gray-200">
                     <SelectValue placeholder="Status" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border-gray-100 shadow-lg">
                     {STATUSES.map((status) => (
-                        <SelectItem key={status.value} value={status.value}>
+                        <SelectItem
+                            key={status.value}
+                            value={status.value}
+                            className="cursor-pointer focus:bg-pink-50 focus:text-pink-900"
+                        >
                             {status.label}
                         </SelectItem>
                     ))}
