@@ -53,94 +53,131 @@ export default function AdminNav() {
 
     return (
         <>
-            {/* Desktop Layout - Sidebar (md:block hidden) */}
-            <aside className="hidden md:flex flex-col fixed top-0 left-0 bottom-0 w-64 bg-white border-r border-[#E5E5E5] z-50">
-                {/* Brand */}
-                <div className="h-16 flex items-center px-6 border-b border-[#E5E5E5]">
-                    <div className="flex flex-col">
-                        <div className="relative h-8 w-auto aspect-[3/1] mb-1">
+            {/* Desktop Layout - Premium Sidebar */}
+            <aside className="hidden md:flex flex-col fixed top-0 left-0 bottom-0 w-72 bg-white z-50">
+                {/* Brand - Clean & Airy */}
+                <div className="h-24 flex items-center px-8">
+                    <div className="flex flex-col gap-1.5">
+                        <Link href="/" className="relative h-6 w-auto aspect-[4/1] block hover:opacity-70 transition-opacity">
+                            {/* Replaced Image with Text for crispness if image has issues, but keeping Image as requested. 
+                                 Using a slightly larger container. */}
                             <Image
                                 src="/logo.png"
-                                alt="Happy Happy Feet Admin"
-                                width={96}
-                                height={32}
-                                className="h-full w-auto object-contain"
+                                alt="Happy Happy Feet"
+                                width={120}
+                                height={40}
+                                className="h-full w-auto object-contain object-left"
                                 priority
                                 quality={100}
                             />
-                        </div>
-                        <span className="text-xs font-medium text-[#999999] bg-[#F5F5F5] px-2 py-0.5 rounded-full w-fit">
-                            Admin
+                        </Link>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 pl-0.5">
+                            Store Admin
                         </span>
                     </div>
                 </div>
 
-                {/* Nav Items */}
-                <nav className="flex-1 px-4 py-6 space-y-1">
-                    {navItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={cn(
-                                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                                isActive(item.href, item.exact)
-                                    ? "bg-[#FDF2F4] text-[#D16A7A]"
-                                    : "text-[#666666] hover:bg-[#F5F5F5] hover:text-[#111111]"
-                            )}
-                        >
-                            <item.icon className="w-5 h-5" />
-                            {item.name}
-                        </Link>
-                    ))}
+                {/* Nav Items - Pill Style */}
+                <nav className="flex-1 px-6 space-y-2 py-4">
+                    {navItems.map((item) => {
+                        const active = isActive(item.href, item.exact);
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={cn(
+                                    "flex items-center gap-4 px-4 py-3.5 rounded-full text-sm font-medium transition-all duration-200 group relative overflow-hidden",
+                                    active
+                                        ? "bg-[#FDF2F4] text-[#D16A7A] shadow-sm ring-1 ring-[#E07A8A]/10"
+                                        : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+                                )}
+                            >
+                                <item.icon
+                                    className={cn(
+                                        "w-5 h-5 transition-transform duration-200 group-hover:scale-110",
+                                        active ? "text-[#D16A7A]" : "text-gray-400 group-hover:text-gray-900"
+                                    )}
+                                    strokeWidth={active ? 2 : 1.5}
+                                />
+                                <span className={cn("tracking-wide", active ? "font-semibold" : "")}>
+                                    {item.name}
+                                </span>
+                            </Link>
+                        );
+                    })}
                 </nav>
 
-                {/* Footer / User Info */}
-                <div className="p-4 border-t border-[#E5E5E5]">
-                    <div className="mb-4 px-2">
-                        <p className="text-xs text-[#999999] font-medium uppercase tracking-wider mb-1">
-                            Signed in as
-                        </p>
-                        <p className="text-sm font-medium text-[#111111] truncate">
-                            {user?.email}
-                        </p>
+                {/* Footer - Minimalist Profile */}
+                <div className="p-8">
+                    <div className="bg-gray-50 rounded-2xl p-4 flex items-center justify-between group hover:bg-gray-100 transition-colors">
+                        <div className="flex items-center gap-3 overflow-hidden">
+                            <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center border border-gray-100 shadow-sm text-xs font-bold text-gray-900">
+                                {user?.email?.charAt(0).toUpperCase()}
+                            </div>
+                            <div className="flex flex-col min-w-0">
+                                <p className="text-xs font-bold text-gray-900 truncate">
+                                    Admin
+                                </p>
+                                <p className="text-[10px] text-gray-500 truncate max-w-[100px]">
+                                    {user?.email}
+                                </p>
+                            </div>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => signOut()}
+                            className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-transparent rounded-full transition-colors"
+                        >
+                            <LogOut className="w-4 h-4" />
+                        </Button>
                     </div>
-                    <Button
-                        variant="ghost"
-                        onClick={() => signOut()}
-                        className="w-full justify-start text-[#666666] hover:text-red-600 hover:bg-red-50"
-                    >
-                        <LogOut className="w-4 h-4 mr-2" />
-                        Sign out
-                    </Button>
                 </div>
             </aside>
 
-            {/* Mobile Layout - Bottom Bar (md:hidden block) */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E5E5] z-50 pb-[env(safe-area-inset-bottom)]">
-                <nav className="grid grid-cols-4 h-16">
-                    {navItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={cn(
-                                "flex flex-col items-center justify-center gap-1",
-                                isActive(item.href, item.exact)
-                                    ? "text-[#D16A7A]"
-                                    : "text-[#999999] hover:text-[#111111]"
-                            )}
-                        >
-                            <item.icon className={cn("w-5 h-5", isActive(item.href, item.exact) ? "fill-current/20" : "")} />
-                            <span className="text-[10px] font-medium">{item.name}</span>
-                        </Link>
-                    ))}
+            {/* Mobile Layout - Premium Bottom Bar */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-100 z-50 pb-[max(env(safe-area-inset-bottom),16px)] pt-3 shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.05)]">
+                <nav className="grid grid-cols-4 h-auto px-2">
+                    {navItems.map((item) => {
+                        const active = isActive(item.href, item.exact);
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={cn(
+                                    "flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl transition-all",
+                                    active ? "text-[#D16A7A]" : "text-gray-400 hover:text-gray-600"
+                                )}
+                            >
+                                <div className={cn(
+                                    "p-1.5 rounded-full transition-all",
+                                    active ? "bg-[#FDF2F4] shadow-sm" : "bg-transparent"
+                                )}>
+                                    <item.icon
+                                        className={cn("w-5 h-5", active ? "stroke-2" : "stroke-1.5")}
+                                    />
+                                </div>
+                                <span className={cn(
+                                    "text-[10px] font-medium tracking-wide",
+                                    active ? "text-[#D16A7A]" : "text-gray-400"
+                                )}>
+                                    {item.name}
+                                </span>
+                            </Link>
+                        );
+                    })}
 
                     {/* Mobile Logout */}
                     <button
                         onClick={() => signOut()}
-                        className="flex flex-col items-center justify-center gap-1 text-[#999999] hover:text-red-500"
+                        className="flex flex-col items-center justify-center gap-1.5 p-2 rounded-xl text-gray-400 hover:text-red-500 transition-colors"
                     >
-                        <LogOut className="w-5 h-5" />
-                        <span className="text-[10px] font-medium">Log Out</span>
+                        <div className="p-1.5 bg-transparent rounded-full">
+                            <LogOut className="w-5 h-5 stroke-1.5" />
+                        </div>
+                        <span className="text-[10px] font-medium tracking-wide">
+                            Log Out
+                        </span>
                     </button>
                 </nav>
             </div>

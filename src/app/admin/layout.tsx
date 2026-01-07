@@ -22,18 +22,20 @@ export default function AdminLayout({
 }) {
     return (
         <div
-            className={`${inter.variable} font-sans antialiased bg-[#FAFAFA] text-[#111111] min-h-screen`}
+            className={`${inter.variable} font-sans antialiased bg-gray-50/50 text-gray-900 min-h-screen selection:bg-pink-100 selection:text-pink-900`}
         >
             <AdminAuthProvider>
                 <AdminNav />
                 {/* 
-                  Desktop: Add left padding to accommodate fixed sidebar (w-64 = 16rem) 
-                  Mobile: Add bottom padding to accommodate bottom bar (h-16 = 4rem) 
+                  Desktop: Add left padding for fixed sidebar (w-72 = 18rem for more air) 
+                  Mobile: Add bottom padding for better bottom bar clearance
                 */}
-                <div className="md:pl-64 pb-16 md:pb-0">
-                    {children}
+                <div className="md:pl-72 pb-24 md:pb-8 pt-6 md:pt-8 min-h-screen transition-all duration-300 ease-in-out">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        {children}
+                    </div>
                 </div>
-                <Toaster position="bottom-center" richColors closeButton />
+                <Toaster position="bottom-right" richColors closeButton className="font-sans" />
             </AdminAuthProvider>
         </div>
     );
