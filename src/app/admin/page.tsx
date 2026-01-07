@@ -1,58 +1,116 @@
-"use client";
-
-import { useAdminAuth } from "@/context/AdminAuthContext";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { LogOut, Package, ShoppingCart, LayoutDashboard, ArrowUpRight, ArrowRight } from "lucide-react";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { Suspense } from "react";
+import {
+    Package,
+    ShoppingCart,
+    LayoutDashboard,
+    ArrowUpRight,
+    ArrowRight,
+    AlertCircle
+} from "lucide-react";
+import { getDashboardStats } from "./actions";
+import { StatsSkeleton } from "@/components/admin/StatsSkeleton";
 
-export default function AdminDashboardPage() {
-    const { user, isLoading, isAuthorized, signOut } = useAdminAuth();
-    const router = useRouter();
+// Independent async component for the stats grid
+// This allows the rest of the page (header, links) to render immediately
+async function DashboardStatsGrid() {
+    const stats = await getDashboardStats();
 
-    useEffect(() => {
-        if (!isLoading && !user) {
-            router.push("/admin/login");
-        }
-    }, [isLoading, user, router]);
-
-    const handleSignOut = async () => {
-        await signOut();
-        router.push("/admin/login");
-    };
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin h-8 w-8 border-2 border-[#E07A8A] border-t-transparent rounded-full" />
-            </div>
-        );
-    }
-
-    if (!user) {
-        return null;
-    }
-
-    // Check authorization
-    if (!isAuthorized) {
-        return (
-            <div className="min-h-screen flex items-center justify-center px-4">
-                <div className="text-center max-w-md">
-                    <EmptyState
-                        title="Access Denied"
-                        description={`Your email (${user.email}) is not authorized to access the admin dashboard.`}
-                        icon={LogOut}
-                        action={{
-                            label: "Sign Out",
-                            onClick: handleSignOut
-                        }}
-                    />
+    // Reusable card for consistency
+    const StatCard = ({
+        title,
+        value,
+        icon: Icon,
+        colorClass,
+        bgClass,
+        badge,
+        footer,
+        hasError
+    }: any) => (
+        <div className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-transparent hover:border-gray-50 relative overflow-hidden">
+            <div className="flex justify-between items-start">
+                <div className={`${bgClass} p-3 rounded-xl group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon className={`w-6 h-6 ${colorClass}`} strokeWidth={1.5} />
                 </div>
+                {badge}
             </div>
-        );
-    }
+            <div className="mt-6">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">
+                    {title}
+                </h3>
+                {hasError ? (
+                    <div className="flex items-center gap-2 text-red-500 text-sm font-medium py-2">
+                        <AlertCircle className="w-4 h-4" />
+                        <span>Failed to load</span>
+                    </div>
+                ) : (
+                    <p className="text-4xl font-sans font-bold text-gray-900">
+                        {value}
+                    </p>
+                )}
+                {footer}
+            </div>
+        </div>
+    );
 
+    return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Products Card */}
+            <StatCard
+                title="Total Products"
+                value={stats.totalProducts}
+                icon={Package}
+                colorClass="text-[#E07A8A]"
+                bgClass="bg-[#FDF2F4]"
+                hasError={stats.error}
+                badge={
+                    <span className="flex items-center text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                        +12% <ArrowUpRight className="w-3 h-3 ml-0.5" />
+                    </span>
+                }
+            />
+
+            {/* Orders Card */}
+            <StatCard
+                title="Pending Orders"
+                value={stats.pendingOrders}
+                icon={ShoppingCart}
+                colorClass="text-blue-500"
+                bgClass="bg-blue-50"
+                hasError={stats.error}
+                badge={
+                    <span className="flex items-center text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
+                        WhatsApp
+                    </span>
+                }
+                footer={
+                    <p className="text-xs text-gray-400 mt-2 font-light">
+                        Orders are processed via WhatsApp
+                    </p>
+                }
+            />
+
+            {/* Status Card (Static for now) */}
+            <StatCard
+                title="Store Status"
+                value="Live & Active"
+                icon={LayoutDashboard}
+                colorClass="text-green-600"
+                bgClass="bg-green-50"
+                badge={
+                    <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                }
+                footer={
+                    <p className="text-xs text-gray-400 mt-2 font-light">
+                        Open for business
+                    </p>
+                }
+            />
+        </div>
+    );
+}
+
+export default async function AdminDashboardPage() {
     return (
         <div className="space-y-10 animate-in fade-in duration-500">
             {/* Header Section */}
@@ -66,81 +124,18 @@ export default function AdminDashboardPage() {
                     </p>
                 </div>
                 <div className="hidden md:block">
-                    {/* Placeholder for date filter or action */}
                     <span className="text-xs font-medium text-gray-400 bg-white px-3 py-1.5 rounded-full border border-gray-100 shadow-sm">
                         Today, {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </span>
                 </div>
             </div>
 
-            {/* Quick Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Products Card */}
-                <div className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-transparent hover:border-gray-50 relative overflow-hidden">
-                    <div className="flex justify-between items-start">
-                        <div className="bg-[#FDF2F4] p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                            <Package className="w-6 h-6 text-[#E07A8A]" strokeWidth={1.5} />
-                        </div>
-                        <span className="flex items-center text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                            +12% <ArrowUpRight className="w-3 h-3 ml-0.5" />
-                        </span>
-                    </div>
-                    <div className="mt-6">
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">
-                            Total Products
-                        </h3>
-                        <p className="text-4xl font-sans font-bold text-gray-900">
-                            100
-                        </p>
-                    </div>
-                </div>
+            {/* Quick Stats Grid with Suspense */}
+            <Suspense fallback={<StatsSkeleton />}>
+                <DashboardStatsGrid />
+            </Suspense>
 
-                {/* Orders Card */}
-                <div className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-transparent hover:border-gray-50 relative overflow-hidden">
-                    <div className="flex justify-between items-start">
-                        <div className="bg-blue-50 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                            <ShoppingCart className="w-6 h-6 text-blue-500" strokeWidth={1.5} />
-                        </div>
-                        <span className="flex items-center text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
-                            —
-                        </span>
-                    </div>
-                    <div className="mt-6">
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">
-                            Pending Orders
-                        </h3>
-                        <p className="text-4xl font-sans font-bold text-gray-900">
-                            —
-                        </p>
-                        <p className="text-xs text-gray-400 mt-2 font-light">
-                            Orders are processed via WhatsApp
-                        </p>
-                    </div>
-                </div>
-
-                {/* Status Card */}
-                <div className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 border border-transparent hover:border-gray-50 relative overflow-hidden">
-                    <div className="flex justify-between items-start">
-                        <div className="bg-green-50 p-3 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                            <LayoutDashboard className="w-6 h-6 text-green-600" strokeWidth={1.5} />
-                        </div>
-                        <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                    </div>
-                    <div className="mt-6">
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">
-                            Store Status
-                        </h3>
-                        <p className="text-2xl font-sans font-bold text-green-600">
-                            Live & Active
-                        </p>
-                        <p className="text-xs text-gray-400 mt-2 font-light">
-                            Open used for business
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Quick Actions / Recent Activity Placeholder */}
+            {/* Quick Actions */}
             <div>
                 <h2 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-6 flex items-center gap-2">
                     Quick Actions
@@ -185,13 +180,6 @@ export default function AdminDashboardPage() {
                     </Link>
                 </div>
             </div>
-
-            {/* Example Empty State (Hidden, but ready for logic if we had real empty data scenarios on dash) */}
-            {/* <EmptyState 
-                title="No Recent Activity" 
-                description="When you start selling, your recent sales will appear here." 
-                icon={LayoutDashboard} 
-            /> */}
         </div>
     );
 }
