@@ -107,6 +107,17 @@ export default function AdminNav() {
                     })}
                 </nav>
 
+                {/* Footer - Minimalist Logout Button (Desktop) */}
+                <div className="p-6 mt-auto border-t border-gray-50">
+                    <Button
+                        variant="ghost"
+                        onClick={() => signOut()}
+                        className="w-full flex items-center justify-start gap-3 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors px-4"
+                    >
+                        <LogOut className="w-5 h-5" />
+                        <span className="font-medium">Log Out</span>
+                    </Button>
+                </div>
 
             </aside>
 

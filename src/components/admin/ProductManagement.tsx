@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Plus, Pencil, Search, X, Filter, Trash2, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,35 +31,49 @@ import { PLACEHOLDER_IMAGE } from "@/lib/placeholder";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-// Debounce hook implementation inline for simplicity
-function useDebounce<T>(value: T, delay: number): T {
-    const [debouncedValue, setDebouncedValue] = useState(value);
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedValue(value);
-        }, delay);
-
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [value, delay]);
-
-    return debouncedValue;
-}
-
 interface ProductManagementProps {
     initialProducts: Product[];
 }
 
 export default function ProductManagement({ initialProducts }: ProductManagementProps) {
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("all");
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    // Initialize state from URL params
+    const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+    const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "all");
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [isDeleting, startTransition] = useTransition();
 
-    // Debounce search query logic (300ms)
-    const debouncedSearchQuery = useDebounce(searchQuery, 300);
+    // Sync state to URL with debounce
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const params = new URLSearchParams(searchParams.toString());
+
+            if (searchQuery) {
+                params.set("search", searchQuery);
+            } else {
+                params.delete("search");
+            }
+
+            if (selectedCategory && selectedCategory !== "all") {
+                params.set("category", selectedCategory);
+            } else {
+                params.delete("category");
+            }
+
+            // Only update if the URL actually changes to avoid infinite loops
+            const newQueryString = params.toString();
+            const currentQueryString = searchParams.toString();
+
+            if (newQueryString !== currentQueryString) {
+                router.replace(`?${newQueryString}`, { scroll: false });
+            }
+        }, 300); // 300ms debounce
+
+        return () => clearTimeout(timer);
+    }, [searchQuery, selectedCategory, router, searchParams]);
+
 
     // Derive categories dynamically from products
     const categories = useMemo(() => {
@@ -67,11 +82,11 @@ export default function ProductManagement({ initialProducts }: ProductManagement
         return Array.from(uniqueCategories).sort();
     }, [initialProducts]);
 
-    // Filter logic
+    // Filter logic - updates instantly on input change
     const filteredProducts = useMemo(() => {
         return initialProducts.filter((product) => {
             // 1. Text Search (Name or Description)
-            const query = debouncedSearchQuery.toLowerCase();
+            const query = searchQuery.toLowerCase(); // Direct use, no deferred value
             const matchesSearch =
                 product.name.toLowerCase().includes(query) ||
                 (product.description && product.description.toLowerCase().includes(query));
@@ -82,7 +97,7 @@ export default function ProductManagement({ initialProducts }: ProductManagement
 
             return matchesSearch && matchesCategory;
         });
-    }, [initialProducts, debouncedSearchQuery, selectedCategory]);
+    }, [initialProducts, searchQuery, selectedCategory]);
 
     // Clear filters handler
     const clearFilters = () => {
@@ -129,8 +144,8 @@ export default function ProductManagement({ initialProducts }: ProductManagement
     const isAllSelected = filteredProducts.length > 0 && selectedIds.size === filteredProducts.length;
 
     // Filter Component (Reusable for Desktop & Mobile Sheet)
-    const FilterControls = ({ mobile = false }) => (
-        <div className={cn("flex flex-col gap-4", mobile ? "w-full" : "flex-row w-full md:w-auto")}>
+    const FilterControls = () => (
+        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
             {/* Search Input */}
             <div className="relative w-full md:w-80">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -179,20 +194,7 @@ export default function ProductManagement({ initialProducts }: ProductManagement
             <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
                 {/* Desktop & Mobile Filters (Shared Layout) */}
                 <div className="w-full md:w-auto">
-                    <FilterControls mobile={false} />
-                    {/* Note: passing mobile=false keeps it flex-row on desktop via the cn logic above. 
-                        Wait, the updated FilterControls uses mobile prop to force flex-col. 
-                        Let's adjust usage: for mobile we want flex-col? 
-                        Actually, "Stacked filters at the top" means search then filters.
-                        Let's just use the responsive className in FilterControls: mobile ? "w-full" : "flex-col md:flex-row..."
-                        
-                        Actually, simplified approach:
-                        Always render FilterControls.
-                        On mobile, we want: Search (Row 1), Category + Clear (Row 2).
-                        On desktop: Search | Category | Clear (Row 1).
-                        
-                        Let's fix FilterControls to handle this responsive grid nicely.
-                    */}
+                    <FilterControls />
                 </div>
 
                 <div className="hidden md:block text-sm text-gray-400 font-medium">

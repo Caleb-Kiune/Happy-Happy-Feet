@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import ConditionalFooter from "@/components/ConditionalFooter";
 import { CartProvider } from "@/context/CartContext";
 import { Toaster } from "@/components/ui/sonner";
 import PageWrapper from "@/components/PageWrapper";
@@ -32,7 +32,7 @@ export default function RootLayout({
             </PageWrapper>
           </main>
           <FloatingWhatsApp />
-          <Footer />
+          <ConditionalFooter />
           <Toaster position="bottom-center" richColors closeButton />
         </CartProvider>
       </body>
