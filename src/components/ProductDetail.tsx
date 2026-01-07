@@ -9,13 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Phone, Check, ShoppingBag, Plus, Minus } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
-import { PRODUCT_SIZES } from "@/lib/constants";
+import { PRODUCT_SIZES, CONTACT_INFO } from "@/lib/constants";
 
 type ProductDetailProps = {
     product: Product;
 };
-
-const PHONE_NUMBER = "254705774171";
 
 export default function ProductDetail({ product }: ProductDetailProps) {
     const { dispatch } = useCart();
@@ -83,7 +81,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         ? `Hi! I'd like to order the ${product.name} in size ${selectedSize} (Qty: ${quantity}). Thank you!`
         : `Hi! I'm interested in the ${product.name}. Please send size options.`;
 
-    const whatsappUrl = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(
+    const whatsappUrl = `https://wa.me/${CONTACT_INFO.whatsapp}?text=${encodeURIComponent(
         message
     )}`;
 

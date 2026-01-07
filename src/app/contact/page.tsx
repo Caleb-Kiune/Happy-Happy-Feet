@@ -2,14 +2,12 @@ import Container from "@/components/Container";
 import { Button } from "@/components/ui/button";
 import { Phone, Mail } from "lucide-react";
 import { Metadata } from "next";
+import { CONTACT_INFO } from "@/lib/constants";
 
 export const metadata: Metadata = {
     title: "Get in Touch | Happy Happy Feet",
     description: "Contact us for orders, inquiries, or assistance. We're here to help you find your perfect pair.",
 };
-
-const PHONE_NUMBER = "254705774171";
-const EMAIL = "hello@happyhappyfeet.com"; // Placeholder email
 
 export default function ContactPage() {
     return (
@@ -31,7 +29,7 @@ export default function ContactPage() {
                             className="w-full rounded-full py-8 text-lg font-semibold bg-success hover:bg-success/90 text-white shadow-lg shadow-success/20"
                         >
                             <a
-                                href={`https://wa.me/${PHONE_NUMBER}`}
+                                href={`https://wa.me/${CONTACT_INFO.whatsapp}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center justify-center gap-x-3"
@@ -48,11 +46,11 @@ export default function ContactPage() {
                     <div className="border-t border-gray-100 pt-8 text-center">
                         <p className="text-gray-900 font-medium mb-2">Other Ways to Reach Us</p>
                         <a
-                            href={`mailto:${EMAIL}`}
+                            href={`mailto:${CONTACT_INFO.email}`}
                             className="inline-flex items-center gap-x-2 text-gray-600 hover:text-accent-500 transition-colors"
                         >
                             <Mail className="h-5 w-5" />
-                            {EMAIL}
+                            {CONTACT_INFO.email}
                         </a>
                     </div>
                 </div>

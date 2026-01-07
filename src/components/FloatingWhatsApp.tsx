@@ -1,8 +1,9 @@
 "use client";
 
 import { MessageCircle } from "lucide-react";
+import { CONTACT_INFO } from "@/lib/constants";
 
-const WHATSAPP_LINK = "https://wa.me/254705774171";
+const WHATSAPP_LINK = `https://wa.me/${CONTACT_INFO.whatsapp}`;
 
 export default function FloatingWhatsApp() {
     return (

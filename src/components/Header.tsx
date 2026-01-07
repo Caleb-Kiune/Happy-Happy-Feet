@@ -15,8 +15,9 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet";
-import { Menu, Instagram, Smartphone } from "lucide-react";
+import { Menu, Smartphone } from "lucide-react";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
+import { SOCIAL_LINKS, CONTACT_INFO } from "@/lib/constants";
 
 const NAV_LINKS = [
     { name: "Home", href: "/" },
@@ -176,11 +177,24 @@ export default function Header() {
 
                                     <div className="mt-auto pt-8 border-t border-gray-50">
                                         <div className="flex gap-6 justify-start">
-                                            <a href="https://instagram.com" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-gray-900 transition-colors">
-                                                <Instagram className="h-5 w-5" />
-                                                <span className="sr-only">Instagram</span>
-                                            </a>
-                                            <a href="https://wa.me/254705774171" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-gray-900 transition-colors">
+                                            {SOCIAL_LINKS.map((social) => (
+                                                <a
+                                                    key={social.id}
+                                                    href={social.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-gray-400 hover:text-gray-900 transition-colors"
+                                                >
+                                                    <social.icon className="h-5 w-5" />
+                                                    <span className="sr-only">{social.name}</span>
+                                                </a>
+                                            ))}
+                                            <a
+                                                href={`https://wa.me/${CONTACT_INFO.whatsapp}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-gray-400 hover:text-gray-900 transition-colors"
+                                            >
                                                 <Smartphone className="h-5 w-5" />
                                                 <span className="sr-only">WhatsApp</span>
                                             </a>

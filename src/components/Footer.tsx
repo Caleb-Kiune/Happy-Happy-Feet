@@ -11,12 +11,10 @@ const FOOTER_LINKS = {
         { name: "Contact Us", href: "/contact" },
         { name: "Privacy Policy", href: "/about" },
     ],
-    social: [
-        { name: "Instagram", href: "https://instagram.com", icon: Instagram },
-        { name: "WhatsApp", href: "https://wa.me/254705774171", icon: Smartphone },
-        { name: "Email", href: "mailto:hello@happyhappyfeet.com", icon: Mail },
-    ],
 };
+
+import { SOCIAL_LINKS, CONTACT_INFO } from "@/lib/constants";
+
 
 export default function Footer() {
     return (
@@ -41,10 +39,10 @@ export default function Footer() {
                             Step into comfort and style. Premium footwear designed for the modern lifestyle.
                         </p>
                         <div className="flex items-center gap-6 pt-2">
-                            {FOOTER_LINKS.social.map((social) => (
+                            {SOCIAL_LINKS.map((social) => (
                                 <a
-                                    key={social.name}
-                                    href={social.href}
+                                    key={social.id}
+                                    href={social.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-gray-400 hover:text-gray-900 transition-colors"
@@ -53,6 +51,13 @@ export default function Footer() {
                                     <social.icon strokeWidth={1.5} className="h-5 w-5" />
                                 </a>
                             ))}
+                            <a
+                                href={`mailto:${CONTACT_INFO.email}`}
+                                className="text-gray-400 hover:text-gray-900 transition-colors"
+                                aria-label="Email"
+                            >
+                                <Mail strokeWidth={1.5} className="h-5 w-5" />
+                            </a>
                         </div>
                     </div>
 
@@ -75,6 +80,7 @@ export default function Footer() {
                         </ul>
                     </div>
 
+                    {/* Visit Us Column */}
                     <div className="md:col-span-3 md:col-start-10">
                         <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-gray-900 mb-6 md:mb-8">
                             Visit Us
@@ -85,10 +91,10 @@ export default function Footer() {
                                 Delivery Countrywide
                             </p>
                             <a
-                                href="https://wa.me/254705774171"
+                                href={`tel:${CONTACT_INFO.phoneInternational}`}
                                 className="block hover:text-gray-900 transition-colors"
                             >
-                                +254 705 774 171
+                                {CONTACT_INFO.phoneDisplay}
                             </a>
                         </div>
                     </div>

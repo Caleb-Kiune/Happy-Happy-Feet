@@ -11,6 +11,7 @@ import { Phone, CheckCircle2, Loader2, ChevronDown, ChevronUp, ShoppingBag } fro
 import { toast } from "sonner";
 import { PLACEHOLDER_IMAGE } from "@/lib/placeholder";
 import { createOrder } from "./actions";
+import { CONTACT_INFO } from "@/lib/constants";
 
 export default function CheckoutPage() {
     const { state, dispatch, totalPrice } = useCart();
@@ -117,7 +118,7 @@ ${itemsList}
 --------------------------------
 Please confirm availability and delivery fee. Thank you!`;
 
-            const whatsappUrl = `https://wa.me/254705774171?text=${encodeURIComponent(
+            const whatsappUrl = `https://wa.me/${CONTACT_INFO.whatsapp}?text=${encodeURIComponent(
                 message
             )}`;
 

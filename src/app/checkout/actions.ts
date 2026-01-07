@@ -29,9 +29,11 @@ type CheckoutInput = {
 };
 
 export async function createOrder(data: CheckoutInput): Promise<ActionState> {
-    const supabase = createAdminClient();
-
     try {
+        // Ensure SUPABASE_SERVICE_ROLE_KEY is set in Vercel Project Settings > Environment Variables
+        // Do not commit the key to the repo.
+        const supabase = createAdminClient();
+
         // 1. Create Order
         const { data: order, error: orderError } = await supabase
             .from("orders")
@@ -82,6 +84,7 @@ export async function createOrder(data: CheckoutInput): Promise<ActionState> {
         return { success: true, orderId: order.id };
     } catch (error: any) {
         console.error("Unexpected Checkout Error:", error);
-        return { error: error.message || "An unexpected error occurred." };
+        // Return a generic error to the user to avoid exposing sensitive info or tech details
+        return { error: "Failed to place order. Please try again later." };
     }
 }

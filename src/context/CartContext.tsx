@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useReducer, useEffect, ReactNode, Dispatch } from "react";
+import { createContext, useContext, useReducer, useEffect, useState, ReactNode, Dispatch } from "react";
 
 // --- Types ---
 
@@ -30,6 +30,7 @@ type CartContextType = {
     dispatch: Dispatch<CartAction>;
     totalItems: number;
     totalPrice: number;
+    isLoaded: boolean;
 };
 
 // --- Initial State ---
@@ -87,6 +88,11 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         case "CLEAR_CART": {
             return initialState;
         }
+        // Add a specialized action for hydration
+        case "HYDRATE": {
+            // @ts-ignore - payload type not defined in original union but needed here internally or we can just cast
+            return action.payload as CartState;
+        }
         default:
             return state;
     }
@@ -101,37 +107,45 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 const CART_STORAGE_KEY = "happy_feet_cart";
 
 export function CartProvider({ children }: { children: ReactNode }) {
-    // Initialize state from localStorage if available
-    const [state, dispatch] = useReducer(cartReducer, initialState, (initial) => {
+    // Start with empty state to match server
+    const [state, dispatch] = useReducer(cartReducer, initialState);
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    // Hydrate from localStorage on client mount
+    useEffect(() => {
         if (typeof window !== "undefined") {
             try {
                 const stored = localStorage.getItem(CART_STORAGE_KEY);
-                return stored ? JSON.parse(stored) : initial;
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    dispatch({ type: "HYDRATE", payload: parsed } as any);
+                }
             } catch (error) {
                 console.error("Failed to load cart from localStorage:", error);
-                return initial;
+            } finally {
+                setIsLoaded(true);
             }
         }
-        return initial;
-    });
+    }, []);
 
     // Persist to localStorage whenever state changes
     useEffect(() => {
-        if (typeof window !== "undefined") {
+        // Only save if we have finished loading to prevent overwriting storage with empty state
+        if (isLoaded && typeof window !== "undefined") {
             try {
                 localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state));
             } catch (error) {
                 console.error("Failed to save cart to localStorage:", error);
             }
         }
-    }, [state]);
+    }, [state, isLoaded]);
 
     // Derived state for easy access
     const totalItems = state.items.reduce((acc, item) => acc + item.quantity, 0);
     const totalPrice = state.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
     return (
-        <CartContext.Provider value={{ state, dispatch, totalItems, totalPrice }}>
+        <CartContext.Provider value={{ state, dispatch, totalItems, totalPrice, isLoaded }}>
             {children}
         </CartContext.Provider>
     );
