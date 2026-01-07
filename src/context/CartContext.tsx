@@ -23,7 +23,8 @@ type CartAction =
     | { type: "ADD_ITEM"; payload: CartItem }
     | { type: "UPDATE_QUANTITY"; payload: { id: string; quantity: number } }
     | { type: "REMOVE_ITEM"; payload: { id: string } }
-    | { type: "CLEAR_CART" };
+    | { type: "CLEAR_CART" }
+    | { type: "HYDRATE"; payload: CartState };
 
 type CartContextType = {
     state: CartState;
@@ -90,8 +91,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         }
         // Add a specialized action for hydration
         case "HYDRATE": {
-            // @ts-ignore - payload type not defined in original union but needed here internally or we can just cast
-            return action.payload as CartState;
+            return action.payload;
         }
         default:
             return state;
@@ -118,7 +118,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 const stored = localStorage.getItem(CART_STORAGE_KEY);
                 if (stored) {
                     const parsed = JSON.parse(stored);
-                    dispatch({ type: "HYDRATE", payload: parsed } as any);
+                    dispatch({ type: "HYDRATE", payload: parsed });
                 }
             } catch (error) {
                 console.error("Failed to load cart from localStorage:", error);
