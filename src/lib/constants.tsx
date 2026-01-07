@@ -33,3 +33,13 @@ export const SOCIAL_LINKS = [
         icon: Instagram
     }
 ];
+
+export const SIZE_GUIDE_DATA = [
+    { cm: "23.0", eu: "36", cn: "230", us: "6", uk: "3.5" },
+    { cm: "23.5", eu: "37", cn: "235", us: "6.5", uk: "4" },
+    { cm: "24.0", eu: "38", cn: "240", us: "7.5", uk: "5" },
+    { cm: "24.5", eu: "39", cn: "245", us: "8.5", uk: "6" },
+    { cm: "25.0", eu: "40", cn: "250", us: "9", uk: "6.5" },
+    { cm: "25.5", eu: "41", cn: "255", us: "9.5", uk: "7.5" },
+    { cm: "26.0", eu: "42", cn: "260", us: "10", uk: "8" },
+];
