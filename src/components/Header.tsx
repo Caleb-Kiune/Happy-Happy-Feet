@@ -123,7 +123,7 @@ export default function Header() {
 
                         {/* Global Search */}
                         <div className={`flex items-center transition-colors duration-300 ${textColorClass}`}>
-                            <SearchToggle />
+                            <SearchToggle variant={isTransparent ? "light" : "dark"} />
                         </div>
 
                         {/* Cart Button */}

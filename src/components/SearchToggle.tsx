@@ -8,9 +8,10 @@ import { useShopSearch } from "@/context/ShopSearchContext";
 
 interface SearchToggleProps {
     mobile?: boolean;
+    variant?: "dark" | "light"; // New prop
 }
 
-export default function SearchToggle({ mobile = false }: SearchToggleProps) {
+export default function SearchToggle({ mobile = false, variant = "dark" }: SearchToggleProps) {
     const router = useRouter();
     const { searchQuery, setSearchQuery, isShopPage, isLiveSearchEnabled } = useShopSearch();
     const [isOpen, setIsOpen] = useState(false);
@@ -98,7 +99,7 @@ export default function SearchToggle({ mobile = false }: SearchToggleProps) {
         }
     };
 
-    // Mobile implementation (Slide-down from header)
+    // Mobile implementation (Always Dark for contrast on white background)
     if (mobile) {
         return (
             <div ref={containerRef} className="">
@@ -133,7 +134,7 @@ export default function SearchToggle({ mobile = false }: SearchToggleProps) {
                                 <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
                             </div>
                         ) : null}
-                        {query && (
+                        {query ? (
                             <button
                                 type="button"
                                 onClick={handleClear}
@@ -141,8 +142,7 @@ export default function SearchToggle({ mobile = false }: SearchToggleProps) {
                             >
                                 <X className="h-4 w-4" />
                             </button>
-                        )}
-                        {!query && (
+                        ) : (
                             <button
                                 type="button"
                                 onClick={() => setIsOpen(false)}
@@ -157,7 +157,9 @@ export default function SearchToggle({ mobile = false }: SearchToggleProps) {
         );
     }
 
-    // Desktop implementation (Inline Expand)
+    // Desktop implementation (Themed)
+    const isLight = variant === "light";
+
     return (
         <div ref={containerRef} className="relative flex items-center">
             <div
@@ -174,12 +176,17 @@ export default function SearchToggle({ mobile = false }: SearchToggleProps) {
                         onChange={handleSearchChange}
                         placeholder="Search..."
                         autoComplete="off"
-                        className="w-full bg-transparent border-b border-gray-200 py-1 pr-8 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 transition-colors tracking-wide"
+                        className={cn(
+                            "w-full bg-transparent border-b py-1 pr-8 text-sm focus:outline-none transition-colors tracking-wide",
+                            isLight
+                                ? "border-white/50 text-white placeholder-white/70 focus:border-white"
+                                : "border-gray-200 text-gray-900 placeholder-gray-400 focus:border-gray-900"
+                        )}
                     />
 
                     {isSearching ? (
                         <div className="absolute right-6 top-1/2 -translate-y-1/2">
-                            <Loader2 className="h-3 w-3 animate-spin text-gray-400" />
+                            <Loader2 className={cn("h-3 w-3 animate-spin", isLight ? "text-white/70" : "text-gray-400")} />
                         </div>
                     ) : null}
 
@@ -187,7 +194,10 @@ export default function SearchToggle({ mobile = false }: SearchToggleProps) {
                         <button
                             type="button"
                             onClick={handleClear}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900"
+                            className={cn(
+                                "absolute right-0 top-1/2 -translate-y-1/2",
+                                isLight ? "text-white/70 hover:text-white" : "text-gray-400 hover:text-gray-900"
+                            )}
                         >
                             <X className="h-3 w-3" />
                         </button>
@@ -195,7 +205,10 @@ export default function SearchToggle({ mobile = false }: SearchToggleProps) {
                         <button
                             type="button"
                             onClick={() => setIsOpen(false)}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900"
+                            className={cn(
+                                "absolute right-0 top-1/2 -translate-y-1/2",
+                                isLight ? "text-white/70 hover:text-white" : "text-gray-400 hover:text-gray-900"
+                            )}
                         >
                             <X className="h-3 w-3" />
                         </button>
