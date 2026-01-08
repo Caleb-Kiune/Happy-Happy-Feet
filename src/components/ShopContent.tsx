@@ -9,6 +9,7 @@ import ShoeCard from "@/components/ShoeCard";
 import { Product } from "@/lib/products";
 import { Category } from "@/app/admin/categories/actions";
 import { X, Check, ChevronDown } from "lucide-react";
+import { useShopSearch } from "@/context/ShopSearchContext";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -45,13 +46,14 @@ type ShopContentProps = {
 export default function ShopContent({ products, availableCategories }: ShopContentProps) {
     const searchParams = useSearchParams();
     const pathname = usePathname();
+    const { searchQuery, setSearchQuery, setLiveSearchEnabled } = useShopSearch();
 
     // 1. Authoritative Client State (Lazy Init from URL)
     // We only read searchParams ONCE on mount to initialize state.
     // Subsequent updates are driven purely by local state interactions.
     const [filterState, setFilterState] = useState(() => ({
         category: searchParams.get("category") || "All",
-        search: searchParams.get("search") || "",
+        search: searchParams.get("search") || "", // Initialize from URL
         sort: searchParams.get("sort") || "featured",
         price: searchParams.get("price") || "all",
         page: Number(searchParams.get("page")) || 1
@@ -60,12 +62,36 @@ export default function ShopContent({ products, availableCategories }: ShopConte
     // 2. Refs for Diff Tracking (Used for History Management)
     const prevCategoryRef = useRef(filterState.category);
 
+    // Dataset Guardrail: If products > 1000, disable live search
+    useEffect(() => {
+        if (products.length > 1000) {
+            setLiveSearchEnabled(false);
+        } else {
+            setLiveSearchEnabled(true);
+        }
+    }, [products.length, setLiveSearchEnabled]);
+
+    // Sync Initial URL Search to Global Context (Once on Mount)
+    useEffect(() => {
+        const initialSearch = searchParams.get("search");
+        if (initialSearch) {
+            setSearchQuery(initialSearch);
+        }
+    }, []); // Only on mount
+
+    // Sync Global Context Search -> Local State
+    useEffect(() => {
+        if (searchQuery !== filterState.search) {
+            setFilterState(prev => ({ ...prev, search: searchQuery, page: 1 }));
+        }
+    }, [searchQuery, filterState.search]);
+
+
     // 3. Helper to update state (Optimistic & Instant)
     const updateFilter = (updates: Partial<typeof filterState>) => {
         setFilterState(prev => {
             // Reset page to 1 if any filter (category, search, sort, price) changes
-            // Only keep current page if the update is explicitly mostly about pagination (handled by checking keys)
-            // Actually, any filter change should reset page. Pagination update is the only exception.
+            // Only keep current page if the update is explicitly mostly about pagination
             const isPagination = Object.keys(updates).length === 1 && updates.hasOwnProperty("page");
             const newPage = isPagination ? (updates.page ?? 1) : 1;
 
@@ -84,7 +110,7 @@ export default function ShopContent({ products, availableCategories }: ShopConte
 
         // Clean URLs: Only add params if they differ from defaults
         if (category && category !== "All") params.set("category", category);
-        if (search) params.set("search", search); // Search is currently not connected in UI but kept for safety
+        if (search) params.set("search", search);
         if (sort && sort !== "featured") params.set("sort", sort);
         if (price && price !== "all") params.set("price", price);
         if (page > 1) params.set("page", page.toString());
@@ -107,8 +133,6 @@ export default function ShopContent({ products, availableCategories }: ShopConte
 
 
     // 5. Memoized Filtering Logic
-    // Only re-runs if `products` or `filterState` changes. 
-    // Does NOT run on animations or unrelated re-renders.
     const filteredProducts = useMemo(() => {
         return products.filter((product) => {
             const { category, search, price } = filterState;
@@ -134,7 +158,7 @@ export default function ShopContent({ products, availableCategories }: ShopConte
 
             return matchesCategory && matchesSearch && matchesPrice;
         });
-    }, [products, filterState.category, filterState.search, filterState.price]); // Explicit deps for granular safety
+    }, [products, filterState.category, filterState.search, filterState.price]);
 
     // 6. Memoized Sorting
     const sortedProducts = useMemo(() => {
@@ -181,7 +205,7 @@ export default function ShopContent({ products, availableCategories }: ShopConte
             filters.push({
                 id: "search",
                 label: `Search: "${search}"`,
-                onRemove: () => updateFilter({ search: "" }), // Assuming we want empty string
+                onRemove: () => setSearchQuery(""), // Clear via Context!
             });
         }
 
@@ -214,6 +238,7 @@ export default function ShopContent({ products, availableCategories }: ShopConte
             price: "all",
             page: 1
         });
+        setSearchQuery(""); // Clear via Context!
     };
 
     const heroTitle = filterState.category === "All" ? "The Collection" : capitalize(filterState.category);
@@ -227,7 +252,7 @@ export default function ShopContent({ products, availableCategories }: ShopConte
                 onSelectCategory={(slug) => updateFilter({ category: slug })}
             />
             <Container>
-                {/* Controls Bar: Split Layout (Filters Left, Sort Right) */}
+                {/* Controls Bar */}
                 <div className="flex flex-row justify-between items-center gap-2 md:gap-4 w-full mb-12 border-b border-gray-100 py-4 overflow-x-auto no-scrollbar">
 
                     {/* Left: Filter Tools */}
@@ -286,7 +311,7 @@ export default function ShopContent({ products, availableCategories }: ShopConte
                     </div>
                 </div>
 
-                {/* Active Filter Chips (Minimal) */}
+                {/* Active Filter Chips */}
                 {activeFilters.length > 0 && (
                     <div className="mb-8 flex flex-wrap items-center gap-3">
                         {activeFilters.map((filter) => (
@@ -313,7 +338,7 @@ export default function ShopContent({ products, availableCategories }: ShopConte
                     </div>
                 )}
 
-                {/* Grid - 2 cols mobile, 4 desktop */}
+                {/* Grid */}
                 <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:gap-x-8 md:gap-y-12 lg:grid-cols-4">
                     {paginatedProducts.map((product) => (
                         <ShoeCard key={product.id} product={product} />

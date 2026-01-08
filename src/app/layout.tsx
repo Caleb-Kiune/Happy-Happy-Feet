@@ -5,6 +5,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import ConditionalFooter from "@/components/ConditionalFooter";
 import { CartProvider } from "@/context/CartContext";
+import { ShopSearchProvider } from "@/context/ShopSearchContext";
 import { Toaster } from "@/components/ui/sonner";
 import PageWrapper from "@/components/PageWrapper";
 
@@ -24,17 +25,19 @@ export default function RootLayout({
       <body
         className={`${inter.variable} font-sans antialiased bg-white text-[#111111] flex flex-col min-h-screen`}
       >
-        <CartProvider>
-          <Header />
-          <main className="flex-grow">
-            <PageWrapper>
-              {children}
-            </PageWrapper>
-          </main>
-          <FloatingWhatsApp />
-          <ConditionalFooter />
-          <Toaster position="bottom-center" richColors closeButton />
-        </CartProvider>
+        <ShopSearchProvider>
+          <CartProvider>
+            <Header />
+            <main className="flex-grow">
+              <PageWrapper>
+                {children}
+              </PageWrapper>
+            </main>
+            <FloatingWhatsApp />
+            <ConditionalFooter />
+            <Toaster position="bottom-center" richColors closeButton />
+          </CartProvider>
+        </ShopSearchProvider>
       </body>
     </html>
   );
