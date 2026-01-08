@@ -21,7 +21,7 @@ export default function ShopHero({
                     src={heroImage}
                     alt="Woman wearing stylish high heels"
                     fill
-                    className="object-cover object-[position:30%_70%]"
+                    className="object-cover object-[position:60%_70%] md:object-[position:30%_70%]"
                     priority
                     placeholder="blur"
                 />
