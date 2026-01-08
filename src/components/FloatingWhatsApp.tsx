@@ -1,25 +1,53 @@
 "use client";
 
-import { MessageCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { CONTACT_INFO } from "@/lib/constants";
+import { useState } from "react";
 
 const WHATSAPP_LINK = `https://wa.me/${CONTACT_INFO.whatsapp}`;
 
 export default function FloatingWhatsApp() {
+    const [isHovered, setIsHovered] = useState(false);
+
     return (
-        <a
-            href={WHATSAPP_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="fixed bottom-6 right-6 z-50 flex items-center gap-2 group"
-            aria-label="Chat on WhatsApp"
-        >
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/90 text-white shadow-lg transition-all duration-300 hover:scale-110 hover:bg-black">
-                <MessageCircle className="h-6 w-6" strokeWidth={1.5} />
-            </div>
-            <span className="max-w-0 overflow-hidden whitespace-nowrap rounded-full bg-white px-0 py-2 text-sm font-medium text-gray-900 shadow-sm transition-all duration-300 group-hover:max-w-xs group-hover:px-4 group-hover:mr-2 opacity-0 group-hover:opacity-100 absolute right-14">
-                Chat with us
-            </span>
-        </a>
+        <AnimatePresence>
+            <motion.a
+                href={WHATSAPP_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                role="button"
+                aria-label="Chat with us on WhatsApp"
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.5 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onHoverStart={() => setIsHovered(true)}
+                onHoverEnd={() => setIsHovered(false)}
+                className="fixed bottom-6 right-6 z-[100] flex items-center justify-end gap-3 group focus:outline-none"
+            >
+                {/* Desktop Tooltip */}
+                <motion.div
+                    initial={{ opacity: 0, x: 10, width: 0 }}
+                    animate={{
+                        opacity: isHovered ? 1 : 0,
+                        x: isHovered ? 0 : 10,
+                        width: isHovered ? "auto" : 0
+                    }}
+                    transition={{ duration: 0.2 }}
+                    className="hidden md:flex items-center bg-white px-3 py-1.5 rounded-lg shadow-md overflow-hidden whitespace-nowrap"
+                >
+                    <span className="text-xs font-bold uppercase tracking-wider text-gray-900">Chat</span>
+                </motion.div>
+
+                {/* Main Button */}
+                <div
+                    className="flex items-center justify-center w-12 h-12 bg-gray-900 hover:bg-[#25D366] rounded-full shadow-lg transition-colors duration-300 ring-offset-2 focus-within:ring-2 focus-within:ring-gray-400"
+                >
+                    <WhatsAppIcon className="w-6 h-6 text-white" />
+                </div>
+            </motion.a>
+        </AnimatePresence>
     );
 }
