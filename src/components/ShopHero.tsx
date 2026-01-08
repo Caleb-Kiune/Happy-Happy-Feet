@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import heroImage from "@/assets/images/portrait-woman-s-legs-with-stylish-high-heels-pantyhose.webp";
+import heroImage from "@/assets/images/lexie-barnhorn-7HzqlpXhQWI-unsplash.jpg";
 
 export default function ShopHero() {
     return (
