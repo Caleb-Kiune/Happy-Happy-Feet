@@ -10,6 +10,7 @@ import {
     ShoppingBag,
     LogOut,
     Menu,
+    Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,12 @@ export default function AdminNav() {
             name: "Orders",
             href: "/admin/orders",
             icon: ShoppingBag,
+            exact: false,
+        },
+        {
+            name: "Categories",
+            href: "/admin/categories",
+            icon: Layers,
             exact: false,
         },
     ];

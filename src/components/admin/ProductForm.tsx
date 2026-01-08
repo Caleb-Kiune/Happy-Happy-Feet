@@ -11,7 +11,8 @@ import { toast } from "sonner";
 import { Loader2, Save, Info, Tag, Layers } from "lucide-react";
 import ImageUpload from "./ImageUpload";
 
-import { PRODUCT_SIZES, PRODUCT_CATEGORIES } from "@/lib/constants";
+import { PRODUCT_SIZES } from "@/lib/constants";
+import { Category } from "@/app/admin/categories/actions";
 
 type ProductFormProps = {
     initialData?: {
@@ -26,9 +27,10 @@ type ProductFormProps = {
         images: string[];
     };
     action: (currentState: any, formData: FormData) => Promise<any>;
+    availableCategories: Category[];
 };
 
-export default function ProductForm({ initialData, action }: ProductFormProps) {
+export default function ProductForm({ initialData, action, availableCategories }: ProductFormProps) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
@@ -231,16 +233,16 @@ export default function ProductForm({ initialData, action }: ProductFormProps) {
                             <div className="space-y-3">
                                 <Label className="text-gray-600">Categories</Label>
                                 <div className="flex flex-wrap gap-2">
-                                    {PRODUCT_CATEGORIES.map(c => {
-                                        const isChecked = categories.includes(c);
+                                    {availableCategories.map(c => {
+                                        const isChecked = categories.includes(c.name);
                                         return (
                                             <div
-                                                key={c}
+                                                key={c.id}
                                                 onClick={() => {
                                                     if (isChecked) {
-                                                        setCategories(categories.filter(cat => cat !== c));
+                                                        setCategories(categories.filter(cat => cat !== c.name));
                                                     } else {
-                                                        setCategories([...categories, c]);
+                                                        setCategories([...categories, c.name]);
                                                     }
                                                 }}
                                                 className={`
@@ -250,7 +252,7 @@ export default function ProductForm({ initialData, action }: ProductFormProps) {
                                                         : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"}
                                                 `}
                                             >
-                                                {c}
+                                                {c.name}
                                             </div>
                                         );
                                     })}

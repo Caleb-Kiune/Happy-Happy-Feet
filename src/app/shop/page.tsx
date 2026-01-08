@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { getAllProducts } from "@/lib/products";
+import { getCategories } from "@/app/admin/categories/actions";
 import ShopContent from "@/components/ShopContent";
 
 export const metadata = {
@@ -12,10 +13,11 @@ export const dynamic = "force-dynamic";
 
 export default async function ShopPage() {
     const products = await getAllProducts();
+    const categories = await getCategories();
 
     return (
         <Suspense fallback={<div className="h-screen bg-white" />}>
-            <ShopContent products={products} />
+            <ShopContent products={products} availableCategories={categories} />
         </Suspense>
     );
 }

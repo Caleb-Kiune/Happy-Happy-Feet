@@ -6,6 +6,7 @@ import Container from "@/components/Container";
 import ShopHero from "@/components/ShopHero";
 import ShoeCard from "@/components/ShoeCard";
 import { Product } from "@/lib/products";
+import { Category } from "@/app/admin/categories/actions";
 import { Button } from "@/components/ui/button";
 import { Search, X, Check, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -40,9 +41,10 @@ const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLower
 
 type ShopContentProps = {
     products: Product[];
+    availableCategories: Category[];
 };
 
-export default function ShopContent({ products }: ShopContentProps) {
+export default function ShopContent({ products, availableCategories }: ShopContentProps) {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
@@ -73,11 +75,10 @@ export default function ShopContent({ products }: ShopContentProps) {
         router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
-    // Derive unique categories from products
+    // Categories from DB
     const uniqueCategories = useMemo(() => {
-        const allCats = products.flatMap(p => p.categories || []);
-        return Array.from(new Set(allCats)).sort();
-    }, [products]);
+        return availableCategories.map(c => c.name);
+    }, [availableCategories]);
 
     // Filter products
     const filteredProducts = useMemo(() => {

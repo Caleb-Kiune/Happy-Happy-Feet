@@ -69,7 +69,7 @@ export async function createProduct(currentState: ActionState | null, formData: 
 
     // Extract Data
     const name = formData.get("name") as string;
-    const slug = formData.get("slug") as string;
+    const baseSlug = formData.get("slug") as string;
     const description = formData.get("description") as string;
     const price = Number(formData.get("price"));
     const categories = (formData.get("categories") as string).split(",").filter(Boolean);
@@ -78,44 +78,65 @@ export async function createProduct(currentState: ActionState | null, formData: 
     const imageUrls = (formData.get("imageUrls") as string).split(",").filter(Boolean);
 
     // Basic Validation
-    if (!name || !slug || !price || categories.length === 0 || imageUrls.length === 0) {
+    if (!name || !baseSlug || !price || categories.length === 0 || imageUrls.length === 0) {
         return { error: "Missing required fields" };
     }
 
-    try {
-        // 1. Insert Product
-        const { data: product, error: productError } = await supabase
-            .from("products")
-            .insert({
-                name,
-                slug,
-                description,
-                price,
-                categories, // Use array
-                sizes,
-                featured,
-            })
-            .select()
-            .single();
+    let slugCandidate = baseSlug;
+    let counter = 1;
+    let maxRetries = 5;
 
-        if (productError) throw productError;
+    while (maxRetries > 0) {
+        try {
+            // 1. Insert Product
+            const { data: product, error: productError } = await supabase
+                .from("products")
+                .insert({
+                    name,
+                    slug: slugCandidate,
+                    description,
+                    price,
+                    categories, // Use array
+                    sizes,
+                    featured,
+                })
+                .select()
+                .single();
 
-        // 2. Insert Images
-        const imageInserts = imageUrls.map((url, index) => ({
-            product_id: product.id,
-            url,
-            sort_order: index,
-        }));
+            if (productError) {
+                // Check for unique violation on slug
+                if (productError.code === "23505" && productError.message?.includes("slug")) {
+                    slugCandidate = `${baseSlug}-${counter++}`;
+                    maxRetries--;
+                    continue; // Retry with new slug
+                }
+                throw productError; // Throw other errors
+            }
 
-        const { error: imagesError } = await supabase
-            .from("product_images")
-            .insert(imageInserts);
+            // 2. Insert Images (Only reached if product insert succeeds)
+            const imageInserts = imageUrls.map((url, index) => ({
+                product_id: product.id,
+                url,
+                sort_order: index,
+            }));
 
-        if (imagesError) throw imagesError;
+            const { error: imagesError } = await supabase
+                .from("product_images")
+                .insert(imageInserts);
 
-    } catch (error: any) {
-        console.error("Create Product Error:", error);
-        return { error: error.message || "Failed to create product" };
+            if (imagesError) throw imagesError;
+
+            // Success! Break the loop
+            break;
+
+        } catch (error: any) {
+            console.error("Create Product Error:", error);
+            return { error: error.message || "Failed to create product" };
+        }
+    }
+
+    if (maxRetries === 0) {
+        return { error: "Failed to generate a unique slug. Please try a different name." };
     }
 
     revalidatePath("/admin/products");

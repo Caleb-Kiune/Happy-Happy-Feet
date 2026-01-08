@@ -9,6 +9,7 @@ import { notFound } from "next/navigation";
 // Given the current architecture, I'll direct query supabase here since it's an admin page and we want fresh data.
 
 import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { getCategories } from "@/app/admin/categories/actions";
 
 // We need a helper to fetch by ID specifically for the Edit page
 async function getProductById(id: string) {
@@ -37,6 +38,7 @@ async function getProductById(id: string) {
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     const product = await getProductById(id);
+    const categories = await getCategories();
 
     if (!product) {
         notFound();
@@ -54,6 +56,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
             <ProductForm
                 initialData={product}
                 action={updateProductWithId}
+                availableCategories={categories}
             />
         </div>
     );
