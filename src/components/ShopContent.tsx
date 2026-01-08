@@ -190,46 +190,10 @@ export default function ShopContent({ products, availableCategories }: ShopConte
             <Container>
 
                 {/* Controls Bar: Split Layout (Filters Left, Sort Right) */}
-                <div className="flex flex-row justify-between items-center gap-2 md:gap-4 w-full mb-12 border-b border-gray-100 pb-4 overflow-x-auto no-scrollbar">
+                <div className="flex flex-row justify-between items-center gap-2 md:gap-4 w-full mb-12 border-b border-gray-100 py-4 overflow-x-auto no-scrollbar">
 
                     {/* Left: Filter Tools */}
                     <div className="flex items-center gap-3 md:gap-6 shrink-0">
-                        {/* Category Dropdown */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 hover:text-gray-600 transition-colors flex items-center gap-1">
-                                    Category
-                                    <ChevronDown className="h-3 w-3 opacity-50" />
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="w-56 bg-white shadow-lg rounded-none border border-gray-100 p-0 max-h-[60vh] overflow-y-auto">
-                                <DropdownMenuItem
-                                    onClick={() => updateParams({ category: "All" })}
-                                    className={`
-                                        flex items-center justify-between px-4 py-3 text-xs uppercase tracking-[0.2em] cursor-pointer transition-colors rounded-none
-                                        ${activeCategory === "All" ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
-                                    `}
-                                >
-                                    All Categories
-                                    {activeCategory === "All" && <Check className="h-3 w-3" />}
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator className="my-0 bg-gray-100" />
-                                {uniqueCategories.map((category) => (
-                                    <DropdownMenuItem
-                                        key={category}
-                                        onClick={() => updateParams({ category: category })}
-                                        className={`
-                                            flex items-center justify-between px-4 py-3 text-xs uppercase tracking-[0.2em] cursor-pointer transition-colors rounded-none
-                                            ${activeCategory === category ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
-                                        `}
-                                    >
-                                        {capitalize(category)}
-                                        {activeCategory === category && <Check className="h-3 w-3" />}
-                                    </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
                         {/* Price Filter */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

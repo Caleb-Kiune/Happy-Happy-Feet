@@ -180,3 +180,13 @@
     @apply font-sans text-sm font-light leading-relaxed text-gray-600;
   }
 }
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
