@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Container from "@/components/Container";
 import ShopHero from "@/components/ShopHero";
+import ShopCategoryBar from "@/components/ShopCategoryBar";
 import ShoeCard from "@/components/ShoeCard";
 import { Product } from "@/lib/products";
 import { Category } from "@/app/admin/categories/actions";
@@ -176,9 +177,16 @@ export default function ShopContent({ products, availableCategories }: ShopConte
         return sortedProducts.slice(0, currentPage * ITEMS_PER_PAGE);
     }, [currentPage, sortedProducts]);
 
+    const heroTitle = activeCategory === "All" ? "The Collection" : capitalize(activeCategory);
+
     return (
         <div className="bg-white pb-24">
-            <ShopHero />
+            <ShopHero title={heroTitle} />
+            <ShopCategoryBar
+                categories={availableCategories}
+                activeCategory={activeCategory}
+                onSelectCategory={(slug) => updateParams({ category: slug })}
+            />
             <Container>
 
                 {/* Controls Bar: Split Layout (Filters Left, Sort Right) */}
