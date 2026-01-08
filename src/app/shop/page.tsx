@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 // Disable static generation - always fetch fresh data
-export const dynamic = "force-dynamic";
+
 
 export default async function ShopPage() {
     const products = await getAllProducts();

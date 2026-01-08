@@ -1,22 +1,19 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { useSearchParams, usePathname } from "next/navigation";
 import Container from "@/components/Container";
 import ShopHero from "@/components/ShopHero";
 import ShopCategoryBar from "@/components/ShopCategoryBar";
 import ShoeCard from "@/components/ShoeCard";
 import { Product } from "@/lib/products";
 import { Category } from "@/app/admin/categories/actions";
-import { Button } from "@/components/ui/button";
-import { Search, X, Check, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, Check, ChevronDown } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 // Sort Options
@@ -47,50 +44,82 @@ type ShopContentProps = {
 
 export default function ShopContent({ products, availableCategories }: ShopContentProps) {
     const searchParams = useSearchParams();
-    const router = useRouter();
     const pathname = usePathname();
 
-    // Derive state directly from URL Params (Single Source of Truth)
-    const activeCategory = searchParams.get("category") || "All";
-    const searchQuery = searchParams.get("search") || "";
-    const sortBy = searchParams.get("sort") || "featured";
-    const priceRange = searchParams.get("price") || "all";
-    const currentPage = Number(searchParams.get("page")) || 1;
+    // 1. Authoritative Client State (Lazy Init from URL)
+    // We only read searchParams ONCE on mount to initialize state.
+    // Subsequent updates are driven purely by local state interactions.
+    const [filterState, setFilterState] = useState(() => ({
+        category: searchParams.get("category") || "All",
+        search: searchParams.get("search") || "",
+        sort: searchParams.get("sort") || "featured",
+        price: searchParams.get("price") || "all",
+        page: Number(searchParams.get("page")) || 1
+    }));
 
-    // Helper to update URL params
-    const updateParams = (updates: Record<string, string | null>) => {
-        const params = new URLSearchParams(searchParams.toString());
-        Object.entries(updates).forEach(([key, value]) => {
-            if (value === null) {
-                params.delete(key);
-            } else {
-                params.set(key, value);
-            }
+    // 2. Refs for Diff Tracking (Used for History Management)
+    const prevCategoryRef = useRef(filterState.category);
+
+    // 3. Helper to update state (Optimistic & Instant)
+    const updateFilter = (updates: Partial<typeof filterState>) => {
+        setFilterState(prev => {
+            // Reset page to 1 if any filter (category, search, sort, price) changes
+            // Only keep current page if the update is explicitly mostly about pagination (handled by checking keys)
+            // Actually, any filter change should reset page. Pagination update is the only exception.
+            const isPagination = Object.keys(updates).length === 1 && updates.hasOwnProperty("page");
+            const newPage = isPagination ? (updates.page ?? 1) : 1;
+
+            return {
+                ...prev,
+                ...updates,
+                page: newPage
+            };
         });
-
-        // Always reset to page 1 when filters change (unless we are explicitly changing page)
-        if (!updates.hasOwnProperty("page")) {
-            params.delete("page");
-        }
-
-        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
-    // Categories from DB
-    const uniqueCategories = useMemo(() => {
-        return availableCategories.map(c => c.name);
-    }, [availableCategories]);
+    // 4. URL Sync Side Effect (Background)
+    useEffect(() => {
+        const params = new URLSearchParams();
+        const { category, search, sort, price, page } = filterState;
 
-    // Filter products
+        // Clean URLs: Only add params if they differ from defaults
+        if (category && category !== "All") params.set("category", category);
+        if (search) params.set("search", search); // Search is currently not connected in UI but kept for safety
+        if (sort && sort !== "featured") params.set("sort", sort);
+        if (price && price !== "all") params.set("price", price);
+        if (page > 1) params.set("page", page.toString());
+
+        const queryString = params.toString();
+        const url = queryString ? `${pathname}?${queryString}` : pathname;
+
+        // Detect if category changed for pushState (Navigation feel)
+        const isCategoryChange = category !== prevCategoryRef.current;
+        prevCategoryRef.current = category;
+
+        // Use standard History API to avoid Next.js server round-trips for filters
+        if (isCategoryChange) {
+            window.history.pushState(null, "", url);
+        } else {
+            window.history.replaceState(null, "", url);
+        }
+
+    }, [filterState, pathname]);
+
+
+    // 5. Memoized Filtering Logic
+    // Only re-runs if `products` or `filterState` changes. 
+    // Does NOT run on animations or unrelated re-renders.
     const filteredProducts = useMemo(() => {
         return products.filter((product) => {
+            const { category, search, price } = filterState;
+
             // 1. Category Filter
             const matchesCategory =
-                activeCategory === "All" ||
-                (product.categories && product.categories.some(cat => cat.toLowerCase() === activeCategory.toLowerCase()));
+                category === "All" ||
+                (product.categories && product.categories.some(cat => cat.toLowerCase() === category.toLowerCase()));
 
             // 2. Search Filter
-            const q = searchQuery.toLowerCase();
+            const q = search.toLowerCase();
             const matchesSearch =
                 !q ||
                 product.name.toLowerCase().includes(q) ||
@@ -98,19 +127,20 @@ export default function ShopContent({ products, availableCategories }: ShopConte
 
             // 3. Price Filter
             let matchesPrice = true;
-            const price = product.price;
-            if (priceRange === "under-4000") matchesPrice = price < 4000;
-            else if (priceRange === "4000-6000") matchesPrice = price >= 4000 && price <= 6000;
-            else if (priceRange === "over-6000") matchesPrice = price > 6000;
+            const p = product.price;
+            if (price === "under-4000") matchesPrice = p < 4000;
+            else if (price === "4000-6000") matchesPrice = p >= 4000 && p <= 6000;
+            else if (price === "over-6000") matchesPrice = p > 6000;
 
             return matchesCategory && matchesSearch && matchesPrice;
         });
-    }, [products, activeCategory, searchQuery, priceRange]);
+    }, [products, filterState.category, filterState.search, filterState.price]); // Explicit deps for granular safety
 
-    // Sort products
+    // 6. Memoized Sorting
     const sortedProducts = useMemo(() => {
+        const { sort } = filterState;
         return [...filteredProducts].sort((a, b) => {
-            switch (sortBy) {
+            switch (sort) {
                 case "price-asc":
                     return a.price - b.price;
                 case "price-desc":
@@ -125,70 +155,78 @@ export default function ShopContent({ products, availableCategories }: ShopConte
                     return b.createdAt.localeCompare(a.createdAt);
             }
         });
-    }, [filteredProducts, sortBy]);
+    }, [filteredProducts, filterState.sort]);
 
-    // Derived Active Filters
+    // 7. Memoized Pagination
+    const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);
+    const paginatedProducts = useMemo(() => {
+        return sortedProducts.slice(0, filterState.page * ITEMS_PER_PAGE);
+    }, [filterState.page, sortedProducts]);
+
+
+    // 8. Derived UI State
     const activeFilters = useMemo(() => {
         const filters = [];
+        const { category, search, sort, price } = filterState;
 
-        if (activeCategory !== "All") {
+        if (category !== "All") {
             filters.push({
                 id: "category",
-                label: capitalize(activeCategory),
-                onRemove: () => updateParams({ category: "All" }),
+                label: capitalize(category),
+                onRemove: () => updateFilter({ category: "All" }),
             });
         }
 
-        if (searchQuery) {
+        if (search) {
             filters.push({
                 id: "search",
-                label: `Search: "${searchQuery}"`,
-                onRemove: () => updateParams({ search: null }),
+                label: `Search: "${search}"`,
+                onRemove: () => updateFilter({ search: "" }), // Assuming we want empty string
             });
         }
 
-        if (sortBy !== "featured") {
-            const label = SORT_OPTIONS.find((o) => o.value === sortBy)?.label;
+        if (sort !== "featured") {
+            const label = SORT_OPTIONS.find((o) => o.value === sort)?.label;
             filters.push({
                 id: "sort",
                 label: label,
-                onRemove: () => updateParams({ sort: "featured" }),
+                onRemove: () => updateFilter({ sort: "featured" }),
             });
         }
 
-        if (priceRange !== "all") {
-            const label = PRICE_RANGES.find((r) => r.value === priceRange)?.label;
+        if (price !== "all") {
+            const label = PRICE_RANGES.find((r) => r.value === price)?.label;
             filters.push({
                 id: "price",
                 label: label,
-                onRemove: () => updateParams({ price: "all" }),
+                onRemove: () => updateFilter({ price: "all" }),
             });
         }
 
         return filters;
-    }, [activeCategory, searchQuery, sortBy, priceRange]);
+    }, [filterState]);
 
     const handleClearAll = () => {
-        router.replace(pathname, { scroll: false });
+        setFilterState({
+            category: "All",
+            search: "",
+            sort: "featured",
+            price: "all",
+            page: 1
+        });
     };
 
-    const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);
-    const paginatedProducts = useMemo(() => {
-        return sortedProducts.slice(0, currentPage * ITEMS_PER_PAGE);
-    }, [currentPage, sortedProducts]);
-
-    const heroTitle = activeCategory === "All" ? "The Collection" : capitalize(activeCategory);
+    const heroTitle = filterState.category === "All" ? "The Collection" : capitalize(filterState.category);
 
     return (
         <div className="bg-white pb-24">
             <ShopHero title={heroTitle} />
             <ShopCategoryBar
                 categories={availableCategories}
-                activeCategory={activeCategory}
-                onSelectCategory={(slug) => updateParams({ category: slug })}
+                activeCategory={filterState.category}
+                onSelectCategory={(slug) => updateFilter({ category: slug })}
             />
             <Container>
-
                 {/* Controls Bar: Split Layout (Filters Left, Sort Right) */}
                 <div className="flex flex-row justify-between items-center gap-2 md:gap-4 w-full mb-12 border-b border-gray-100 py-4 overflow-x-auto no-scrollbar">
 
@@ -206,14 +244,14 @@ export default function ShopContent({ products, availableCategories }: ShopConte
                                 {PRICE_RANGES.map((range) => (
                                     <DropdownMenuItem
                                         key={range.value}
-                                        onClick={() => updateParams({ price: range.value })}
+                                        onClick={() => updateFilter({ price: range.value })}
                                         className={`
                                             flex items-center justify-between px-4 py-3 text-xs uppercase tracking-[0.2em] cursor-pointer transition-colors rounded-none
-                                            ${priceRange === range.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
+                                            ${filterState.price === range.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
                                         `}
                                     >
                                         {range.label}
-                                        {priceRange === range.value && <Check className="h-3 w-3" />}
+                                        {filterState.price === range.value && <Check className="h-3 w-3" />}
                                     </DropdownMenuItem>
                                 ))}
                             </DropdownMenuContent>
@@ -233,14 +271,14 @@ export default function ShopContent({ products, availableCategories }: ShopConte
                                 {SORT_OPTIONS.map((option) => (
                                     <DropdownMenuItem
                                         key={option.value}
-                                        onClick={() => updateParams({ sort: option.value })}
+                                        onClick={() => updateFilter({ sort: option.value })}
                                         className={`
                                             flex items-center justify-between px-4 py-3 text-xs uppercase tracking-[0.2em] cursor-pointer transition-colors rounded-none
-                                            ${sortBy === option.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
+                                            ${filterState.sort === option.value ? "bg-gray-50 text-gray-900 font-bold" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
                                         `}
                                     >
                                         {option.label}
-                                        {sortBy === option.value && <Check className="h-3 w-3" />}
+                                        {filterState.sort === option.value && <Check className="h-3 w-3" />}
                                     </DropdownMenuItem>
                                 ))}
                             </DropdownMenuContent>
@@ -286,7 +324,7 @@ export default function ShopContent({ products, availableCategories }: ShopConte
                 {paginatedProducts.length < sortedProducts.length && (
                     <div className="mt-20 flex justify-center">
                         <button
-                            onClick={() => updateParams({ page: (currentPage + 1).toString() })}
+                            onClick={() => updateFilter({ page: filterState.page + 1 })}
                             className="group relative px-8 py-3 bg-gray-900 text-white text-xs font-bold uppercase tracking-[0.2em] transition-all hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             Load More
