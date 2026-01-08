@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Container from "@/components/Container";
+import ShopHero from "@/components/ShopHero";
 import ShoeCard from "@/components/ShoeCard";
 import { Product } from "@/lib/products";
 import { Button } from "@/components/ui/button";
@@ -175,18 +176,9 @@ export default function ShopContent({ products }: ShopContentProps) {
     }, [currentPage, sortedProducts]);
 
     return (
-        <div className="bg-white pb-24 pt-16 md:pt-24">
+        <div className="bg-white pb-24">
+            <ShopHero />
             <Container>
-                {/* Header */}
-                <div className="flex flex-col items-center text-center mt-8 mb-16">
-                    <h1 className="font-sans text-4xl md:text-5xl font-bold tracking-[0.2em] text-gray-900 uppercase">
-                        The Collection
-                    </h1>
-                    <div className="h-px w-24 bg-gray-200 mt-8 mb-4"></div>
-                    <p className="max-w-xl text-sm md:text-base text-gray-500 font-light tracking-wide">
-                        Timeless comfort, elevated style.
-                    </p>
-                </div>
 
                 {/* Controls Bar: Split Layout (Filters Left, Sort Right) */}
                 <div className="flex flex-row justify-between items-center gap-2 md:gap-4 w-full mb-12 border-b border-gray-100 pb-4 overflow-x-auto no-scrollbar">
