@@ -1,3 +1,4 @@
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -38,6 +39,7 @@ export default function RootLayout({
             <Toaster position="bottom-center" richColors closeButton />
           </CartProvider>
         </ShopSearchProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
