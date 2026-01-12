@@ -8,7 +8,7 @@ export function createClient() {
 }
 
 // Admin allowlist - only these emails can access the admin dashboard
-export const ADMIN_EMAILS = ["calebkiune@gmail.com"];
+export const ADMIN_EMAILS = ["happyhappysteps@yahoo.com"];
 
 export function isAuthorizedAdmin(email: string | undefined): boolean {
     if (!email) return false;

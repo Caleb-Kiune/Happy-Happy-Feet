@@ -10,7 +10,7 @@ export const CONTACT_INFO = {
     phoneDisplay: "0720 823 387",       // For UI display
     phoneInternational: "+254720823387", // For tel: links
     whatsapp: "254720823387",           // Digits only for wa.me links
-    email: "hello@happyhappyfeet.com"   // Placeholder/Existing
+    email: "happyhappysteps@yahoo.com"  // Placeholder/Existing
 };
 
 export const SOCIAL_LINKS = [
