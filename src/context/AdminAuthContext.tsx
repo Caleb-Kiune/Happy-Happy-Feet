@@ -7,6 +7,7 @@ import {
     useState,
     useCallback,
 } from "react";
+import { useRouter } from "next/navigation";
 import { createClient, isAuthorizedAdmin } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
@@ -24,6 +25,7 @@ const AdminAuthContext = createContext<AdminAuthContextType | undefined>(
 export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const router = useRouter();
 
     useEffect(() => {
         const supabase = createClient();
@@ -54,7 +56,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         const supabase = createClient();
         await supabase.auth.signOut();
         setUser(null);
-    }, []);
+        router.push("/admin/login");
+    }, [router]);
 
     const isAuthorized = isAuthorizedAdmin(user?.email);
 
