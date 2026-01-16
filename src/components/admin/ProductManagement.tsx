@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useTransition } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -206,35 +207,39 @@ export default function ProductManagement({ initialProducts }: ProductManagement
                 </div>
             </div>
 
-            {/* Bulk Action Floating Bar */}
-            {selectedIds.size > 0 && (
-                <div className="fixed bottom-6 left-4 right-4 md:left-[calc(18rem+2rem)] md:right-8 flex justify-center z-40 mb-[env(safe-area-inset-bottom)] pointer-events-none animate-in slide-in-from-bottom-5 fade-in">
-                    <div className="bg-[#111111] text-white rounded-full shadow-xl px-6 py-3 flex items-center gap-6 pointer-events-auto">
-                        <span className="text-sm font-medium pl-2">
-                            {selectedIds.size} selected
-                        </span>
-                        <div className="h-4 w-px bg-gray-700" />
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-gray-300 hover:text-white h-8 hover:bg-white/10 rounded-full px-3"
-                                onClick={() => setSelectedIds(new Set())}
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                size="sm"
-                                className="bg-[#E07A8A] hover:bg-[#D16A7A] text-white h-8 rounded-full px-4 shadow-sm"
-                                onClick={handleBulkDelete}
-                                disabled={isDeleting}
-                            >
-                                {isDeleting ? "Deleting..." : "Delete"}
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Bulk Action Floating Bar - Portalled to body to escape stacking contexts */}
+            {selectedIds.size > 0 &&
+                (typeof document !== 'undefined'
+                    ? createPortal(
+                        <div className="fixed bottom-6 left-4 right-4 md:left-[calc(18rem+2rem)] md:right-8 flex justify-center z-[100] mb-[env(safe-area-inset-bottom)] pointer-events-none animate-in slide-in-from-bottom-5 fade-in">
+                            <div className="bg-[#111111] text-white rounded-full shadow-xl px-6 py-3 flex items-center gap-6 pointer-events-auto">
+                                <span className="text-sm font-medium pl-2">
+                                    {selectedIds.size} selected
+                                </span>
+                                <div className="h-4 w-px bg-gray-700" />
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-gray-300 hover:text-white h-8 hover:bg-white/10 rounded-full px-3"
+                                        onClick={() => setSelectedIds(new Set())}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        className="bg-[#E07A8A] hover:bg-[#D16A7A] text-white h-8 rounded-full px-4 shadow-sm"
+                                        onClick={handleBulkDelete}
+                                        disabled={isDeleting}
+                                    >
+                                        {isDeleting ? "Deleting..." : "Delete"}
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>,
+                        document.body
+                    )
+                    : null)}
 
             {/* Desktop Table - Premium, Clean Style */}
             <div className="hidden md:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
