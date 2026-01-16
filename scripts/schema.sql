@@ -73,22 +73,22 @@ CREATE POLICY "Public read products" ON products
   FOR SELECT USING (true);
 
 CREATE POLICY "Admin full access products" ON products 
-  FOR ALL USING (auth.email() = 'calebkiune@gmail.com');
+  FOR ALL USING (auth.email() IN ('calebkiune@gmail.com', 'happyhappysteps@yahoo.com'));
 
 -- Product Images: Public read, Admin full access
 CREATE POLICY "Public read images" ON product_images 
   FOR SELECT USING (true);
 
 CREATE POLICY "Admin full access images" ON product_images 
-  FOR ALL USING (auth.email() = 'calebkiune@gmail.com');
+  FOR ALL USING (auth.email() IN ('calebkiune@gmail.com', 'happyhappysteps@yahoo.com'));
 
 -- Orders: Admin only (no public access)
 CREATE POLICY "Admin full access orders" ON orders 
-  FOR ALL USING (auth.email() = 'calebkiune@gmail.com');
+  FOR ALL USING (auth.email() IN ('calebkiune@gmail.com', 'happyhappysteps@yahoo.com'));
 
 -- Order Items: Admin only
 CREATE POLICY "Admin full access order_items" ON order_items 
-  FOR ALL USING (auth.email() = 'calebkiune@gmail.com');
+  FOR ALL USING (auth.email() IN ('calebkiune@gmail.com', 'happyhappysteps@yahoo.com'));
 
 -- ============================================
 -- DONE! Now run the migration script.
