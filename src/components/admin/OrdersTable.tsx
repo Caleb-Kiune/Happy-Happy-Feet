@@ -26,6 +26,7 @@ import {
     DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { deleteOrders } from "@/app/admin/orders/actions";
+import ConfirmationModal from "@/components/admin/ConfirmationModal";
 import { toast } from "sonner";
 
 type OrdersTableProps = {
@@ -123,11 +124,14 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
         setSelectedIds(newSelected);
     };
 
-    const handleBulkDelete = () => {
-        if (!confirm(`Are you sure you want to delete ${selectedIds.size} orders? This cannot be undone.`)) {
-            return;
-        }
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+    const handleBulkDelete = () => {
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = () => {
+        setShowDeleteModal(false);
         startTransition(async () => {
             const result = await deleteOrders(Array.from(selectedIds));
             if (result?.error) {
@@ -405,6 +409,19 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
                     </div>
                 )}
             </div>
-        </div>
+
+
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={confirmDelete}
+                title={`Delete ${selectedIds.size} Orders?`}
+                description="This action cannot be undone. These orders will be permanently removed."
+                confirmText="Delete Orders"
+                variant="destructive"
+                isLoading={isDeleting}
+            />
+        </div >
     );
 }

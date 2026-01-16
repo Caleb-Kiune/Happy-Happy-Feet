@@ -27,6 +27,7 @@ import {
 import { deleteProducts } from "@/app/admin/products/actions";
 import DeleteProductButton from "@/components/admin/DeleteProductButton";
 import ProductRow from "@/components/admin/ProductRow";
+import ConfirmationModal from "@/components/admin/ConfirmationModal";
 import { Product } from "@/lib/products";
 import { PLACEHOLDER_IMAGE } from "@/lib/placeholder";
 import { toast } from "sonner";
@@ -125,19 +126,39 @@ export default function ProductManagement({ initialProducts }: ProductManagement
         setSelectedIds(newSelected);
     };
 
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [progressText, setProgressText] = useState("");
+
     const handleBulkDelete = () => {
-        if (!confirm(`Are you sure you want to delete ${selectedIds.size} products? This will also delete their images and cannot be undone.`)) {
-            return;
-        }
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = async () => {
+        const idsToDelete = Array.from(selectedIds);
+        const total = idsToDelete.length;
+        const BATCH_SIZE = 20;
+        let deletedCount = 0;
 
         startTransition(async () => {
-            const result = await deleteProducts(Array.from(selectedIds));
-            if (result?.error) {
-                toast.error(result.error);
-            } else {
-                toast.success(`${selectedIds.size} products deleted successfully`);
-                setSelectedIds(new Set());
+            setProgressText(`Deleting 0/${total}...`);
+
+            // Process in chunks
+            for (let i = 0; i < total; i += BATCH_SIZE) {
+                const chunk = idsToDelete.slice(i, i + BATCH_SIZE);
+                setProgressText(`Deleting ${Math.min(i + BATCH_SIZE, total)}/${total}...`);
+
+                const result = await deleteProducts(chunk);
+                if (result?.error) {
+                    toast.error(`Error deleting batch: ${result.error}`);
+                    // Optional: Break here if you want to stop on first error
+                }
+                deletedCount += chunk.length;
             }
+
+            toast.success(`Deleted ${deletedCount} products`);
+            setSelectedIds(new Set());
+            setShowDeleteModal(false);
+            setProgressText("");
         });
     };
 
@@ -376,6 +397,18 @@ export default function ProductManagement({ initialProducts }: ProductManagement
                     </div>
                 )}
             </div>
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={showDeleteModal}
+                onClose={() => !isDeleting && setShowDeleteModal(false)}
+                onConfirm={confirmDelete}
+                title={`Delete ${selectedIds.size} Products?`}
+                description="This action cannot be undone. This will permanently delete the selected products and their associated images from our servers."
+                confirmText="Delete Products"
+                variant="destructive"
+                isLoading={isDeleting}
+                loadingText={progressText}
+            />
         </div>
     );
 }

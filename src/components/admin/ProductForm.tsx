@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,6 +41,37 @@ export default function ProductForm({ initialData, action, availableCategories }
     const [sizes, setSizes] = useState<string[]>(initialData?.sizes || []);
     const [images, setImages] = useState<string[]>(initialData?.images || []);
 
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const formRef = useRef<HTMLFormElement>(null);
+
+    // Keyboard Shortcuuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+                e.preventDefault();
+                formRef.current?.requestSubmit();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
+    const validateForm = () => {
+        const newErrors: Record<string, string> = {};
+
+        if (!name.trim()) newErrors.name = "Product name is required";
+        if (!slug.trim()) newErrors.slug = "Slug is required";
+        if (images.length === 0) newErrors.images = "At least one image is required";
+        if (categories.length === 0) newErrors.categories = "Select at least one category";
+
+        const priceValue = Number(initialData?.price || 0); // Need to get current value from input ideally, but for now checking if field exists is hard without controlled input for price. 
+        // Actually price is uncontrolled in JSX (defaultValue). I should probably make it controlled or checking FormData later.
+        // For inline validation before submit, controlled is better. Let's make Price controlled.
+
+        return newErrors;
+    };
+
     // Auto-generate slug
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newName = e.target.value;
@@ -60,18 +91,31 @@ export default function ProductForm({ initialData, action, availableCategories }
     // Submission Wrapper
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
-        if (images.length === 0) {
-            toast.error("Please add at least one image");
-            return;
-        }
-
-        if (categories.length === 0) {
-            toast.error("Please select at least one category");
-            return;
-        }
+        setErrors({});
 
         const formData = new FormData(e.currentTarget);
+        const price = formData.get("price");
+
+        const newErrors: Record<string, string> = {};
+        if (!name.trim()) newErrors.name = "Product name is required";
+        if (!slug.trim()) newErrors.slug = "Slug is required";
+        if (!price || Number(price) < 0) newErrors.price = "Valid price is required";
+        if (images.length === 0) newErrors.images = "At least one image is required";
+        if (categories.length === 0) newErrors.categories = "Select at least one category";
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            toast.error("Please fix the errors below");
+
+            // Scroll to first error
+            const firstErrorField = Object.keys(newErrors)[0];
+            const element = document.getElementById(firstErrorField) || document.getElementById("form-top");
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+            return;
+        }
+
         // Append controlled fields
         formData.set("categories", categories.join(","));
         formData.set("sizes", sizes.join(","));
@@ -84,10 +128,6 @@ export default function ProductForm({ initialData, action, availableCategories }
             } else {
                 toast.success(initialData ? "Product updated" : "Product created");
                 if (!initialData) {
-                    // If creating, maybe redirect or clear form? 
-                    // For now user likely wants to stay or go back. Next.js router.push/back happens in calling code or manual nav.
-                    // But here we rely on server action revalidating.
-                    // Let's go back to list on success for generic flow
                     router.push("/admin/products");
                 }
             }
@@ -95,7 +135,7 @@ export default function ProductForm({ initialData, action, availableCategories }
     };
 
     return (
-        <form onSubmit={onSubmit} className="max-w-7xl mx-auto pb-24 animate-in fade-in duration-500">
+        <form ref={formRef} onSubmit={onSubmit} className="max-w-7xl mx-auto pb-24 animate-in fade-in duration-500">
             {/* Header Actions */}
             <div className="flex items-center justify-between mb-8 sticky top-6 z-20 bg-gray-50/80 backdrop-blur-md py-4 -mx-4 px-4 md:static md:bg-transparent md:p-0">
                 <div>
@@ -148,20 +188,21 @@ export default function ProductForm({ initialData, action, availableCategories }
 
                         <div className="space-y-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="name" className="text-gray-700">Product Name</Label>
+                                <Label htmlFor="name" className={errors.name ? "text-red-500" : "text-gray-700"}>Product Name</Label>
                                 <Input
                                     id="name"
                                     name="name"
                                     value={name}
                                     onChange={handleNameChange}
-                                    required
+                                    // required // Custom validation instead
                                     placeholder="e.g. Classic Red Heels"
-                                    className="bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#E07A8A]/20 transition-all h-12 text-lg"
+                                    className={`bg-gray-50 border-transparent focus:bg-white transition-all h-12 text-lg ${errors.name ? "border-red-300 focus:ring-red-200" : "focus:ring-2 focus:ring-[#E07A8A]/20"}`}
                                 />
+                                {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="slug" className="text-gray-700">Slug (URL)</Label>
+                                <Label htmlFor="slug" className={errors.slug ? "text-red-500" : "text-gray-700"}>Slug (URL)</Label>
                                 <div className="flex items-center">
                                     <span className="text-gray-400 text-sm mr-2 select-none">/products/</span>
                                     <Input
@@ -169,11 +210,12 @@ export default function ProductForm({ initialData, action, availableCategories }
                                         name="slug"
                                         value={slug}
                                         onChange={(e) => setSlug(e.target.value)}
-                                        required
+                                        // required
                                         placeholder="classic-red-heels"
-                                        className="bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#E07A8A]/20 transition-all font-mono text-sm"
+                                        className={`bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-sm ${errors.slug ? "border-red-300 focus:ring-red-200" : "focus:ring-2 focus:ring-[#E07A8A]/20"}`}
                                     />
                                 </div>
+                                {errors.slug && <p className="text-sm text-red-500 mt-1">{errors.slug}</p>}
                             </div>
 
                             <div className="grid gap-2">
@@ -189,16 +231,17 @@ export default function ProductForm({ initialData, action, availableCategories }
                     </div>
 
                     {/* Media Card */}
-                    <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm space-y-6">
+                    <div id="images" className={`bg-white p-6 md:p-8 rounded-3xl shadow-sm space-y-6 ${errors.images ? "ring-2 ring-red-100" : ""}`}>
                         <div className="flex items-center gap-2 mb-2">
                             <Layers className="w-5 h-5 text-gray-400" />
-                            <h2 className="text-sm font-bold uppercase tracking-widest text-gray-500">Media Gallery</h2>
+                            <h2 className={`text-sm font-bold uppercase tracking-widest ${errors.images ? "text-red-500" : "text-gray-500"}`}>Media Gallery</h2>
                         </div>
                         <ImageUpload
                             images={images}
                             onChange={(newImages) => setImages(newImages)}
                             disabled={isPending}
                         />
+                        {errors.images && <p className="text-sm text-red-500">{errors.images}</p>}
                     </div>
                 </div>
 
@@ -213,7 +256,7 @@ export default function ProductForm({ initialData, action, availableCategories }
 
                         <div className="space-y-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="price" className="text-gray-600">Price (KSh)</Label>
+                                <Label htmlFor="price" className={errors.price ? "text-red-500" : "text-gray-600"}>Price (KSh)</Label>
                                 <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">KSh</span>
                                     <Input
@@ -221,17 +264,18 @@ export default function ProductForm({ initialData, action, availableCategories }
                                         name="price"
                                         type="number"
                                         defaultValue={initialData?.price}
-                                        required
+                                        // required
                                         min="0"
-                                        className="pl-12 bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#E07A8A]/20 transition-all font-mono text-lg font-medium"
+                                        className={`pl-12 bg-gray-50 border-transparent focus:bg-white transition-all font-mono text-lg font-medium ${errors.price ? "border-red-300 focus:ring-red-200" : "focus:ring-2 focus:ring-[#E07A8A]/20"}`}
                                     />
                                 </div>
+                                {errors.price && <p className="text-sm text-red-500 mt-1">{errors.price}</p>}
                             </div>
 
                             <div className="h-px bg-gray-100" />
 
-                            <div className="space-y-3">
-                                <Label className="text-gray-600">Categories</Label>
+                            <div className="space-y-3" id="categories">
+                                <Label className={errors.categories ? "text-red-500" : "text-gray-600"}>Categories</Label>
                                 <div className="flex flex-wrap gap-2">
                                     {availableCategories.map(c => {
                                         const isChecked = categories.includes(c.name);
@@ -257,7 +301,8 @@ export default function ProductForm({ initialData, action, availableCategories }
                                         );
                                     })}
                                 </div>
-                                {categories.length === 0 && (
+                                {errors.categories && <p className="text-sm text-red-500">{errors.categories}</p>}
+                                {categories.length === 0 && !errors.categories && (
                                     <p className="text-[10px] text-red-500 font-medium animate-pulse">Required</p>
                                 )}
                             </div>
