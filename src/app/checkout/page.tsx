@@ -73,13 +73,10 @@ export default function CheckoutPage() {
                     const validProductId = item.productId || item.id.split('-')[0];
                     return {
                         product_id: validProductId,
-                        product_name: item.name,
                         size: item.size,
                         quantity: item.quantity,
-                        price: item.price
                     };
                 }),
-                total: totalPrice,
             });
 
             if (result.error) {

@@ -7,10 +7,14 @@ export function createClient() {
     );
 }
 
-// Admin allowlist - only these emails can access the admin dashboard
-export const ADMIN_EMAILS = ["happyhappysteps@yahoo.com", "calebkiune@gmail.com"];
-
+// Safe for Server/Edge. On client, this may return empty/false depending on env availability used.
 export function isAuthorizedAdmin(email: string | undefined): boolean {
     if (!email) return false;
-    return ADMIN_EMAILS.includes(email.toLowerCase());
+
+    const adminEmails = process.env.ADMIN_EMAILS
+        ? process.env.ADMIN_EMAILS.split(",").map(e => e.trim().toLowerCase())
+        : [];
+
+    // Fallback for dev if env not set (optional, but safer to be strict)
+    return adminEmails.includes(email.toLowerCase());
 }
