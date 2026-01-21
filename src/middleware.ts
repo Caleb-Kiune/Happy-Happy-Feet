@@ -69,6 +69,10 @@ export async function middleware(request: NextRequest) {
 
         // Check if user is an authorized admin
         if (!isAuthorizedAdmin(user.email)) {
+            console.warn(
+                `[Middleware] Admin access denied for user: ${user.email}. ` +
+                `ADMIN_EMAILS env var exists? ${!!process.env.ADMIN_EMAILS}`
+            );
             // Logged in user is NOT an admin. Redirect to home.
             return NextResponse.redirect(new URL("/", request.url));
         }
